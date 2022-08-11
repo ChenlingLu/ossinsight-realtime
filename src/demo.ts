@@ -1,7 +1,7 @@
 import {
   AnimationClip,
   AnimationMixer,
-  Color,
+  Color, DefaultLoadingManager,
   LoopOnce,
   Mesh,
   MeshStandardMaterial,
@@ -29,6 +29,9 @@ export function getPos(week: number, day: number) {
 }
 
 export async function demo(scene: Scene, outlinePass: OutlinePass, mixers: AnimationMixerSet, interactables: Set<Object3D>) {
+  DefaultLoadingManager.setURLModifier(url => {
+    return import.meta.env.BASE_URL.replace(/\/$/, '') + url;
+  })
   scene.background = new Color(0x9ad0ec);
   const loader = new GLTFLoader();
   const cache = new ObjectCache<GLTF>(loader, GLTF_BOX);
