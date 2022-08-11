@@ -30,7 +30,7 @@ export function getPos(week: number, day: number) {
 
 export async function demo(scene: Scene, outlinePass: OutlinePass, mixers: AnimationMixerSet, interactables: Set<Object3D>) {
   DefaultLoadingManager.setURLModifier(url => {
-    return import.meta.env.BASE_URL.replace(/\/$/, '') + url;
+    return import.meta.env.BASE_URL.replace(/\/$/, '') + '/' + url.replace(/^\//, '');
   })
   scene.background = new Color(0x9ad0ec);
   const loader = new GLTFLoader();
