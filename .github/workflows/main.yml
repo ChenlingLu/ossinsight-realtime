@@ -1,0 +1,38 @@
+name: Build GH Pages
+
+on:
+  push:
+    branches: [ "main" ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v2.2.2
+        with:
+          version: 7.9.0
+
+      - name: Setup Node.js environment
+        uses: actions/setup-node@v3.4.1
+        with:
+          node-version: 16.x
+          cache: pnpm
+          cache-dependency-path: pnpm-lock.yaml
+
+      - name: Install deps
+        run: pnpm i --frozen-lockfile --strict-peer-dependencies
+      
+      - name: Build docs
+        run: npm run docs:build
+
+      - name: GH Pages deploy
+        uses: Cecilapp/GitHub-Pages-deploy@3.2.1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          build_dir: dist
+          email: 634750802@qq.com
