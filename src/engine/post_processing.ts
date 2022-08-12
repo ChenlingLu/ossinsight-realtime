@@ -10,17 +10,17 @@ export function createPostProcessing(
   camera: Camera,
   renderer: WebGLRenderer,
 ) {
+  const size = new Vector2(width, height);
   const composer = new EffectComposer(renderer, renderer.getRenderTarget() ?? undefined);
 
-  const renderPass = new RenderPass(scene, camera)
-  renderPass.renderToScreen = true;
+  const renderPass = new RenderPass(scene, camera);
+  renderPass.needsSwap = true;
 
-  const outlinePass = new OutlinePass(new Vector2(width, height), scene, camera);
+  const outlinePass = new OutlinePass(size, scene, camera);
   outlinePass.edgeGlow = 2;
   outlinePass.edgeThickness = 2;
-  outlinePass.downSampleRatio = 4;
+  outlinePass.downSampleRatio = 2;
   outlinePass.pulsePeriod = 3;
-
 
   composer.addPass(renderPass);
   composer.addPass(outlinePass);

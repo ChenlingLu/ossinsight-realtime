@@ -12,7 +12,8 @@ function cubicBezier(p0: number, p1: number, p2: number, p3: number, count: numb
   return curve.getPoints(count);
 }
 
-export const DEFAULT_CURVE = cubicBezier(.49, .83, .86, .44);
+export const DEFAULT_CURVE = cubicBezier(.42, .0, .58, .1);
+
 
 export function genVec3Curve(curve: Vector2[], start: Vector3, end: Vector3): [number[], Vector3[]] {
   const delta = end.clone().sub(start);

@@ -10,11 +10,11 @@ export default class ObjectCache<T> extends Set<T> {
     super();
   }
 
-  async getOne() {
+  async getOne(): Promise<T> {
     const result = this[Symbol.iterator]().next()
     if (!result.done) {
       this.delete(result.value)
-      return result.value
+      return result.value as T
     }
     this.n += 1
     return await this.loader.loadAsync(this.url);

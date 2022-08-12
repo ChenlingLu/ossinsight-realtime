@@ -9,3 +9,9 @@ export class AnimationMixerSet extends Set<AnimationMixer> implements Updatable 
     this.forEach(mixer => mixer.update(delta));
   }
 }
+
+export class UpdatableSet extends Set<Updatable> implements Updatable {
+  update(delta: number) {
+    this.forEach(u => u.update(delta))
+  }
+}

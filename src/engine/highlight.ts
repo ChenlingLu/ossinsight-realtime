@@ -21,7 +21,7 @@ export function unhighlight(outlinePass: OutlinePass, object?: Object3D) {
     outlinePass.selectedObjects[0].dispatchEvent({
       type: 'blur',
     });
-    outlinePass.selectedObjects = []
+    outlinePass.selectedObjects = [];
     return true;
   }
   return false;

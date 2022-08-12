@@ -2,6 +2,7 @@ import {
   ACESFilmicToneMapping,
   Camera,
   PCFSoftShadowMap,
+  RGBAFormat,
   Scene,
   sRGBEncoding,
   Vector2,
@@ -16,8 +17,8 @@ export function createRenderer(window: Window, container: Window | HTMLElement, 
     powerPreference: "high-performance",
     canvas: canvas,
     context: context ?? undefined,
-    stencil: false,
     alpha: true,
+    antialias: false,
   });
 
   renderer.autoClear = false;
@@ -30,6 +31,8 @@ export function createRenderer(window: Window, container: Window | HTMLElement, 
   const target = new WebGLRenderTarget(size.x, size.y, {
     samples: 4,
     stencilBuffer: true,
+    format: RGBAFormat,
+    encoding: sRGBEncoding,
   });
 
   renderer.setRenderTarget(target);

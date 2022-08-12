@@ -1,5 +1,5 @@
 import { defineConfig } from "vite";
 
 export default defineConfig({
-  base: '/ossinsight-realtime/',
+  base: process.env.NODE_ENV === 'production' ? '/ossinsight-realtime/' : '/',
 });

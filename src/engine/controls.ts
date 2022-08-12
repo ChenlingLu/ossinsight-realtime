@@ -11,5 +11,7 @@ export function createControls(camera: Camera, renderer: WebGLRenderer) {
   controls.minDistance = 30;
   controls.maxDistance = 150;
 
+
+
   return controls;
 }
