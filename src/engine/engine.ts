@@ -1,9 +1,9 @@
 import { setup } from "./setup";
 import { Camera, DefaultLoadingManager, Object3D, Scene, TextureLoader, WebGLRenderer } from "three";
 import { AnimationMixerSet, UpdatableSet } from "./updatables";
-import { OutlinePass } from "three/examples/jsm/postprocessing/OutlinePass";
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
+import { CSS2DRenderer } from "three/examples/jsm/renderers/CSS2DRenderer";
 
 DefaultLoadingManager.setURLModifier(url => {
   return import.meta.env.BASE_URL.replace(/\/$/, '') + '/' + url.replace(/^\//, '');
@@ -14,12 +14,12 @@ export class Engine {
   controls!: OrbitControls;
   scene!: Scene;
   renderer!: WebGLRenderer;
+  renderer2d!: CSS2DRenderer;
   start!: () => void;
   stop!: () => void;
   mixers!: AnimationMixerSet;
   updatables!: UpdatableSet;
   interactables!: Set<Object3D>;
-  outlinePass!: OutlinePass;
   gltfLoader: GLTFLoader;
   textureLoader: TextureLoader;
 
@@ -35,8 +35,8 @@ export class Engine {
       stop,
       animationMixers,
       interactables,
-      outlinePass,
       renderer,
+      renderer2d,
       camera,
       controls,
       updatables,
@@ -47,8 +47,8 @@ export class Engine {
     this.mixers = animationMixers;
     this.updatables = updatables;
     this.interactables = interactables;
-    this.outlinePass = outlinePass;
     this.renderer = renderer;
+    this.renderer2d = renderer2d;
     this.camera = camera;
     this.controls = controls;
   }

@@ -46,7 +46,6 @@ class Vector3Transition extends Transition {
   }
 }
 
-
 export function transitionVec3(target: Vector3, to: Vector3, duration: number, curve: Vector2[]): Transition {
   return new Vector3Transition(target, to, duration, curve);
 }

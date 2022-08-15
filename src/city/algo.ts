@@ -287,7 +287,7 @@ export function getCity(newContribs: number[][], rawContribs: any[][]) {
             dir: building.dir,
             value: getValue(x, y),
             mirror: building.mirror,
-            data: getRawData(x, y),
+            data: Object.assign({}, getRawData(x, y), { week: x, day: y }),
           };
         }
       }

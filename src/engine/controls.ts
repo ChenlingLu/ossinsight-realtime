@@ -7,11 +7,9 @@ export function createControls(camera: Camera, renderer: WebGLRenderer) {
   controls.autoRotateSpeed = -1;
   controls.enableDamping = true;
   controls.dampingFactor = 0.1;
-  controls.enablePan = false;
-  controls.minDistance = 30;
+  controls.enablePan = true;
+  controls.minDistance = 10;
   controls.maxDistance = 150;
-
-
 
   return controls;
 }

@@ -1,24 +1,14 @@
-import {
-  ACESFilmicToneMapping,
-  Camera,
-  PCFSoftShadowMap,
-  RGBAFormat,
-  Scene,
-  sRGBEncoding,
-  Vector2,
-  WebGLRenderer,
-  WebGLRenderTarget,
-} from "three";
+import { ACESFilmicToneMapping, PCFSoftShadowMap, sRGBEncoding, Vector2, WebGLRenderer } from "three";
 import { getSize } from "./utils";
+import { CSS2DRenderer } from "three/examples/jsm/renderers/CSS2DRenderer";
 
-export function createRenderer(window: Window, container: Window | HTMLElement, canvas: HTMLCanvasElement, scene: Scene, camera: Camera) {
-  const context = canvas.getContext('webgl2', { antialias: false });
+export function createRenderer(window: Window, container: Window | HTMLElement, canvas: HTMLCanvasElement) {
+  // 3d renderer
   const renderer = new WebGLRenderer({
     powerPreference: "high-performance",
     canvas: canvas,
-    context: context ?? undefined,
     alpha: true,
-    antialias: false,
+    antialias: true,
   });
 
   renderer.autoClear = false;
@@ -28,26 +18,33 @@ export function createRenderer(window: Window, container: Window | HTMLElement, 
   renderer.toneMapping = ACESFilmicToneMapping;
 
   const size = renderer.getDrawingBufferSize(new Vector2());
-  const target = new WebGLRenderTarget(size.x, size.y, {
-    samples: 4,
-    stencilBuffer: true,
-    format: RGBAFormat,
-    encoding: sRGBEncoding,
-  });
 
-  renderer.setRenderTarget(target);
-  resizeRenderer(window, container, renderer, target);
+  // labels renderer
+  const renderer2d = new CSS2DRenderer();
+  renderer2d.setSize(size.x, size.y);
+  renderer2d.domElement.style.position = 'absolute';
+  renderer2d.domElement.style.top = '0';
+  renderer2d.domElement.style.left = '0';
+  renderer2d.domElement.style.pointerEvents = 'none';
+  getContainerElement(container).appendChild(renderer2d.domElement);
 
-  renderer.render(scene, camera);
-  return { renderer, target, size };
+  resizeRenderer(window, container, renderer, renderer2d);
+
+  return { renderer, renderer2d, size };
 }
 
-export function resizeRenderer(window: Window, container: Window | HTMLElement, renderer: WebGLRenderer, target: WebGLRenderTarget) {
+export function resizeRenderer(window: Window, container: Window | HTMLElement, renderer: WebGLRenderer, renderer2d: CSS2DRenderer) {
   const containerSize = getSize(container);
 
   renderer.setPixelRatio(window.devicePixelRatio);
   renderer.setSize(containerSize.width, containerSize.height);
+  renderer2d.setSize(containerSize.width, containerSize.height);
+}
 
-  const size = renderer.getDrawingBufferSize(new Vector2());
-  target.setSize(size.x, size.y);
+function getContainerElement(container: HTMLElement | Window): HTMLElement {
+  if (container instanceof Window) {
+    return window.document.body;
+  } else {
+    return container;
+  }
 }

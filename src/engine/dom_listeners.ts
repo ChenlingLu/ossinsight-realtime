@@ -1,11 +1,11 @@
-import { Object3D, PerspectiveCamera, Raycaster, Scene, WebGLRenderer, WebGLRenderTarget } from "three";
+import { Object3D, PerspectiveCamera, Raycaster, Scene, WebGLRenderer } from "three";
 import { resizeRenderer } from "./renderer";
-import { OutlinePass } from "three/examples/jsm/postprocessing/OutlinePass";
 import { getSize, isInteractable } from "./utils";
 import { EffectComposer } from "three/examples/jsm/postprocessing/EffectComposer";
 import { highlight, unhighlight } from "./highlight";
+import { CSS2DRenderer } from "three/examples/jsm/renderers/CSS2DRenderer";
 
-export function setupDOMListeners(window: Window, container: Window | HTMLElement, canvas: HTMLCanvasElement, scene: Scene, camera: PerspectiveCamera, renderer: WebGLRenderer, target: WebGLRenderTarget, interactables: Set<Object3D>, composer: EffectComposer, outlinePass: OutlinePass) {
+export function setupDOMListeners(window: Window, container: Window | HTMLElement, canvas: HTMLCanvasElement, scene: Scene, camera: PerspectiveCamera, renderer: WebGLRenderer, renderer2d: CSS2DRenderer, interactables: Set<Object3D>, composer: EffectComposer) {
   const raycaster = new Raycaster();
 
   let canvasWidth = canvas.clientWidth;
@@ -18,7 +18,7 @@ export function setupDOMListeners(window: Window, container: Window | HTMLElemen
     camera.updateProjectionMatrix();
     canvasWidth = size.width;
     canvasHeight = size.height;
-    resizeRenderer(window, container, renderer, target);
+    resizeRenderer(window, container, renderer, renderer2d);
     composer.setSize(size.width * window.devicePixelRatio, size.height * window.devicePixelRatio);
   };
 
@@ -34,11 +34,11 @@ export function setupDOMListeners(window: Window, container: Window | HTMLElemen
         target = target.parent;
       }
       if (isInteractable(target)) {
-        highlight(outlinePass, target);
+        highlight(target);
         return;
       }
     }
-    unhighlight(outlinePass);
+    unhighlight(scene);
   };
 
   window.addEventListener('resize', handleWindowResize);

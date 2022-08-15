@@ -16,16 +16,19 @@ import { renderShiftX, renderShiftY, renderShiftZ, renderTiles } from "./city/re
 import { DEFAULT_CURVE, genVec3Curve, randomNumber, randomVector3 } from "./city/seed";
 import { makeVector3 } from "./engine/vectors";
 import ObjectCache from "./engine/cache";
-import { getData, transform } from "./api";
+import { getData, RawData, transform } from "./api";
 import { highlight } from "./engine/highlight";
 import Engine from "./engine";
 import { createSmoke } from "./engine/smoke";
 import { FLOOR_HEIGHT } from "./city/constants";
 import { createNumbers } from "./engine/numbers";
 import { transitionVec3 } from "./utils/transition";
+import { CSS2DObject } from "three/examples/jsm/renderers/CSS2DRenderer";
+import { createTooltip } from "./engine/tooltip";
 
 export class DemoEngine extends Engine {
   cache: ObjectCache<GLTF>;
+  tooltip?: ReturnType<typeof createTooltip>;
 
   constructor(window: Window, canvas: HTMLCanvasElement) {
     super(window, canvas);
@@ -48,23 +51,26 @@ export class DemoEngine extends Engine {
 
     const groups = renderTiles(this.scene, this.gltfLoader, tiles, this.interactables);
 
-    highlight(this.outlinePass, groups[day][week]);
+    highlight(groups[day][week]);
 
-    this.showNow(data, week, day);
+    this.setNow(data, week, day);
 
     this.scene.addEventListener('focus', (e) => {
-      if (e.group) {
-        this.controls.autoRotate = e.data.event_day === rawData[day]?.[week]?.event_day;
+      if (e.data) {
+        this.controls.autoRotate = e.data.week === week && e.data.day === day;
+        this.showTooltip(e.data.week, e.data.day, rawData);
       }
-      const transition = transitionVec3(this.controls.target, e.group.children[0].position.clone().setY(0), 1.5, DEFAULT_CURVE)
-      this.updatables.add(transition);
-      transition.addEventListener('finished', ()=> {
-        this.updatables.delete(transition)
-      })
+      const controlPositionTransition = transitionVec3(this.controls.target, e.group.children[0].position.clone().setY(0), 1.5, DEFAULT_CURVE);
+      this.updatables.add(controlPositionTransition);
+      controlPositionTransition.addEventListener('finished', () => {
+        this.updatables.delete(controlPositionTransition);
+      });
     });
 
     this.scene.addEventListener('blur', () => {
-      highlight(this.outlinePass, groups[day][week]);
+      highlight(groups[day][week]);
+      this.hideTooltip();
+      this.controls.autoRotate = true;
     });
 
     this.start();
@@ -89,7 +95,7 @@ export class DemoEngine extends Engine {
   async addBrick(from: Vector3, to: Vector3, scale: number, color: Color, duration: number) {
     const obj = await this.cache.getOne();
     obj.scene.position.set(from.x, from.y, from.z);
-    obj.scene.rotation.set(Math.random() * 360, Math.random() * 360, Math.random() * 360, 'XYZ')
+    obj.scene.rotation.set(Math.random() * 360, Math.random() * 360, Math.random() * 360, 'XYZ');
 
     const mesh = <Mesh>obj.scene.getObjectByName('Mesh');
     const material = <MeshStandardMaterial>mesh.material;
@@ -98,7 +104,7 @@ export class DemoEngine extends Engine {
     const mixer = new AnimationMixer(obj.scene);
 
     const [positionTimes, positions] = genVec3Curve(DEFAULT_CURVE, from, randomVector3(to, makeVector3(1)));
-    const [scaleTimes, scales] = genVec3Curve(DEFAULT_CURVE, makeVector3(scale), makeVector3(0.3));
+    const [scaleTimes, scales] = genVec3Curve(DEFAULT_CURVE, makeVector3(scale), makeVector3(0));
 
     const action = mixer.clipAction(new AnimationClip('brick-entrance', duration, [
       new VectorKeyframeTrack('.position', positionTimes.map(i => i * duration), positions.flatMap(vec3 => vec3.toArray())),
@@ -119,8 +125,8 @@ export class DemoEngine extends Engine {
     });
   }
 
-  showNow (data: number[][], week: number, day: number) {
-    const pos = getPos(week, day, data[day][week] * FLOOR_HEIGHT * 2)
+  setNow(data: number[][], week: number, day: number) {
+    const pos = getPos(week, day, data[day][week] * FLOOR_HEIGHT * 2);
 
     // set camera
     this.controls.target.copy(pos);
@@ -132,21 +138,29 @@ export class DemoEngine extends Engine {
     this.scene.add(smoke);
 
     // create numbers
-    const numbers = createNumbers(window, 200, 200);
-    numbers.mesh.position.copy(pos);
-    numbers.mesh.scale.set(5, 5, 5);
-    numbers.setValue(100);
-    this.scene.add(numbers.mesh);
-    let cur = 1000
+    const numbersCanvas = createNumbers(window.document, 26);
+    const numbers = new CSS2DObject(numbersCanvas.numbers);
+    numbers.position.copy(pos);
+    numbers.position.y += 1.5;
+    numbers.scale.set(5, 5, 5);
+    numbersCanvas.setValue(100);
+    this.scene.add(numbers);
+    let cur = 1000;
     setInterval(() => {
-      numbers.setValue(cur += Math.floor(1000 * Math.random()));
-      numbers.mesh.material.needsUpdate = true;
+      numbersCanvas.setValue(cur += Math.floor(1000 * Math.random()));
     }, 1000);
-    this.updatables.add(numbers);
+    this.updatables.add(numbersCanvas);
 
     this.controls.addEventListener('change', () => {
       smoke.rotation.copy(this.camera.rotation);
-      numbers.mesh.rotation.copy(this.camera.rotation);
+    });
+
+    // add base
+    this.gltfLoader.load('models/building_base.glb', gltf => {
+      gltf.scene.position.copy(pos);
+      gltf.scene.position.setY(renderShiftZ);
+      gltf.scene.scale.copy(makeVector3(0.6));
+      this.scene.add(gltf.scene);
     });
 
     // add bricks
@@ -162,11 +176,34 @@ export class DemoEngine extends Engine {
         this.addBrick(from, toPos, scale, new Color(color.x, color.y, color.z), duration);
       }
     }, 100);
-
   }
 
+  showTooltip(week: number, day: number, rawData: (RawData | undefined)[][]) {
+    if (!rawData) {
+      return;
+    }
+    const { events, event_day } = rawData[day][week] ?? { events: 0, event_day: 'unknown' };
+    const pos = getPos(week, day, events / 1000000 * 2);
+    const tooltip = this.tooltip = this.tooltip ?? createTooltip(this.window.document);
+
+    tooltip.update(`${fmt.format(new Date(event_day))}\n${events} events`);
+    tooltip.object.position.copy(pos.clone().setY(pos.y));
+    if (!tooltip.rendered) {
+      this.scene.add(tooltip.object);
+      tooltip.rendered = true;
+    }
+  }
+
+  hideTooltip() {
+    if (this.tooltip?.rendered) {
+      this.tooltip.rendered = false;
+      this.tooltip.object.removeFromParent();
+    }
+  }
 }
 
 export function getPos(week: number, day: number, h?: number) {
   return new Vector3(2 * (week + renderShiftX) * 1.1, -renderShiftZ + (h ?? 0), 2 * (day + renderShiftY) * 1.1);
 }
+
+const fmt = Intl.DateTimeFormat('en', { year: 'numeric', month: '2-digit', day: '2-digit' });

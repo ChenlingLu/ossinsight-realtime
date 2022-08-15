@@ -224,13 +224,4 @@ function registerEvents(scene: Scene, group: Group, interactables: Set<Object3D>
       data,
     });
   });
-
-  group.addEventListener('blur', () => {
-    scene.dispatchEvent({
-      type: 'blur',
-      group,
-      data,
-    });
-  });
-
 }

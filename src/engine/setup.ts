@@ -15,14 +15,14 @@ export function setup(window: Window, canvas: HTMLCanvasElement) {
 
   const scene = new Scene();
   const camera = createCamera(window);
-  const { renderer, target, size } = createRenderer(window, window, canvas, scene, camera);
+  const { renderer, renderer2d } = createRenderer(window, window, canvas);
   const controls = createControls(camera, renderer);
-  const { composer, outlinePass } = createPostProcessing(size.x, size.y, scene, camera, renderer);
+  const { composer } = createPostProcessing(scene, camera, renderer);
 
-  setupDOMListeners(window, window, canvas, scene, camera, renderer, target, interactables, composer, outlinePass);
+  setupDOMListeners(window, window, canvas, scene, camera, renderer, renderer2d, interactables, composer);
   setupLighting(scene);
 
-  const { start, stop } = createAnimate(composer, controls, animationMixers, updatables);
+  const { start, stop } = createAnimate(scene, camera, composer, renderer2d, controls, animationMixers, updatables);
 
-  return { scene, renderer, start, stop, animationMixers, updatables, interactables, outlinePass, camera, controls };
+  return { scene, renderer, renderer2d, start, stop, animationMixers, updatables, interactables, camera, controls };
 }

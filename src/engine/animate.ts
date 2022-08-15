@@ -1,12 +1,13 @@
-import { Clock } from "three";
+import { Camera, Clock, Scene } from "three";
 import { EffectComposer } from "three/examples/jsm/postprocessing/EffectComposer";
 import { Updatable } from "./updatables";
 import stats from "./debug";
+import { CSS2DRenderer } from "three/examples/jsm/renderers/CSS2DRenderer";
 
 const FPS = 60;
 const FRAME_INTERVAL = 1 / FPS;
 
-export function createAnimate(composer: EffectComposer, ...updatableList: Updatable[]) {
+export function createAnimate(scene: Scene, camera: Camera, composer: EffectComposer, renderer2d: CSS2DRenderer, ...updatableList: Updatable[]) {
   const clock = new Clock();
   let animateHandle: number = 0;
   let stopped = true;
@@ -30,6 +31,7 @@ export function createAnimate(composer: EffectComposer, ...updatableList: Updata
       });
 
       composer.render();
+      renderer2d.render(scene, camera);
 
       delta %= FRAME_INTERVAL;
       stats?.end();
