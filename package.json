@@ -6,15 +6,24 @@
   "license": "LISCENCE",
   "scripts": {
     "dev": "vite",
-    "build": "tsc && vite build",
-    "preview": "vite preview"
+    "build": "vue-tsc --noEmit && vite build",
+    "preview": "vite preview",
+    "test": "vitest",
+    "coverage": "vitest run --coverage"
   },
   "devDependencies": {
+    "@octokit/openapi-types": "^13.0.1",
+    "@types/node": "^18.7.3",
     "@types/three": "^0.143.0",
+    "@vitejs/plugin-vue": "^3.0.3",
+    "@vitest/coverage-c8": "^0.22.0",
     "typescript": "^4.6.4",
-    "vite": "^3.0.0"
+    "vite": "^3.0.5",
+    "vitest": "^0.22.0",
+    "vue-tsc": "^0.40.1"
   },
   "dependencies": {
-    "three": "^0.143.0"
+    "three": "^0.143.0",
+    "vue": "^3.2.37"
   }
 }

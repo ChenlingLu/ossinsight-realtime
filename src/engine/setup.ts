@@ -8,18 +8,18 @@ import { createAnimate } from "./animate";
 import { setupDOMListeners } from "./dom_listeners";
 import { AnimationMixerSet, UpdatableSet } from "./updatables";
 
-export function setup(window: Window, canvas: HTMLCanvasElement) {
+export function setup(window: Window, canvas: HTMLCanvasElement, container: HTMLElement | undefined = undefined) {
   const updatables = new UpdatableSet();
   const animationMixers = new AnimationMixerSet();
   const interactables = new Set<Object3D>();
 
   const scene = new Scene();
   const camera = createCamera(window);
-  const { renderer, renderer2d } = createRenderer(window, window, canvas);
+  const { renderer, renderer2d } = createRenderer(window, container ?? window, canvas);
   const controls = createControls(camera, renderer);
   const { composer } = createPostProcessing(scene, camera, renderer);
 
-  setupDOMListeners(window, window, canvas, scene, camera, renderer, renderer2d, interactables, composer);
+  setupDOMListeners(window, container ?? window, canvas, scene, camera, renderer, renderer2d, interactables, composer);
   setupLighting(scene);
 
   const { start, stop } = createAnimate(scene, camera, composer, renderer2d, controls, animationMixers, updatables);

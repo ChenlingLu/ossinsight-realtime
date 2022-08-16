@@ -9,33 +9,14 @@ export function createNumbers(document: Document, fontSize: number) {
   numbers.style.fontWeight = 'bold';
   numbers.style.textAlign = 'center';
   container.appendChild(numbers);
-  let current: number = 0;
 
-  let from: number;
-  let to: number;
-  let step: number;
-  let animating = false;
-
+  let handle: number;
   const setValue = (value: number) => {
-    from = current;
-    to = value;
-    animating = true;
+    cancelAnimationFrame(handle);
+    handle = requestAnimationFrame(() => {
+      numbers.innerText = value.toLocaleString('en');
+    });
   };
 
-  const update = (delta: number) => {
-    if (!animating) {
-      return;
-    }
-    step = Math.floor((to - from) * delta) || (to > from ? 1 : -1); // prevent 0
-    if (Math.abs(to - current) <= Math.abs(step)) {
-      current = to;
-      animating = false;
-    } else {
-      current += step;
-    }
-
-    numbers.innerText = current.toLocaleString('en');
-  };
-
-  return { numbers: container, update, setValue };
+  return { numbers: container, setValue };
 }

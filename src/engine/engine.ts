@@ -23,7 +23,7 @@ export class Engine {
   gltfLoader: GLTFLoader;
   textureLoader: TextureLoader;
 
-  constructor(public window: Window, public canvas: HTMLCanvasElement) {
+  constructor(public window: Window, public canvas: HTMLCanvasElement, public container?: HTMLElement) {
     this.gltfLoader = new GLTFLoader();
     this.textureLoader = new TextureLoader();
   }
@@ -40,7 +40,7 @@ export class Engine {
       camera,
       controls,
       updatables,
-    } = setup(this.window, this.canvas);
+    } = setup(this.window, this.canvas, this.container);
     this.scene = scene;
     this.start = start;
     this.stop = stop;
