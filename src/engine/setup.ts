@@ -14,7 +14,7 @@ export function setup(window: Window, canvas: HTMLCanvasElement, container: HTML
   const interactables = new Set<Object3D>();
 
   const scene = new Scene();
-  const camera = createCamera(window);
+  const camera = createCamera(container ?? window);
   const { renderer, renderer2d } = createRenderer(window, container ?? window, canvas);
   const controls = createControls(camera, renderer);
   const { composer } = createPostProcessing(scene, camera, renderer);

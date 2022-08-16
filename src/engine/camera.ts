@@ -1,9 +1,11 @@
 import { PerspectiveCamera } from "three";
+import { getSize } from "./utils";
 
-export function createCamera(window: Window) {
+export function createCamera(container: HTMLElement | Window) {
+  const { width, height} = getSize(container)
   const camera = new PerspectiveCamera(
     50,
-    window.innerWidth / window.innerHeight,
+    width / height,
     0.1,
     400,
   );
