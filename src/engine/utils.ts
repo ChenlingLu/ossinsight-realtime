@@ -13,9 +13,14 @@ export function isInteractable(t: Object3D): boolean {
   return !!t.userData.interactable;
 }
 
+export function isElement(el: Window | HTMLElement): el is HTMLElement {
+  return (el as HTMLElement).nodeType === 1;
+}
+
 export function getSize(el: Window | HTMLElement): Vector2 {
-  return new Vector2(
-    (el as HTMLElement).clientWidth || (el as Window).innerWidth,
-    (el as HTMLElement).clientHeight || (el as Window).innerHeight,
-  );
+  if (isElement(el)) {
+    return new Vector2(el.clientWidth, el.clientHeight);
+  } else {
+    return new Vector2(el.innerWidth, el.innerHeight);
+  }
 }

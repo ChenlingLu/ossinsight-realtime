@@ -13,7 +13,7 @@ import { loop, sampling } from "../api/poll";
 const container = ref<HTMLElement>();
 const canvas = ref<HTMLCanvasElement>();
 const tooltipContainer = ref<HTMLElement>();
-const tooltip = ref<Tooltip>();
+const tooltip = ref<typeof Tooltip>();
 const engineRef = ref<DemoEngine>();
 
 onMounted(async () => {
