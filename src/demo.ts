@@ -21,19 +21,17 @@ import { highlight } from "./engine/highlight";
 import Engine from "./engine";
 import { createSmoke } from "./engine/smoke";
 import { FLOOR_HEIGHT, INIT_CONTRIBUTIONS } from "./city/constants";
-import { createNumbers } from "./engine/numbers";
 import { transitionVec3 } from "./utils/transition";
-import { CSS2DObject } from "three/examples/jsm/renderers/CSS2DRenderer";
 import { createPlaceholder } from "./engine/html-placeholder";
 import { GithubEvent } from "./api/poll";
 
 export class DemoEngine extends Engine {
   cache: ObjectCache<GLTF>;
   tooltip?: ReturnType<typeof createPlaceholder>;
+  numbers?: ReturnType<typeof createPlaceholder<number>>;
   week: number = 0;
   day: number = 0;
   data: number[][] = INIT_CONTRIBUTIONS;
-  numbersCanvas?: ReturnType<typeof createNumbers>;
   bricks: number = 0;
 
   constructor(window: Window, canvas: HTMLCanvasElement, container?: HTMLElement) {
@@ -45,11 +43,13 @@ export class DemoEngine extends Engine {
     this.scene.background = new Color(0x9ad0ec);
 
     const base = new Vector3(0, -4, 0);
-    await Promise.all([
-      this.add(GLTF_ENVIRONMENT, base, false, true),
-      this.add(GLTF_ENVIRONMENT_OBJECTS, base, true, false),
-      this.add(GLTF_ENVIRONMENT_ANIMATED, base, true, false),
-    ]);
+
+    this.add(GLTF_ENVIRONMENT, base, false, true);
+    this.add(GLTF_ENVIRONMENT_OBJECTS, base, true, false);
+    this.add(GLTF_ENVIRONMENT_ANIMATED, base, true, false);
+
+    const oldGroups = renderTiles(this.scene, this.gltfLoader, getCity(INIT_CONTRIBUTIONS, INIT_CONTRIBUTIONS), this.interactables);
+    this.start();
 
     const [data, rawData, [day, week]] = transform(await getData());
 
@@ -59,6 +59,7 @@ export class DemoEngine extends Engine {
 
     const tiles = getCity(data, rawData);
 
+    oldGroups.forEach(groups => groups.forEach(group => group.removeFromParent()))
     const groups = renderTiles(this.scene, this.gltfLoader, tiles, this.interactables);
 
     highlight(groups[day][week]);
@@ -88,7 +89,6 @@ export class DemoEngine extends Engine {
       this.controls.autoRotate = true;
     });
 
-    this.start();
   }
 
   async add(asset: string, position: Vector3, castShadow = false, receiveShadow = false) {
@@ -123,13 +123,15 @@ export class DemoEngine extends Engine {
     });
 
     // create numbers
-    const numbersCanvas = this.numbersCanvas = createNumbers(window.document, 26);
-    const numbers = new CSS2DObject(numbersCanvas.numbers);
-    numbers.position.copy(pos);
-    numbers.position.y += 1.5;
-    numbers.scale.set(5, 5, 5);
-    numbersCanvas.setValue(data[day][week]);
-    this.scene.add(numbers);
+    const numbers = this.numbers = createPlaceholder<number>(this.window.document);
+    numbers.object.position.copy(pos);
+    numbers.object.position.y += 1.5;
+    numbers.object.scale.set(5, 5, 5);
+    this.dispatchEvent({
+      type: 'update:current-number',
+      value: data[day][week],
+    })
+    this.scene.add(numbers.object);
 
     // add base
     this.gltfLoader.load('models/building_base.glb', gltf => {
@@ -148,7 +150,10 @@ export class DemoEngine extends Engine {
     const pos = getPos(week, day, events / 1000000 * 2);
     const tooltip = this.tooltip!;
 
-    tooltip.update?.(`${fmt.format(new Date(event_day))}\n${events.toLocaleString('en')} events`);
+    this.dispatchEvent({
+      type: 'update:tooltip',
+      value: `${fmt.format(new Date(event_day))}\n${events.toLocaleString('en')} events`,
+    })
     tooltip.object.position.copy(pos.clone().setY(pos.y));
     if (!tooltip.rendered) {
       this.scene.add(tooltip.object);
@@ -213,7 +218,10 @@ export class DemoEngine extends Engine {
   }
 
   setCurrent(val: number) {
-    this.numbersCanvas?.setValue(val);
+    this.dispatchEvent({
+      type: 'update:current-number',
+      value: val,
+    })
   }
 }
 

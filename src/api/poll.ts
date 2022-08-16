@@ -1,5 +1,5 @@
-import { Stream } from "../stream/stream";
-import type { components } from '@octokit/openapi-types'
+import type { components } from '@octokit/openapi-types';
+import { fromEvent, map } from 'rxjs';
 
 export type GithubEvent = components['schemas']['event']
 const WS_URL = 'wss://api.ossinsight.io/websocket';
@@ -26,6 +26,8 @@ export interface SamplingRequest extends BaseRequest {
    * Sampling rate. It means that N events are received that satisfy the conditions but only one of them is returned to the front end. If you want all of them, you need set it to 1.
    */
   samplingRate: number;
+
+  filter?: string[];
 }
 
 export interface LoopRequest extends BaseRequest {
@@ -75,35 +77,13 @@ class Connection extends WebSocket {
   }
 }
 
-export class ConnectionStream extends Stream<any> {
-  constructor(connection: Connection) {
-    const handleMessage = (ev: MessageEvent) => {
-      this.provide([ev.data]);
-    };
-    super({
-      request: () => {
-        connection.init();
-        connection.addEventListener('message', handleMessage);
-      },
-      stop: () => {
-        connection.removeEventListener('message', handleMessage);
-      },
-    });
-  }
-}
-
-export function sampling(req: SamplingRequest): Stream<GithubEvent> {
+export function sampling(req: SamplingRequest) {
   const conn = new Connection('sampling', req, true);
-
-  const stream = new ConnectionStream(conn);
-
-  return stream.map(data => JSON.parse(data));
-}
-
-export function loop(req: LoopRequest): Stream<{ msgList: GithubEvent, typeMap: Record<string, number> }> {
-  const conn = new Connection('loop', req);
-
-  const stream = new ConnectionStream(conn);
-
-  return stream;
+  conn.init();
+  return {
+    source: fromEvent<MessageEvent>(conn, 'message').pipe(map(event => JSON.parse(event.data))),
+    dispose: () => {
+      conn.close();
+    },
+  };
 }

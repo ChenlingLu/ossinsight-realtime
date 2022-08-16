@@ -1,5 +1,5 @@
 import { setup } from "./setup";
-import { Camera, DefaultLoadingManager, Object3D, Scene, TextureLoader, WebGLRenderer } from "three";
+import { Camera, DefaultLoadingManager, EventDispatcher, Object3D, Scene, TextureLoader, WebGLRenderer } from "three";
 import { AnimationMixerSet, UpdatableSet } from "./updatables";
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
@@ -9,7 +9,7 @@ DefaultLoadingManager.setURLModifier(url => {
   return import.meta.env.BASE_URL.replace(/\/$/, '') + '/' + url.replace(/^\//, '');
 });
 
-export class Engine {
+export class Engine extends EventDispatcher {
   camera!: Camera;
   controls!: OrbitControls;
   scene!: Scene;
@@ -24,6 +24,7 @@ export class Engine {
   textureLoader: TextureLoader;
 
   constructor(public window: Window, public canvas: HTMLCanvasElement, public container?: HTMLElement) {
+    super();
     this.gltfLoader = new GLTFLoader();
     this.textureLoader = new TextureLoader();
   }
