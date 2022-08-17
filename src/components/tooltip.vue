@@ -1,25 +1,16 @@
 <template>
-  <Teleport :to="container ?? 'body'">
+  <Teleport :to="props.container ?? 'body'">
     <div class="container">
       <div class="content">
-        {{ text }}
+        {{ props.text }}
       </div>
     </div>
   </Teleport>
 </template>
 <script setup lang="ts">
-import { defineProps, ref, Teleport } from "vue";
+import { defineProps, Teleport } from "vue";
 
-const text = ref('');
-
-const { container } = defineProps<{ container?: HTMLElement }>()
-
-defineExpose({
-  update: (newText: string) => {
-    text.value = newText;
-  },
-});
-
+const props = defineProps<{ container?: HTMLElement, text: string }>()
 </script>
 <style scoped>
 .container {

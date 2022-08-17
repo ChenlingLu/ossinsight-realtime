@@ -1,5 +1,7 @@
 // see https://github.com/honzaap/GithubCity/blob/main/constants.js
 
+import { RawData } from "../api/total";
+
 export type BuildingType = {
   groundUrl: string;
   floorUrl?: string;
@@ -332,3 +334,5 @@ export const INIT_CONTRIBUTIONS = [
     0, 2, 1, 2, 1,
   ],
 ];
+
+export const INIT_RAW = INIT_CONTRIBUTIONS.map(g => g.map(i => ({} as RawData)))

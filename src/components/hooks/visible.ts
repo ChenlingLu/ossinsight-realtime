@@ -5,7 +5,6 @@ export function isVisible(document: Document): Ref<boolean> {
 
   watchEffect((onCleanup) => {
     const handleVisibilityChange = () => {
-      console.log(document.visibilityState);
       inView.value = document.visibilityState === 'visible';
     };
 

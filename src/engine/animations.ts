@@ -1,6 +1,7 @@
 import { AnimationBlendMode, AnimationClip, AnimationMixer, Object3D } from "three";
 import { KeyframeTrack } from "three/src/animation/KeyframeTrack";
 import { AnimationMixerSet } from "./updatables";
+import { dispose } from "./dispose";
 
 export function makeAnimation(mixers: AnimationMixerSet, target: Object3D, name?: string, duration?: number, tracks?: KeyframeTrack[], blendMode?: AnimationBlendMode, remove: boolean = true) {
   const mixer = new AnimationMixer(target);
@@ -9,6 +10,7 @@ export function makeAnimation(mixers: AnimationMixerSet, target: Object3D, name?
     mixers.delete(mixer);
     if (remove) {
       target.removeFromParent();
+      dispose(target);
     }
   });
   mixers.add(mixer);

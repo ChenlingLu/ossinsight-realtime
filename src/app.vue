@@ -4,12 +4,13 @@
       <Scene />
     </main>
     <aside class="side">
-
+      <Side />
     </aside>
   </div>
 </template>
 <script setup lang="ts">
 import Scene from "./components/scene.vue";
+import Side from "./components/side";
 </script>
 <style scoped>
 #app {

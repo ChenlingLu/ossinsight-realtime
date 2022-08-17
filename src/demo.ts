@@ -1,45 +1,67 @@
 import {
   AnimationClip,
   AnimationMixer,
+  BoxGeometry,
   Color,
+  Euler,
+  Group,
+  InterpolateLinear,
   LoopOnce,
   Mesh,
+  MeshLambertMaterial,
   MeshStandardMaterial,
+  NormalAnimationBlendMode,
+  NumberKeyframeTrack,
+  Object3D,
+  PlaneGeometry,
+  Quaternion,
+  QuaternionKeyframeTrack,
   Vector3,
   VectorKeyframeTrack,
 } from "three";
-import { GLTF } from "three/examples/jsm/loaders/GLTFLoader";
-import { GLTF_BOX, GLTF_ENVIRONMENT, GLTF_ENVIRONMENT_ANIMATED, GLTF_ENVIRONMENT_OBJECTS } from "./assets";
+import { GLTF_ENVIRONMENT, GLTF_ENVIRONMENT_ANIMATED, GLTF_ENVIRONMENT_OBJECTS } from "./assets";
 import { setShadow } from "./engine/shadow";
 import { getCity } from "./city/algo";
 import { renderShiftX, renderShiftY, renderShiftZ, renderTiles } from "./city/render";
 import { DEFAULT_CURVE, genVec3Curve, randomNumber, randomVector3 } from "./city/seed";
 import { makeVector3 } from "./engine/vectors";
 import ObjectCache from "./engine/cache";
-import { getData, RawData, transform } from "./api";
+import { transform } from "./api";
 import { highlight } from "./engine/highlight";
 import Engine from "./engine";
-import { createSmoke } from "./engine/smoke";
-import { FLOOR_HEIGHT, INIT_CONTRIBUTIONS } from "./city/constants";
+import { FLOOR_HEIGHT, INIT_CONTRIBUTIONS, INIT_RAW } from "./city/constants";
 import { transitionVec3 } from "./utils/transition";
 import { createPlaceholder } from "./engine/html-placeholder";
 import { GithubEvent } from "./api/poll";
+import { RawData } from "./api/total";
+import { dispose } from "./engine/dispose";
+import { makeAnimation } from "./engine/animations";
 
 export class DemoEngine extends Engine {
-  cache: ObjectCache<GLTF>;
+  cache: ObjectCache<Mesh>;
   tooltip?: ReturnType<typeof createPlaceholder>;
   numbers?: ReturnType<typeof createPlaceholder<number>>;
   week: number = 0;
   day: number = 0;
   data: number[][] = INIT_CONTRIBUTIONS;
+  rawData: (RawData | undefined)[][] = INIT_RAW;
   bricks: number = 0;
+  groups?: Group[][];
 
   constructor(window: Window, canvas: HTMLCanvasElement, container?: HTMLElement) {
     super(window, canvas, container);
-    this.cache = new ObjectCache<GLTF>(this.gltfLoader, GLTF_BOX);
+    this.cache = new ObjectCache(() => this.createBox());
   }
 
-  async init() {
+  dispose() {
+    this.cache.allLoaded.forEach(obj => {
+      dispose(obj);
+    });
+    super.dispose();
+  }
+
+  setup() {
+    super.setup();
     this.scene.background = new Color(0x9ad0ec);
 
     const base = new Vector3(0, -4, 0);
@@ -48,89 +70,147 @@ export class DemoEngine extends Engine {
     this.add(GLTF_ENVIRONMENT_OBJECTS, base, true, false);
     this.add(GLTF_ENVIRONMENT_ANIMATED, base, true, false);
 
-    const oldGroups = renderTiles(this.scene, this.gltfLoader, getCity(INIT_CONTRIBUTIONS, INIT_CONTRIBUTIONS), this.interactables);
+    this.groups = renderTiles(this.scene, this.gltfLoader, getCity(INIT_CONTRIBUTIONS, INIT_CONTRIBUTIONS), this.interactables);
     this.start();
 
-    const [data, rawData, [day, week]] = transform(await getData());
-
-    this.data = data;
-    this.week = week;
-    this.day = day;
-
-    const tiles = getCity(data, rawData);
-
-    oldGroups.forEach(groups => groups.forEach(group => group.removeFromParent()))
-    const groups = renderTiles(this.scene, this.gltfLoader, tiles, this.interactables);
-
-    highlight(groups[day][week]);
-
-    this.setNow(data, week, day);
-
     this.tooltip = createPlaceholder(this.window.document);
+    this.numbers = createPlaceholder<number>(this.window.document);
 
     this.scene.addEventListener('focus', (e) => {
       if (!e.data) {
         return;
       }
       if (e.data) {
-        this.controls.autoRotate = e.data.week === week && e.data.day === day;
-        this.showTooltip(e.data.week, e.data.day, rawData);
+        this.controls.autoRotate = e.data.week === this.week && e.data.day === this.day;
+        this.showTooltip(e.data.week, e.data.day);
+        this.setControlPosition(getPos(e.data.week, e.data.day));
       }
-      const controlPositionTransition = transitionVec3(this.controls.target, e.group.children[0].position.clone().setY(0), 1.5, DEFAULT_CURVE);
-      this.updatables.add(controlPositionTransition);
-      controlPositionTransition.addEventListener('finished', () => {
-        this.updatables.delete(controlPositionTransition);
-      });
     });
 
     this.scene.addEventListener('blur', () => {
-      highlight(groups[day][week]);
+      if (this.data !== INIT_CONTRIBUTIONS) {
+        this.setControlPosition(getPos(this.week, this.day));
+      }
       this.hideTooltip();
       this.controls.autoRotate = true;
     });
-
   }
 
-  async add(asset: string, position: Vector3, castShadow = false, receiveShadow = false) {
-    const obj = await this.gltfLoader.loadAsync(asset);
-    obj.scene.position.set(position.x, position.y, position.z);
-    if (castShadow || receiveShadow) {
-      setShadow(obj.scene, castShadow, receiveShadow);
-    }
-    if (obj.animations && obj.animations.length !== 0) {
-      const mixer = new AnimationMixer(obj.scene);
-      obj.animations.forEach(animation => {
-        mixer.clipAction(animation).play();
-      });
-      this.mixers.add(mixer);
-    }
-    this.scene.add(obj.scene);
+  setControlPosition(newPosition: Vector3, duration = 1.5, curve = DEFAULT_CURVE) {
+    const controlPositionTransition = transitionVec3(this.controls.target, newPosition, duration, curve);
+    this.updatables.add(controlPositionTransition);
+    controlPositionTransition.addEventListener('finished', () => {
+      this.updatables.delete(controlPositionTransition);
+    });
+  }
+
+  setTotal(raw: RawData[]) {
+    const [data, rawData, [day, week]] = transform(raw);
+
+    this.data = data;
+    this.rawData = rawData;
+    this.week = week;
+    this.day = day;
+
+    const tiles = getCity(data, rawData);
+
+    this.groups?.forEach(groups => groups.forEach(group => {
+      group.removeFromParent();
+      dispose(group);
+    }));
+    const groups = this.groups = renderTiles(this.scene, this.gltfLoader, tiles, this.interactables);
+
+    highlight(groups[day][week]);
+
+    this.setNow(data, week, day);
+  }
+
+  add(asset: string, position: Vector3, castShadow = false, receiveShadow = false) {
+    this.gltfLoader.load(asset, obj => {
+      obj.scene.position.set(position.x, position.y, position.z);
+      if (castShadow || receiveShadow) {
+        setShadow(obj.scene, castShadow, receiveShadow);
+      }
+      if (obj.animations && obj.animations.length !== 0) {
+        const mixer = new AnimationMixer(obj.scene);
+        obj.animations.forEach(animation => {
+          mixer.clipAction(animation).play();
+        });
+        this.mixers.add(mixer);
+      }
+      this.scene.add(obj.scene);
+    });
+  }
+
+  smoke?: Object3D;
+  smokeMaterial = new MeshLambertMaterial({
+    map: this.textureLoader.load('textures/smoke.png'),
+    opacity: 0.7,
+    transparent: true,
+    emissive: new Color(0xffffff)
+  });
+  smokeGeometry = new PlaneGeometry();
+
+  createSmoke(pos: Vector3) {
+    const geometry = this.smokeGeometry;
+    const material = this.smokeMaterial;
+
+    const smoke = new Group();
+
+    const duration = 15;
+
+    const create = () => {
+      const element = new Mesh(geometry, material.clone());
+      element.scale.set(1, 1, 1);
+      element.position.copy(randomVector3(makeVector3(0), makeVector3(0.5)));
+      smoke.add(element);
+
+      const from = element.position;
+      const to = from.clone().add(new Vector3(0.2 * Math.random(), 3 * Math.random(), 0.2 * Math.random()));
+
+      const s = Math.random() * 360;
+      const qInitial = new Quaternion().setFromEuler(new Euler(0, 0, s, 'XYZ'));
+      const qFinal = new Quaternion().setFromEuler(new Euler(0, 0, s + Math.random() * 360, 'XYZ'));
+
+      makeAnimation(this.mixers, element, 'smoke', duration, [
+        new VectorKeyframeTrack('.position', [0, duration], [from, to].flatMap(vec => vec.toArray())),
+        new NumberKeyframeTrack('.material.opacity', [0, duration * 0.4, duration * 0.6, duration], [0, 0.9, 0.9, 0], InterpolateLinear),
+        new QuaternionKeyframeTrack('.quaternion', [0, duration], [qInitial, qFinal].flatMap(q => q.toArray())),
+      ], NormalAnimationBlendMode).setLoop(LoopOnce, 1).play();
+    };
+
+    setInterval(() => {
+      create();
+    }, 300);
+
+    smoke.scale.set(2, 2, 2);
+    smoke.position.copy(pos);
+    this.controls.addEventListener('change', () => {
+      smoke.rotation.copy(this.camera.rotation);
+    });
+    this.scene.add(smoke);
+
+    this.smoke = smoke;
   }
 
   setNow(data: number[][], week: number, day: number) {
     const pos = getPos(week, day, data[day][week] * FLOOR_HEIGHT * 2);
 
     // set camera
-    this.controls.target.copy(pos);
+    this.setControlPosition(pos.clone().setY(0));
 
     // create smoke
-    const smoke = createSmoke(this.textureLoader, 'textures/smoke.png', this.mixers);
-    smoke.scale.set(2, 2, 2);
-    smoke.position.copy(pos);
-    this.scene.add(smoke);
-    this.controls.addEventListener('change', () => {
-      smoke.rotation.copy(this.camera.rotation);
-    });
+    this.createSmoke(pos);
 
     // create numbers
-    const numbers = this.numbers = createPlaceholder<number>(this.window.document);
+    const numbers = this.numbers!;
     numbers.object.position.copy(pos);
     numbers.object.position.y += 1.5;
     numbers.object.scale.set(5, 5, 5);
     this.dispatchEvent({
       type: 'update:current-number',
-      value: data[day][week],
-    })
+      value: data[day][week].toLocaleString('en'),
+    });
     this.scene.add(numbers.object);
 
     // add base
@@ -142,18 +222,18 @@ export class DemoEngine extends Engine {
     });
   }
 
-  showTooltip(week: number, day: number, rawData: (RawData | undefined)[][]) {
-    if (!rawData) {
+  showTooltip(week: number, day: number) {
+    if (!this.rawData) {
       return;
     }
-    const { events, event_day } = rawData[day][week] ?? { events: 0, event_day: 'unknown' };
+    const { events, event_day } = this.rawData[day][week] ?? { events: 0, event_day: 'unknown' };
     const pos = getPos(week, day, events / 1000000 * 2);
     const tooltip = this.tooltip!;
 
     this.dispatchEvent({
       type: 'update:tooltip',
       value: `${fmt.format(new Date(event_day))}\n${events.toLocaleString('en')} events`,
-    })
+    });
     tooltip.object.position.copy(pos.clone().setY(pos.y));
     if (!tooltip.rendered) {
       this.scene.add(tooltip.object);
@@ -168,16 +248,22 @@ export class DemoEngine extends Engine {
     }
   }
 
-  private async _addBrick(from: Vector3, to: Vector3, scale: number, color: Color, duration: number, cb: () => void) {
-    const obj = await this.cache.getOne();
-    obj.scene.position.set(from.x, from.y, from.z);
-    obj.scene.rotation.set(Math.random() * 360, Math.random() * 360, Math.random() * 360, 'XYZ');
+  boxGeometry: BoxGeometry = new BoxGeometry();
 
-    const mesh = <Mesh>obj.scene.getObjectByName('Mesh');
+  private createBox(): Mesh {
+    const material = new MeshStandardMaterial({ transparent: true });
+    return new Mesh(this.boxGeometry, material);
+  }
+
+  private async _addBrick(from: Vector3, to: Vector3, scale: number, color: Color, duration: number, cb: () => void) {
+    const mesh = this.cache.getOne();
+    mesh.position.set(from.x, from.y, from.z);
+    mesh.rotation.set(Math.random() * 360, Math.random() * 360, Math.random() * 360, 'XYZ');
+
     const material = <MeshStandardMaterial>mesh.material;
     material.color.set(color);
 
-    const mixer = new AnimationMixer(obj.scene);
+    const mixer = new AnimationMixer(mesh);
 
     const [positionTimes, positions] = genVec3Curve(DEFAULT_CURVE, from, randomVector3(to, makeVector3(1)));
     const [scaleTimes, scales] = genVec3Curve(DEFAULT_CURVE, makeVector3(scale), makeVector3(0));
@@ -191,18 +277,18 @@ export class DemoEngine extends Engine {
     action.play();
     this.mixers.add(mixer);
 
-    this.scene.add(obj.scene);
+    this.scene.add(mesh);
 
     // remove when animation done
     mixer.addEventListener('finished', () => {
       this.mixers.delete(mixer);
-      this.scene.remove(obj.scene);
-      this.cache.add(obj);
+      this.scene.remove(mesh);
+      this.cache.add(mesh);
       cb();
     });
   }
 
-  addBrick(_event: GithubEvent) {
+  addBrick(_event: Partial<GithubEvent>) {
     // add bricks
     const fromPos = getPos(this.week, this.day).setY(40);
     const toPos = fromPos.clone().setY(this.data[this.day][this.week] * FLOOR_HEIGHT * 2);
@@ -220,8 +306,8 @@ export class DemoEngine extends Engine {
   setCurrent(val: number) {
     this.dispatchEvent({
       type: 'update:current-number',
-      value: val,
-    })
+      value: val.toLocaleString('en'),
+    });
   }
 }
 

@@ -1,9 +1,4 @@
-export type RawData = { event_day: string, events: number }
-
-
-export function getData(): Promise<RawData[]> {
-  return fetch('https://api.ossinsight.io/q/events-daily').then(data => data.json()).then(data => data.data);
-}
+import { RawData } from "./api/total";
 
 const DAY = 24 * 60 * 60 * 1000;
 

@@ -79,11 +79,13 @@ class Connection extends WebSocket {
 
 export function sampling(req: SamplingRequest) {
   const conn = new Connection('sampling', req, true);
-  conn.init();
   return {
-    source: fromEvent<MessageEvent>(conn, 'message').pipe(map(event => JSON.parse(event.data))),
+    source: fromEvent<MessageEvent>(conn, 'message').pipe(map(event => JSON.parse(event.data) as Partial<GithubEvent>)),
     dispose: () => {
       conn.close();
+    },
+    start: () => {
+      conn.init();
     },
   };
 }
