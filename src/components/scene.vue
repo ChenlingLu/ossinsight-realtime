@@ -6,7 +6,7 @@
 </template>
 <script setup lang="ts">
 import { Event } from "three";
-import { onMounted, ref, watch } from "vue";
+import { ref, watch } from "vue";
 import { DemoEngine } from "../demo";
 import Tooltip from "./tooltip.vue";
 import Numbers from "./numbers.vue";
@@ -26,12 +26,15 @@ const { data: total } = useApi(getTotal);
 const tooltip = useCSS2DObject(Tooltip, { text: '' });
 const numbers = useCSS2DObject(Numbers, { text: '' });
 
-const CSSObjects = makeVNodesRenderer([tooltip.vnode, numbers.vnode])
+const CSSObjects = makeVNodesRenderer([tooltip.vnode, numbers.vnode]);
 
-onMounted(async () => {
-  const engine = new DemoEngine(canvas.value!.ownerDocument.defaultView as Window, canvas.value!, container.value!);
-  engine.setup();
-  engineRef.value = engine;
+watch([canvas, container], ([canvas, container]) => {
+  if (canvas && container) {
+    const window = canvas.ownerDocument.defaultView as Window;
+    const engine = new DemoEngine(window, canvas, container);
+    engine.setup();
+    engineRef.value = engine;
+  }
 });
 
 watch(engineRef, (engine, _, onCleanup) => {
@@ -57,10 +60,6 @@ watch(engineRef, (engine, _, onCleanup) => {
     });
   }
 });
-
-import.meta.hot?.on('vite:beforeUpdate', () => {
-  engineRef.value = undefined;
-})
 
 watch([engineRef, () => total.response] as const, ([engine, resp]) => {
   if (engine && resp) {
