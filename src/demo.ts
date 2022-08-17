@@ -40,7 +40,7 @@ import { makeAnimation } from "./engine/animations";
 export class DemoEngine extends Engine {
   cache: ObjectCache<Mesh>;
   tooltip?: ReturnType<typeof createPlaceholder>;
-  numbers?: ReturnType<typeof createPlaceholder<number>>;
+  numbers?: ReturnType<typeof createPlaceholder>;
   week: number = 0;
   day: number = 0;
   data: number[][] = INIT_CONTRIBUTIONS;
@@ -74,7 +74,7 @@ export class DemoEngine extends Engine {
     this.start();
 
     this.tooltip = createPlaceholder(this.window.document);
-    this.numbers = createPlaceholder<number>(this.window.document);
+    this.numbers = createPlaceholder(this.window.document);
 
     this.scene.addEventListener('focus', (e) => {
       if (!e.data) {
@@ -145,11 +145,13 @@ export class DemoEngine extends Engine {
   smoke?: Object3D;
   smokeMaterial = new MeshLambertMaterial({
     map: this.textureLoader.load('textures/smoke.png'),
-    opacity: 0.7,
+    opacity: 0.01,
     transparent: true,
-    emissive: new Color(0xffffff)
+    emissive: new Color(0xffffff),
+    fog: true,
   });
   smokeGeometry = new PlaneGeometry();
+  addSmoke?: () => void;
 
   createSmoke(pos: Vector3) {
     const geometry = this.smokeGeometry;
@@ -160,6 +162,10 @@ export class DemoEngine extends Engine {
     const duration = 15;
 
     const create = () => {
+      if (!this.running) {
+        return;
+      }
+
       const element = new Mesh(geometry, material.clone());
       element.scale.set(1, 1, 1);
       element.position.copy(randomVector3(makeVector3(0), makeVector3(0.5)));
@@ -179,10 +185,6 @@ export class DemoEngine extends Engine {
       ], NormalAnimationBlendMode).setLoop(LoopOnce, 1).play();
     };
 
-    setInterval(() => {
-      create();
-    }, 300);
-
     smoke.scale.set(2, 2, 2);
     smoke.position.copy(pos);
     this.controls.addEventListener('change', () => {
@@ -191,6 +193,7 @@ export class DemoEngine extends Engine {
     this.scene.add(smoke);
 
     this.smoke = smoke;
+    this.addSmoke = create;
   }
 
   setNow(data: number[][], week: number, day: number) {
@@ -200,6 +203,10 @@ export class DemoEngine extends Engine {
     this.setControlPosition(pos.clone().setY(0));
 
     // create smoke
+    if (this.smoke) {
+      this.smoke.removeFromParent();
+      dispose(this.smoke);
+    }
     this.createSmoke(pos);
 
     // create numbers
@@ -256,6 +263,11 @@ export class DemoEngine extends Engine {
   }
 
   private async _addBrick(from: Vector3, to: Vector3, scale: number, color: Color, duration: number, cb: () => void) {
+    if (!this.running) {
+      cb()
+      return;
+    }
+
     const mesh = this.cache.getOne();
     mesh.position.set(from.x, from.y, from.z);
     mesh.rotation.set(Math.random() * 360, Math.random() * 360, Math.random() * 360, 'XYZ');
@@ -300,6 +312,7 @@ export class DemoEngine extends Engine {
     this._addBrick(from, toPos, scale, new Color(color.x, color.y, color.z), duration, () => {
       this.bricks += 1;
       this.setCurrent(this.data[this.day][this.week] + this.bricks);
+      this.addSmoke?.();
     });
   }
 

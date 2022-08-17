@@ -37,7 +37,7 @@ export function useApi<T extends object>(call: () => Promise<T>) {
 const DEFAULT_SAMPLING_REQ: SamplingRequest = {
   samplingRate: 1,
   filter: ['id'],
-  // eventType: 'PullRequestEvent',
+  eventType: 'PullRequestEvent',
 };
 
 export function useSampling(condition: Ref<boolean>, initialReq: SamplingRequest = DEFAULT_SAMPLING_REQ) {

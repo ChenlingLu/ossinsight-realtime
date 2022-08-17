@@ -17,6 +17,7 @@ export class Engine extends EventDispatcher {
   scene!: Scene;
   renderer!: WebGLRenderer;
   renderer2d!: CSS2DRenderer;
+  running: boolean;
   start!: () => void;
   stop!: () => void;
   mixers!: AnimationMixerSet;
@@ -29,6 +30,7 @@ export class Engine extends EventDispatcher {
     super();
     this.gltfLoader = new GLTFLoader();
     this.textureLoader = new TextureLoader();
+    this.running = false;
   }
 
   setup() {
@@ -45,8 +47,14 @@ export class Engine extends EventDispatcher {
       updatables,
     } = setup(this.window, this.canvas, this.container);
     this.scene = scene;
-    this.start = start;
-    this.stop = stop;
+    this.start = () => {
+      this.running = true;
+      start();
+    };
+    this.stop = () => {
+      this.running = false;
+      stop()
+    };
     this.mixers = animationMixers;
     this.updatables = updatables;
     this.interactables = interactables;
