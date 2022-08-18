@@ -13,10 +13,14 @@
         </flex>
       </h2>
     </flex>
-    <hr class="divider"/>
+    <hr class="divider" />
     <flex class="info" direction="row" justify="space-between">
       <h2>Real-Time Events</h2>
       <a href="#">🤖️ how to make it</a>
+    </flex>
+    <flex class="info" direction="row" justify="space-between">
+      <LangSelect v-model="language" />
+      <RepoFilter v-model="repo" />
     </flex>
     <list class="list" :el-ref="(el: HTMLElement) => containerRef = el">
       <transition-group name="list">
@@ -47,8 +51,13 @@ import { subscribeOnVisible } from "../hooks/observable";
 import Dot from "../ui/dot.vue";
 import { ConnectionState } from "../../api/poll";
 import { bufferTime, Subject } from "rxjs";
+import LangSelect from "../ui/lang-select.vue";
+import RepoFilter from "../ui/repo-filter.vue";
+import { languages } from "../ui/lang";
 
 const usePrEvents = prEventsPollStore('pullRequestEvents');
+
+const allPass = (_: FilteredEvent) => true;
 
 const events = useEvents();
 const prEvents = usePrEvents();
@@ -57,6 +66,10 @@ const total = ref(0);
 const state = ref(ConnectionState.CONNECTING);
 const elements = reactive<(HTMLElement | undefined)[]>([]);
 const containerRef = ref<HTMLElement>();
+const language = ref('All');
+const repo = ref('');
+const eventFilter = ref(allPass);
+
 
 const refEl = (i: number, el: any) => {
   elements[i] = el ? markRaw(el) : undefined;
@@ -78,7 +91,11 @@ subscribeOnVisible(() => prEvents.stream, (container) => {
   if (container) {
     return event => {
       total.value++;
-      subject.next(markRaw(process(event)));
+
+      const ev = process(event);
+      if (eventFilter.value(ev)) {
+        subject.next(markRaw(ev));
+      }
     };
   }
 }, containerRef);
@@ -111,7 +128,49 @@ watch(elements, elements => {
   }
 }, { immediate: false, flush: 'post' });
 
-const number = computed(() => (events.total + total.value).toLocaleString('en'))
+watch([language, repo], ([language, repo]) => {
+  repo = repo.toLowerCase().trim()
+  let filters: (typeof allPass)[] = [];
+  if (language === 'Others') {
+    filters.push(ev => {
+      const lang = ev["payload.pull_request.base.repo.language"];
+      for (let exists of languages) {
+        if (lang === exists) {
+          return false;
+        }
+      }
+      return true;
+    });
+  } else if (language !== 'All') {
+    filters.push(ev => ev["payload.pull_request.base.repo.language"] === language);
+  }
+
+  if (repo !== '') {
+    filters.push(ev => ev["actor.login"].toLowerCase().indexOf(repo) !== -1 || ev['repo.name'].toLowerCase().indexOf(repo) !== -1);
+  }
+
+  if (filters.length === 0) {
+    eventFilter.value = allPass;
+  } else {
+    eventFilter.value = (i: FilteredEvent) => {
+      for (const filter of filters) {
+        if (!filter(i)) {
+          return false;
+        }
+      }
+      return true;
+    };
+  }
+});
+
+watch(eventFilter, (filter) => {
+  const filtered = realtimeEvents.filter(filter)
+  if (filtered.length !== realtimeEvents.length) {
+    realtimeEvents.splice(0, realtimeEvents.length, ...filtered)
+  }
+})
+
+const number = computed(() => (events.total + total.value).toLocaleString('en'));
 
 </script>
 <style scoped lang="less">
@@ -126,6 +185,7 @@ const number = computed(() => (events.total + total.value).toLocaleString('en'))
   box-sizing: border-box;
   position: relative;
   margin: 16px;
+
   &:before {
     display: block;
     content: ' ';
@@ -137,6 +197,7 @@ const number = computed(() => (events.total + total.value).toLocaleString('en'))
     opacity: 0.15;
     border-radius: 6px;
   }
+
   &-title {
     text-align: center;
     font-size: 14px;

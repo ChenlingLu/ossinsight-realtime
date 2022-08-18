@@ -312,7 +312,7 @@ export class DemoEngine extends Engine {
     const color = randomVector3(makeVector3(0), makeVector3(1));
     this._addBrick(from, toPos, scale, new Color(color.x, color.y, color.z), duration, () => {
       this.bricks += 1;
-      this.setCurrent(this.data[this.day][this.week] + this.bricks);
+      this.setCurrent((this.rawData[this.day][this.week]?.events ?? 0) + this.bricks);
       this.addSmoke?.();
     });
   }

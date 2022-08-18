@@ -18,6 +18,7 @@ const { event } = toRefs(props)
   display: block;
   font-size: 12px;
   color: #565656;
+  margin-bottom: 8px;
 
   &:deep(a) {
     text-decoration: none !important;
