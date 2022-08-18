@@ -6,9 +6,9 @@
   </select>
 </template>
 <script lang="ts" setup>
+import { languages } from "./lang";
 const props = defineProps<{ modelValue: string }>();
 const emits = defineEmits(['update:modelValue']);
-import { languages } from "./lang";
 
 const onChange = (event: any) => {
   emits('update:modelValue', event.currentTarget.value);
