@@ -82,8 +82,13 @@ export class DemoEngine extends Engine {
         return;
       }
       if (e.data) {
-        this.controls.autoRotate = e.data.week === this.week && e.data.day === this.day;
-        this.showTooltip(e.data.week, e.data.day);
+        if (this.week === e.data.week && this.day === e.data.day) {
+          this.controls.autoRotate = true;
+          this.hideTooltip();
+        } else {
+          this.showTooltip(e.data.week, e.data.day);
+          this.controls.autoRotate = false;
+        }
         this.setControlPosition(getPos(e.data.week, e.data.day));
       }
     });
@@ -217,7 +222,7 @@ export class DemoEngine extends Engine {
     numbers.object.scale.set(5, 5, 5);
     this.dispatchEvent({
       type: 'update:current-number',
-      value: data[day][week].toLocaleString('en'),
+      value: (this.rawData[day][week]?.events ?? 0).toLocaleString('en'),
     });
     this.scene.add(numbers.object);
 
@@ -235,7 +240,7 @@ export class DemoEngine extends Engine {
       return;
     }
     const { events, event_day } = this.rawData[day][week] ?? { events: 0, event_day: 'unknown' };
-    const pos = getPos(week, day, events / 1000000 * 2);
+    const pos = getPos(week, day, events / 100000 * 2);
     const tooltip = this.tooltip!;
 
     this.dispatchEvent({
@@ -308,7 +313,7 @@ export class DemoEngine extends Engine {
 
     const from = randomVector3(fromPos, new Vector3(25, 10, 25));
     const duration = randomNumber(2, 0.5);
-    const scale = randomNumber(1, 0.4);
+    const scale = randomNumber(3, 0.4);
     const color = randomVector3(makeVector3(0), makeVector3(1));
     this._addBrick(from, toPos, scale, new Color(color.x, color.y, color.z), duration, () => {
       this.bricks += 1;

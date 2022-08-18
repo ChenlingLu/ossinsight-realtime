@@ -19,7 +19,6 @@ const onChange = (event: any) => {
   padding: 8px;
   font-size: 14px;
   border-radius: 3px;
-  min-width: 140px;
   outline: none;
 }
 </style>

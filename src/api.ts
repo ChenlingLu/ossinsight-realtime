@@ -27,7 +27,7 @@ export function transform(data: RawData[]) {
     const day = offset % 7;
     const week = Math.floor(offset / 7);
 
-    map[day][week] = item.events / 1000000;
+    map[day][week] = item.events / 100000;
     rawMap[day][week] = item;
   });
 

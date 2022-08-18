@@ -15,12 +15,12 @@
     </flex>
     <hr class="divider" />
     <flex class="info" direction="row" justify="space-between">
-      <h2>Real-Time Events</h2>
+      <h2>Real-Time Pull Requests</h2>
       <a href="https://ossinsight.io/blog/why-we-choose-tidb-to-support-ossinsight">🤖️ how to make it</a>
     </flex>
     <flex class="info" direction="row" justify="space-between">
       <LangSelect v-model="language" />
-      <RepoFilter v-model="repo" />
+      <RepoFilter v-model="repo" style="margin-left: 16px; flex: 1" />
     </flex>
     <list class="list" :el-ref="(el: HTMLElement) => containerRef = el">
       <transition-group name="list">
@@ -35,6 +35,7 @@
       &nbsp;
       &nbsp;
       <img src="/logos/tidbcloud.png" alt="TiDB Cloud" height="20" />
+      &nbsp;
       &nbsp;
       <img src="/logos/pulsar.png" alt="Pulsar" height="20" />
     </flex>

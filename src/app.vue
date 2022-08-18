@@ -1,17 +1,22 @@
 <template>
   <div class="app">
-    <div class="heading">
+    <a href="https://ossinsight.io" target="_blank">
+      <img class="logo" src="/logos/ossinsight.svg" height="45" alt="OSSInsight Logo">
+    </a>
+    <header class="heading">
       <h1>
-        <img src="/logos/ossinsight.svg" height="45" alt="OSSInsight Logo" style="vertical-align: text-bottom">
         How We Build the World by Coding
       </h1>
       <p>
         {{ formattedDate }}
       </p>
-    </div>
+    </header>
     <main class="main">
       <Scene />
     </main>
+    <footer>
+      <p>Inspired by <GhRepo name="honzaap/GithubCity"/></p>
+    </footer>
     <aside class="side">
       <Side />
     </aside>
@@ -21,6 +26,7 @@
 import Scene from "./components/scene.vue";
 import Side from "./components/side";
 import { computed, ref } from "vue";
+import GhRepo from "./components/ui/gh-repo.vue";
 
 const sideSize = '450px';
 const now = ref(new Date());
@@ -63,15 +69,14 @@ const formattedDate = computed(() => {
   width: v-bind(sideSize);
 }
 
-header {
+.logo {
   position: fixed;
-  top: 16px;
-  left: 16px;
-  z-index: 10000;
-  pointer-events: none;
+  z-index: 1000;
+  left: 8px;
+  top: 8px;
 }
 
-.heading {
+header {
   width: calc(100% - v-bind(sideSize));
   position: fixed;
   left: 0;
@@ -79,17 +84,38 @@ header {
   pointer-events: none;
 }
 
-.heading h1 {
+header h1 {
   margin: 0 auto;
   text-align: center;
   color: white;
 }
 
-.heading p {
+header p {
   margin-top: 16px;
   margin-left: auto;
   margin-right: auto;
   text-align: center;
   color: white;
+}
+
+footer {
+  width: calc(100% - v-bind(sideSize));
+  position: fixed;
+  left: 0;
+  bottom: 16px;
+  pointer-events: none;
+}
+
+footer p {
+  font-size: 12px;
+  margin: 0 auto;
+  text-align: center;
+  color: white;
+}
+
+footer p a {
+  color: white !important;
+  text-decoration: underline;
+  pointer-events: auto;
 }
 </style>
