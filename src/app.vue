@@ -11,6 +11,7 @@
 <script setup lang="ts">
 import Scene from "./components/scene.vue";
 import Side from "./components/side";
+const sideSize = '450px';
 </script>
 <style scoped>
 #app {
@@ -19,9 +20,9 @@ import Side from "./components/side";
   display: flex;
 }
 .main {
-  width: calc(100% - 300px);
+  width: calc(100% - v-bind(sideSize));
 }
 .side {
-  width: 300px;
+  width: v-bind(sideSize);
 }
 </style>

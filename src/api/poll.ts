@@ -1,5 +1,6 @@
 import type { components } from '@octokit/openapi-types';
-import { fromEvent, map } from 'rxjs';
+import { Observable, Subscriber } from 'rxjs';
+import { createDebugLogger } from "../utils/debug";
 
 export type GithubEvent = components['schemas']['event']
 const WS_URL = 'wss://api.ossinsight.io/websocket';
@@ -19,6 +20,8 @@ interface BaseRequest {
    * Specify the user name you want to see. If you don't set it, all user names will be returned.
    */
   userName?: string;
+
+  returnType?: 'map' | 'list'
 }
 
 export interface SamplingRequest extends BaseRequest {
@@ -45,7 +48,7 @@ export interface LoopRequest extends BaseRequest {
 class Connection extends WebSocket {
   private initialized: boolean;
 
-  constructor(endpoint: string, private initialMessage?: string | object, private reInitialize: boolean = false) {
+  constructor(endpoint: string, private initialMessage?: string | object) {
     super(`${WS_URL}/${endpoint}`);
     this.initialized = false;
   }
@@ -63,7 +66,7 @@ class Connection extends WebSocket {
   }
 
   init() {
-    if (this.initialized && !this.reInitialize) {
+    if (this.initialized) {
       return;
     }
     this.initialized = true;
@@ -77,15 +80,100 @@ class Connection extends WebSocket {
   }
 }
 
-export function sampling(req: SamplingRequest) {
-  const conn = new Connection('sampling', req, true);
-  return {
-    source: fromEvent<MessageEvent>(conn, 'message').pipe(map(event => JSON.parse(event.data) as Partial<GithubEvent>)),
-    dispose: () => {
-      conn.close();
-    },
-    start: () => {
-      conn.init();
-    },
-  };
+export const enum ConnectionState {
+  CONNECTING,
+  CONNECTED,
+  CLOSED,
+  ERROR,
+}
+
+export class ConnectionSource<T> extends Observable<T> {
+  private readonly stateListener: ((state: ConnectionState) => void)[] = [];
+
+  onStateChange(cb: (state: ConnectionState) => void) {
+    this.stateListener.push(cb);
+  }
+
+  stateChange(state: ConnectionState) {
+    this.stateListener.forEach(cb => cb(state));
+  }
+
+  constructor(type: string, initReq?: any) {
+    const debug = createDebugLogger('ws');
+
+    let conn: Connection | undefined = undefined;
+    let subscribers: Set<Subscriber<T>> = new Set();
+    super(subscriber => {
+      debug('subscribe');
+      subscribers.add(subscriber);
+
+      const handleMessage = (event: MessageEvent) => {
+        subscriber.next(JSON.parse(event.data));
+      };
+
+      const subscribe = (conn: Connection) => {
+        conn.addEventListener("message", handleMessage);
+      };
+
+      const tryTearDown = () => {
+        debug('teardown');
+        if (conn) {
+          subscribers.delete(subscriber);
+          if (subscribers.size === 0) {
+            if (conn.readyState === WebSocket.OPEN) {
+              conn.close();
+            }
+            conn.removeEventListener('message', handleMessage);
+            conn.removeEventListener('close', handleClose);
+            conn.removeEventListener('error', handleError);
+          }
+        }
+      };
+
+      // init or reopen new one
+      if (!conn || conn.readyState >= WebSocket.CLOSING) {
+        const theConn = conn = new Connection(type, initReq);
+        this.stateChange(ConnectionState.CONNECTING);
+        theConn.addEventListener('open', () => {
+          debug('open');
+          theConn.init();
+          this.stateChange(ConnectionState.CONNECTED);
+        }, { once: true });
+        theConn.addEventListener('close', () => {
+          this.stateChange(ConnectionState.CLOSED);
+        }, { once: true });
+        theConn.addEventListener('error', () => {
+          this.stateChange(ConnectionState.ERROR);
+        }, { once: true });
+      }
+
+      if (conn.readyState === WebSocket.OPEN) {
+        subscribe(conn);
+      } else {
+        // wait ready
+        let theConn = conn;
+        theConn.addEventListener('open', () => subscribe(theConn), { once: true });
+      }
+
+      const handleClose = () => {
+        debug('close');
+        subscriber.complete();
+        subscriber.unsubscribe();
+      };
+      const handleError = () => {
+        debug('error');
+        subscriber.error(new Error('websocket error'));
+        subscriber.unsubscribe();
+      };
+
+      conn.addEventListener('close', handleClose);
+      conn.addEventListener('error', handleError);
+
+      subscriber.add(tryTearDown);
+    });
+  }
+}
+
+export function sampling<Event = Partial<GithubEvent>>(req: SamplingRequest): ConnectionSource<Event> {
+  return new ConnectionSource('sampling', req);
 }

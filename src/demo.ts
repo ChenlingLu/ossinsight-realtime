@@ -36,6 +36,7 @@ import { GithubEvent } from "./api/poll";
 import { RawData } from "./api/total";
 import { dispose } from "./engine/dispose";
 import { makeAnimation } from "./engine/animations";
+import { FilteredEvent } from "./store/poll";
 
 export class DemoEngine extends Engine {
   cache: ObjectCache<Mesh>;
@@ -180,7 +181,7 @@ export class DemoEngine extends Engine {
 
       makeAnimation(this.mixers, element, 'smoke', duration, [
         new VectorKeyframeTrack('.position', [0, duration], [from, to].flatMap(vec => vec.toArray())),
-        new NumberKeyframeTrack('.material.opacity', [0, duration * 0.4, duration * 0.6, duration], [0, 0.9, 0.9, 0], InterpolateLinear),
+        new NumberKeyframeTrack('.material.opacity', [0, duration * 0.4, duration * 0.6, duration], [0, 0.6, 0.6, 0], InterpolateLinear),
         new QuaternionKeyframeTrack('.quaternion', [0, duration], [qInitial, qFinal].flatMap(q => q.toArray())),
       ], NormalAnimationBlendMode).setLoop(LoopOnce, 1).play();
     };
@@ -300,7 +301,7 @@ export class DemoEngine extends Engine {
     });
   }
 
-  addBrick(_event: Partial<GithubEvent>) {
+  addBrick(_event: FilteredEvent) {
     // add bricks
     const fromPos = getPos(this.week, this.day).setY(40);
     const toPos = fromPos.clone().setY(this.data[this.day][this.week] * FLOOR_HEIGHT * 2);

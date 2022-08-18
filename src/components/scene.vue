@@ -6,27 +6,32 @@
 </template>
 <script setup lang="ts">
 import { Event } from "three";
-import { ref, watch } from "vue";
+import { onMounted, ref, watch } from "vue";
 import { DemoEngine } from "../demo";
 import Tooltip from "./tooltip.vue";
 import Numbers from "./numbers.vue";
-import { isVisible } from "./hooks/visible";
-import { useApi, useSampling } from "./hooks/api";
-import { getTotal } from "../api/total";
 import { useCSS2DObject } from "./hooks/css2d";
 import { makeVNodesRenderer } from "./vnodes";
+import { useEvents } from "../store";
+import { prEventsPollStore, process } from "../store/poll";
+import { subscribeOnVisible } from "./hooks/observable";
 
 const container = ref<HTMLElement>();
 const canvas = ref<HTMLCanvasElement>();
 const engineRef = ref<DemoEngine>();
-const visible = isVisible(document);
-const { stream: eventStream, start: startEventStream } = useSampling(visible);
-const { data: total } = useApi(getTotal);
+
+const usePREvents = prEventsPollStore('pullRequestEvents');
+const prEvents = usePREvents();
+const events = useEvents();
 
 const tooltip = useCSS2DObject(Tooltip, { text: '' });
 const numbers = useCSS2DObject(Numbers, { text: '' });
 
 const CSSObjects = makeVNodesRenderer([tooltip.vnode, numbers.vnode]);
+
+onMounted(() => {
+  events.reload();
+});
 
 watch([canvas, container], ([canvas, container]) => {
   if (canvas && container) {
@@ -61,20 +66,17 @@ watch(engineRef, (engine, _, onCleanup) => {
   }
 });
 
-watch([engineRef, () => total.response] as const, ([engine, resp]) => {
+watch([engineRef, () => events.events] as const, ([engine, resp]) => {
   if (engine && resp) {
     engine.setTotal(resp);
   }
 });
 
-watch([engineRef, eventStream], ([engine, stream], _, onCleanup) => {
-  if (engine && stream) {
-    const subscription = stream.subscribe(event => engine.addBrick(event));
-    startEventStream();
-    onCleanup(() => subscription.unsubscribe());
+subscribeOnVisible(() => prEvents.stream, (engine) => {
+  if (engine) {
+    return event => engine.addBrick(process(event));
   }
-});
-
+}, engineRef);
 </script>
 <style scoped>
 .container {
