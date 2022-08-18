@@ -245,7 +245,7 @@ export class DemoEngine extends Engine {
 
     this.dispatchEvent({
       type: 'update:tooltip',
-      value: `${fmt.format(new Date(event_day))}\n${events.toLocaleString('en')} events`,
+      value: `${fmt.format(new Date(event_day))}\n${events.toLocaleString('en')} pull requests`,
     });
     tooltip.object.position.copy(pos.clone().setY(pos.y));
     if (!tooltip.rendered) {
