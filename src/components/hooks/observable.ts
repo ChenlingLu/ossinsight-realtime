@@ -10,7 +10,7 @@ declare type MapSources<T, Immediate> = {
 type Subscribe<T> = ((value: T) => void);
 
 export function subscribeOnVisible<T, S extends WatchSource[]>(getObservable: () => Observable<T>, cb: (...source: MapSources<S, false>) => Subscribe<T> | void, ...source: S) {
-  const visible = isVisible(document);
+  const visible = isVisible(document, 5000);
 
   watch([getObservable, visible, ...source] as const, ([observable, visible, ...source], _, onCleanup) => {
     if (visible) {

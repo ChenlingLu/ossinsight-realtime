@@ -207,6 +207,7 @@ const number = computed(() => (events.total + total.value).toLocaleString('en'))
     .numbers {
       font-size: 24px;
       font-weight: bold;
+      font-family: monospace;
     }
   }
 }

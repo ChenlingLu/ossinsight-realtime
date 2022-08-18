@@ -3,6 +3,7 @@ body {
   padding: 0;
   min-height: 100vh;
   font-family: -apple-system, "PingFang SC", "Helvetica", sans-serif;
+  overflow: hidden;
 }
 
 html {

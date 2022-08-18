@@ -15,7 +15,6 @@
   rotate: 45deg;
   background: #0085FF;
   color: white;
-  background-blend-mode: exclusion;
   font-size: 16px;
   font-weight: bold;
 

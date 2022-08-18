@@ -24,7 +24,7 @@ const props = defineProps<{ container?: HTMLElement, text: string }>();
   -webkit-text-stroke: 1px black;
   white-space: pre-wrap;
   padding: 4px 8px;
-  font-family: -apple-system, "PingFang SC", "Helvetica", sans-serif;
+  font-family: monospace;
   font-size: 26px;
   font-weight: bolder;
 }
