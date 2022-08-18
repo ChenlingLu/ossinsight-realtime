@@ -3,7 +3,7 @@
     <flex class="banner">
       <h2 class="banner-title">
         <span>
-          Total Pull Request Events in GitHub World since 2011
+          Total Pull Request Events in GitHub World since {{(new Date()).getUTCFullYear()}}
         </span>
         <flex direction="row" justify="center" align="center" style="margin-top: 8px">
           <Dot :color="colorMap[state]" style="margin-right: 4px" />

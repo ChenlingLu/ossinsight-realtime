@@ -17,6 +17,7 @@
     <footer>
       <p>Inspired by <GhRepo name="honzaap/GithubCity"/></p>
     </footer>
+    <demo-tag />
     <aside class="side">
       <Side />
     </aside>
@@ -27,6 +28,7 @@ import Scene from "./components/scene.vue";
 import Side from "./components/side";
 import { computed, ref } from "vue";
 import GhRepo from "./components/ui/gh-repo.vue";
+import DemoTag from "./components/ui/demo-tag.vue";
 
 const sideSize = '450px';
 const now = ref(new Date());
