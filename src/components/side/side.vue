@@ -18,7 +18,7 @@
       <h2>Real-Time Events</h2>
       <a href="#">🤖️ how to make it</a>
     </flex>
-    <list class="list" :el-ref="el => containerRef = el">
+    <list class="list" :el-ref="(el: HTMLElement) => containerRef = el">
       <transition-group name="list">
         <li v-for="(event, i) in realtimeEvents" :key="event.id" :ref="el => refEl(i, el)">
           <Event :event="event" />
@@ -58,7 +58,7 @@ const state = ref(ConnectionState.CONNECTING);
 const elements = reactive<(HTMLElement | undefined)[]>([]);
 const containerRef = ref<HTMLElement>();
 
-const refEl = (i: number, el: HTMLElement | undefined) => {
+const refEl = (i: number, el: any) => {
   elements[i] = el ? markRaw(el) : undefined;
 };
 
