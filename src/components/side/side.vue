@@ -16,7 +16,7 @@
     <hr class="divider" />
     <flex class="info" direction="row" justify="space-between">
       <h2>Real-Time Events</h2>
-      <a href="#">🤖️ how to make it</a>
+      <a href="https://ossinsight.io/blog/why-we-choose-tidb-to-support-ossinsight">🤖️ how to make it</a>
     </flex>
     <flex class="info" direction="row" justify="space-between">
       <LangSelect v-model="language" />
