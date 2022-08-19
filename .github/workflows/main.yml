@@ -36,3 +36,4 @@ jobs:
         with:
           build_dir: dist
           email: 634750802@qq.com
+          cname: live.ossinsight.io
