@@ -1,7 +1,10 @@
 import { acceptHMRUpdate, defineStore } from "pinia";
-import { ConnectionSource, sampling, SamplingRequest } from "../api/poll";
+import { ConnectionSource, sampling, SamplingRequest } from "@/api/poll";
 import { markRaw } from "vue";
 
+export interface PollStore<T> {
+  stream: ConnectionSource<T>;
+}
 
 export type CreatePoller<P, T> = (params: P) => ConnectionSource<T>
 

@@ -1,6 +1,6 @@
 import type { components } from '@octokit/openapi-types';
 import { Observable, Subscriber } from 'rxjs';
-import { createDebugLogger } from "../utils/debug";
+import { createDebugLogger } from "@/utils/debug";
 
 export type GithubEvent = components['schemas']['event']
 const WS_URL = 'wss://api.ossinsight.io/websocket';

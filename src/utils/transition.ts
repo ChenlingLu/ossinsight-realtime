@@ -1,5 +1,5 @@
 import { EventDispatcher, Vector2, Vector3 } from "three";
-import { Updatable } from "../engine/updatables";
+import { Updatable } from "@/engine/updatables";
 
 abstract class Transition extends EventDispatcher implements Updatable {
   finished = false;

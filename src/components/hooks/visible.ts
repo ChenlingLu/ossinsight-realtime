@@ -1,31 +1,8 @@
-import { onBeforeUnmount, onMounted, ref, Ref } from "vue";
+import { inject, readonly, ref, Ref } from "vue";
+import { SYMBOL_VISIBLE } from "@/plugins/visible";
 
-export function isVisible(document: Document, throttle = 0): Ref<boolean> {
-  const inView = ref(document.visibilityState === 'visible');
-  let throttleHandler: ReturnType<typeof setTimeout> | undefined = undefined;
-  const handleVisibilityChange = () => {
-    const visible = document.visibilityState === 'visible';
-    if (visible) {
-      clearTimeout(throttleHandler);
-      inView.value = true;
-    } else {
-      if (throttle) {
-        throttleHandler = setTimeout(() => {
-          inView.value = false;
-        }, throttle);
-      } else {
-        inView.value = false;
-      }
-    }
-  };
+const TRUE = readonly(ref(true));
 
-  onMounted(() => {
-    document.addEventListener('visibilitychange', handleVisibilityChange);
-  });
-
-  onBeforeUnmount(() => {
-    document.removeEventListener('visibilitychange', handleVisibilityChange);
-  });
-
-  return inView;
+export function useVisible(): Readonly<Ref<boolean>> {
+  return inject<Readonly<Ref<boolean>>>(SYMBOL_VISIBLE) ?? TRUE;
 }

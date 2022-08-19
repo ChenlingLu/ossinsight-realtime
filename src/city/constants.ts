@@ -1,6 +1,6 @@
 // see https://github.com/honzaap/GithubCity/blob/main/constants.js
 
-import { RawData } from "../api/total";
+import { RawData } from "@/api/total";
 
 export type BuildingType = {
   groundUrl: string;

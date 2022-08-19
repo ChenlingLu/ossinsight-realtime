@@ -17,7 +17,7 @@
 import { BuildingTileType, RoadTileType, TileType } from "./algo";
 import { Group, MathUtils, Object3D, Scene, Vector3 } from "three";
 import { FLOOR_HEIGHT, GRASS_ASSET, ROAD_TYPES, TREES_SMALL } from "./constants";
-import { setShadow } from "../engine/shadow";
+import { setShadow } from "@/engine/shadow";
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader";
 
 export const renderShiftX = -26;

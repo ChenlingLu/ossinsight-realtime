@@ -15,7 +15,9 @@
       <Scene />
     </main>
     <footer>
-      <p>Inspired by <GhRepo name="honzaap/GithubCity"/></p>
+      <p>Inspired by
+        <GhRepo name="honzaap/GithubCity" />
+      </p>
     </footer>
     <demo-tag />
     <aside class="side">
@@ -25,7 +27,7 @@
 </template>
 <script setup lang="ts">
 import Scene from "./components/scene.vue";
-import Side from "./components/side";
+import Side from "./components/side.vue";
 import { computed, ref } from "vue";
 import GhRepo from "./components/ui/gh-repo.vue";
 import DemoTag from "./components/ui/demo-tag.vue";
@@ -47,7 +49,7 @@ const fmt = new Intl.DateTimeFormat('en', {
   // timeZoneName: "shortOffset",
   hour12: false,
   timeStyle: 'full',
-  dateStyle: 'full'
+  dateStyle: 'full',
 });
 
 const formattedDate = computed(() => {
