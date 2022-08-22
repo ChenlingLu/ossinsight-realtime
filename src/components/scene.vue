@@ -11,6 +11,7 @@ import { useActive } from "./hooks/lifecycle";
 import { map } from "rxjs";
 import { useEngine, useEngineCssElements } from "@/components/hooks/engine";
 import { RawData } from "@/api/total";
+import { RawSamplingFirstMessage } from "@/api/poll";
 
 const active = useActive();
 
@@ -18,9 +19,19 @@ const canvas = ref<HTMLCanvasElement>();
 const container = ref<HTMLElement>();
 const engineRef = useEngine(canvas, container);
 
+const processFirstMessage = (firstMessage?: RawSamplingFirstMessage) => {
+  if (!firstMessage) {
+    return [];
+  }
+  return Object.entries(firstMessage.eventMap).map(([event_day, events]) => ({
+    event_day,
+    events: parseInt(events),
+  }));
+};
+
 const usePREvents = prEventsPollStore('pullRequestEvents');
 const prEvents = usePREvents();
-const events = ref<RawData[]>();
+const events = ref<RawData[]>(processFirstMessage(prEvents.stream.lastFirstMessage));
 
 const CSSElements = useEngineCssElements(engineRef);
 
@@ -39,10 +50,7 @@ watchEffect((onCleanup) => {
         .pipe(map(process))
         .subscribe(event => engine.addBrick(event));
     subscription.add(prEvents.firstMessage.subscribe(firstMessage => {
-      events.value = Object.entries(firstMessage.eventMap).map(([event_day, events]) => ({
-        event_day,
-        events: parseInt(events),
-      }));
+      events.value = processFirstMessage(firstMessage);
     }));
     onCleanup(() => subscription.unsubscribe());
   }

@@ -19,7 +19,7 @@ function poll<TMap extends Record<K, T>, F extends FirstMessage, K extends strin
       }),
       actions: {},
       getters: {
-        firstMessage: state => state.stream.firstMessage
+        firstMessage: state => state.stream.firstMessage,
       },
     });
 

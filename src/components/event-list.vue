@@ -15,6 +15,7 @@ import { useActive } from "./hooks/lifecycle";
 import { FilteredEvent, PollStore, process, RawFilteredEvent } from "@/store/poll";
 import { bufferTime, filter, map, Subject } from "rxjs";
 import { languages } from "./ui/lang";
+import { RawSamplingFirstMessage } from "@/api/poll";
 
 const allPass = (_: FilteredEvent) => true;
 
@@ -27,7 +28,7 @@ const active = useActive();
 const subject = new Subject<FilteredEvent>();
 
 const props = defineProps<{
-  source: PollStore<RawFilteredEvent>,
+  source: PollStore<RawFilteredEvent, RawSamplingFirstMessage>,
   language: string,
   repo: string,
 }>();

@@ -41,16 +41,23 @@ import { computed, ref, watchEffect } from "vue";
 import { prEventsPollStore } from "@/store/poll";
 import { useActive } from "./hooks/lifecycle";
 import Dot from "./ui/dot.vue";
-import { ConnectionState } from "@/api/poll";
+import { ConnectionState, RawSamplingFirstMessage } from "@/api/poll";
 import LangSelect from "./ui/lang-select.vue";
 import RepoFilter from "./ui/repo-filter.vue";
 import EventList from "./event-list.vue";
 
 const usePrEvents = prEventsPollStore('pullRequestEvents');
 
+const getEventCount = (firstEventMessage?: RawSamplingFirstMessage) => {
+  if (!firstEventMessage) {
+    return 0
+  }
+  return Object.values(firstEventMessage.eventMap).reduce((a, b) => a + parseInt(b), 0)
+}
+
 const active = useActive();
-const events = ref(0);
 const prEvents = usePrEvents();
+const events = ref(getEventCount(prEvents.stream.lastFirstMessage));
 const total = ref(0);
 const state = ref(ConnectionState.CONNECTING);
 const language = ref('All');
@@ -69,7 +76,7 @@ watchEffect((onCleanup) => {
   if (active.value) {
     const subscription = prEvents.stream.subscribe(() => total.value++);
     subscription.add(prEvents.firstMessage.subscribe(fm => {
-      events.value = Object.values(fm.eventMap).reduce((a, b) => a + parseInt(b), 0);
+      events.value = getEventCount(fm);
       total.value = 0;
     }));
     onCleanup(() => subscription.unsubscribe());

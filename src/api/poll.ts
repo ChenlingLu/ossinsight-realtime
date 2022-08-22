@@ -98,6 +98,7 @@ export interface RawSamplingFirstMessage extends FirstMessage {
 export class ConnectionSource<T, F extends FirstMessage> extends Observable<T> {
   private readonly stateListener: ((state: ConnectionState) => void)[] = [];
   public readonly firstMessage: Subject<F> = new Subject<F>();
+  public lastFirstMessage?: F
 
   onStateChange(cb: (state: ConnectionState) => void) {
     this.stateListener.push(cb);
@@ -121,6 +122,7 @@ export class ConnectionSource<T, F extends FirstMessage> extends Observable<T> {
         if (firstMessage.firstMessageTag) {
           debug('firstMessage', firstMessage);
           this.firstMessage.next(firstMessage);
+          this.lastFirstMessage = firstMessage;
         } else {
           subscriber.next(JSON.parse(event.data));
         }
