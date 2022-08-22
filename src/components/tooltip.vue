@@ -2,7 +2,7 @@
   <Teleport :to="props.container ?? 'body'">
     <div class="container">
       <div class="content">
-        <p class="headline">
+        <p class="headline bold">
           <template v-if="props.isToday">
             Total Pull Requests today
           </template>
@@ -10,7 +10,7 @@
             Total Pull Requests at {{ props.date }}
           </template>
         </p>
-        <p>
+        <p class="data">
           <PrIcon />
           <code class="number">{{ props.value }}</code>
         </p>
@@ -23,8 +23,8 @@
             <template v-else>
               Total floors:
             </template>
+            {{ props.floor }}
           </span>
-          {{ props.floor }}
         </p>
         <p class="headline extra">
           *100,000 pull requests extrude 1 floor
@@ -35,7 +35,7 @@
 </template>
 <script setup lang="ts">
 import { defineProps, Teleport } from "vue";
-import PrIcon from '@primer/octicons/build/svg/git-pull-request-24.svg?component';
+import PrIcon from '@primer/octicons/build/svg/git-pull-request-16.svg?component';
 
 const props = defineProps<{ container?: HTMLElement, isToday: boolean, date: string, value: string, floor: number }>();
 
@@ -75,7 +75,6 @@ p {
 }
 
 svg {
-  vertical-align: text-bottom;
   margin-right: 8px;
   margin-left: 4px;
 }
@@ -85,7 +84,8 @@ svg {
 }
 
 .number {
-  font-size: 24px;
+  font-size: 28px;
+  font-weight: bold;
 }
 
 hr {
@@ -103,4 +103,11 @@ hr {
   color: #7c7c7c;
 }
 
+.bold {
+  font-weight: bold;
+}
+
+.data{
+  line-height: 1.5;
+}
 </style>
