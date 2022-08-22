@@ -119,6 +119,7 @@ export class ConnectionSource<T, F extends FirstMessage> extends Observable<T> {
       const handleMessage = (event: MessageEvent) => {
         const firstMessage = JSON.parse(event.data);
         if (firstMessage.firstMessageTag) {
+          debug('firstMessage', firstMessage);
           this.firstMessage.next(firstMessage);
         } else {
           subscriber.next(JSON.parse(event.data));
