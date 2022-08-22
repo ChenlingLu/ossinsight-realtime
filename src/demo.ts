@@ -48,6 +48,7 @@ export class DemoEngine extends Engine {
   rawData: (RawData | undefined)[][] = INIT_RAW;
   bricks: number = 0;
   groups?: Group[][];
+  focusingToday: boolean = true;
 
   constructor(window: Window, canvas: HTMLCanvasElement, container?: HTMLElement) {
     super(window, canvas, container);
@@ -82,13 +83,10 @@ export class DemoEngine extends Engine {
         return;
       }
       if (e.data) {
-        if (this.week === e.data.week && this.day === e.data.day) {
-          this.controls.autoRotate = true;
-          this.hideTooltip();
-        } else {
-          this.showTooltip(e.data.week, e.data.day);
-          this.controls.autoRotate = false;
-        }
+        const isToday = this.week === e.data.week && this.day === e.data.day
+        this.showTooltip(e.data.week, e.data.day);
+        this.controls.autoRotate = isToday;
+        this.focusingToday = isToday;
         this.setControlPosition(getPos(e.data.week, e.data.day));
       }
     });
@@ -216,15 +214,7 @@ export class DemoEngine extends Engine {
     this.createSmoke(pos);
 
     // create numbers
-    const numbers = this.numbers!;
-    numbers.object.position.copy(pos);
-    numbers.object.position.y += 1.5;
-    numbers.object.scale.set(5, 5, 5);
-    this.dispatchEvent({
-      type: 'update:current-number',
-      value: (this.rawData[day][week]?.events ?? 0).toLocaleString('en'),
-    });
-    this.scene.add(numbers.object);
+    // this.showNumbers(pos, week, day)
 
     // add base
     this.gltfLoader.load('models/building_base.glb', gltf => {
@@ -235,17 +225,38 @@ export class DemoEngine extends Engine {
     });
   }
 
+  showNumbers (pos: Vector3, week: number, day: number) {
+    const numbers = this.numbers!;
+    numbers.object.position.copy(pos);
+    numbers.object.position.y += 1.5;
+    numbers.object.scale.set(5, 5, 5);
+    if (!numbers.rendered) {
+      this.scene.add(numbers.object);
+      numbers.rendered = true
+    }
+  }
+
+  hideNumbers () {
+    if (this.numbers?.rendered) {
+      this.numbers.rendered = false;
+      this.numbers.object.removeFromParent();
+    }
+  }
+
   showTooltip(week: number, day: number) {
     if (!this.rawData) {
       return;
     }
     const { events, event_day } = this.rawData[day][week] ?? { events: 0, event_day: 'unknown' };
-    const pos = getPos(week, day, events / 100000 * 2);
+    const pos = getPos(week, day, events / 100000 * FLOOR_HEIGHT * 2);
     const tooltip = this.tooltip!;
 
     this.dispatchEvent({
       type: 'update:tooltip',
-      value: `${fmt.format(new Date(event_day))}\n${events.toLocaleString('en')} pull requests`,
+      date: fmt.format(new Date(event_day)),
+      value: events.toLocaleString('en'),
+      isToday: week === this.week && day === this.day,
+      floor: Math.floor(events / 100000),
     });
     tooltip.object.position.copy(pos.clone().setY(pos.y));
     if (!tooltip.rendered) {
@@ -331,7 +342,7 @@ export class DemoEngine extends Engine {
 }
 
 export function getPos(week: number, day: number, h?: number) {
-  return new Vector3(2 * (week + renderShiftX) * 1.1, -renderShiftZ + (h ?? 0), 2 * (day + renderShiftY) * 1.1);
+  return new Vector3(2 * (week + renderShiftX) * 1.1, renderShiftZ * 2 + (h ?? 0), 2 * (day + renderShiftY) * 1.1);
 }
 
 const fmt = Intl.DateTimeFormat('en', { year: 'numeric', month: '2-digit', day: '2-digit' });

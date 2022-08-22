@@ -30,7 +30,7 @@ export function useEngine(canvasRef: Ref<HTMLCanvasElement | undefined>, contain
 }
 
 export function useEngineCssElements(engineRef: EngineRef) {
-  const tooltip = useCSS2DObject(Tooltip, { text: '' });
+  const tooltip = useCSS2DObject(Tooltip, { date: '', value: '', isToday: true, floor: 0 });
   const numbers = useCSS2DObject(Numbers, { text: '' });
 
   watchEffect((onCleanup) => {
@@ -40,11 +40,17 @@ export function useEngineCssElements(engineRef: EngineRef) {
       numbers.container.value = engine.numbers!.element;
 
       const tooltipUpdateHandler = (event: Event) => {
-        tooltip.props.text = event.value;
+        tooltip.props.date = event.date;
+        tooltip.props.value = event.value;
+        tooltip.props.isToday = event.isToday;
+        tooltip.props.floor = event.floor;
       };
 
       const numbersUpdateHandler = (event: Event) => {
         numbers.props.text = event.value;
+        if (engine.focusingToday) {
+          tooltip.props.value = event.value;
+        }
       };
 
       engine.addEventListener('update:tooltip', tooltipUpdateHandler);
