@@ -1,14 +1,14 @@
 import { acceptHMRUpdate, defineStore } from "pinia";
-import { ConnectionSource, sampling, SamplingRequest } from "@/api/poll";
+import { ConnectionSource, FirstMessage, RawSamplingFirstMessage, sampling, SamplingRequest } from "@/api/poll";
 import { markRaw } from "vue";
 
-export interface PollStore<T> {
-  stream: ConnectionSource<T>;
+export interface PollStore<T, F extends FirstMessage> {
+  stream: ConnectionSource<T, F>;
 }
 
-export type CreatePoller<P, T> = (params: P) => ConnectionSource<T>
+export type CreatePoller<P, T, F extends FirstMessage> = (params: P) => ConnectionSource<T, F>
 
-function poll<TMap extends Record<K, T>, K extends string = string & keyof TMap, T = TMap[K], R extends Record<K, any> = any>(name: string, createPoller: CreatePoller<R[K], T>, options: R) {
+function poll<TMap extends Record<K, T>, F extends FirstMessage, K extends string = string & keyof TMap, T = TMap[K], R extends Record<K, any> = any>(name: string, createPoller: CreatePoller<R[K], T, F>, options: R) {
   return function createUsePoll(type: K) {
     const param = options[type];
     const storeName = `poll/${name}/${type}`;
@@ -18,7 +18,9 @@ function poll<TMap extends Record<K, T>, K extends string = string & keyof TMap,
         stream: markRaw(createPoller(param)),
       }),
       actions: {},
-      getters: {},
+      getters: {
+        firstMessage: state => state.stream.firstMessage
+      },
     });
 
     if (import.meta.hot) {
@@ -51,7 +53,7 @@ export function process(raw: RawFilteredEvent): FilteredEvent {
   };
 }
 
-export const prEventsPollStore = poll<{ 'pullRequestEvents': RawFilteredEvent }>('sampling', sampling, {
+export const prEventsPollStore = poll<{ 'pullRequestEvents': RawFilteredEvent }, RawSamplingFirstMessage>('sampling', sampling, {
   pullRequestEvents: {
     samplingRate: 1,
     filter: ['id', 'payload.action', 'payload.pull_request.number', 'repo.name', 'actor.login', 'payload.pull_request.base.repo.language'],

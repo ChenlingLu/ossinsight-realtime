@@ -5,12 +5,12 @@
   </div>
 </template>
 <script setup lang="ts">
-import { onMounted, ref, watchEffect } from "vue";
-import { useEvents } from "@/store";
+import { ref, watchEffect } from "vue";
 import { prEventsPollStore, process } from "@/store/poll";
 import { useActive } from "./hooks/lifecycle";
 import { map } from "rxjs";
 import { useEngine, useEngineCssElements } from "@/components/hooks/engine";
+import { RawData } from "@/api/total";
 
 const active = useActive();
 
@@ -20,17 +20,13 @@ const engineRef = useEngine(canvas, container);
 
 const usePREvents = prEventsPollStore('pullRequestEvents');
 const prEvents = usePREvents();
-const events = useEvents();
+const events = ref<RawData[]>();
 
 const CSSElements = useEngineCssElements(engineRef);
 
-onMounted(() => {
-  events.reload();
-});
-
 watchEffect(() => {
   const engine = engineRef.value;
-  const newEvents = events.data;
+  const newEvents = events.value;
   if (engine && newEvents) {
     engine.setTotal(newEvents);
   }
@@ -38,10 +34,16 @@ watchEffect(() => {
 
 watchEffect((onCleanup) => {
   const engine = engineRef.value;
-  if (events.ready && active.value && engine) {
+  if (active.value && engine) {
     const subscription = prEvents.stream
         .pipe(map(process))
         .subscribe(event => engine.addBrick(event));
+    subscription.add(prEvents.firstMessage.subscribe(firstMessage => {
+      events.value = Object.entries(firstMessage.eventMap).map(([event_day, events]) => ({
+        event_day,
+        events: parseInt(events),
+      }));
+    }));
     onCleanup(() => subscription.unsubscribe());
   }
 });

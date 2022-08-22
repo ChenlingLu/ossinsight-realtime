@@ -48,6 +48,7 @@ const props = defineProps<{ container?: HTMLElement, isToday: boolean, date: str
 .content {
   position: relative;
   margin-top: -50%;
+  transform: translate3d(-2px, -8px, 0);
   border-radius: 4px;
   color: white;
   background: #2c2c2c;

@@ -37,7 +37,6 @@
 </template>
 <script setup lang="ts">
 import Flex from "./ui/flex.vue";
-import { useEvents } from "@/store";
 import { computed, ref, watchEffect } from "vue";
 import { prEventsPollStore } from "@/store/poll";
 import { useActive } from "./hooks/lifecycle";
@@ -50,7 +49,7 @@ import EventList from "./event-list.vue";
 const usePrEvents = prEventsPollStore('pullRequestEvents');
 
 const active = useActive();
-const events = useEvents();
+const events = ref(0);
 const prEvents = usePrEvents();
 const total = ref(0);
 const state = ref(ConnectionState.CONNECTING);
@@ -69,11 +68,15 @@ prEvents.stream.onStateChange(newState => state.value = newState);
 watchEffect((onCleanup) => {
   if (active.value) {
     const subscription = prEvents.stream.subscribe(() => total.value++);
+    subscription.add(prEvents.firstMessage.subscribe(fm => {
+      events.value = Object.values(fm.eventMap).reduce((a, b) => a + parseInt(b), 0);
+      total.value = 0;
+    }));
     onCleanup(() => subscription.unsubscribe());
   }
 });
 
-const number = computed(() => (events.total + total.value).toLocaleString('en'));
+const number = computed(() => (events.value + total.value).toLocaleString('en'));
 </script>
 <style scoped lang="less">
 .container {

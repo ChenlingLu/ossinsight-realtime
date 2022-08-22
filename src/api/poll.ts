@@ -1,5 +1,5 @@
 import type { components } from '@octokit/openapi-types';
-import { Observable, Subscriber } from 'rxjs';
+import { Observable, Subject, Subscriber } from 'rxjs';
 import { createDebugLogger } from "@/utils/debug";
 
 export type GithubEvent = components['schemas']['event']
@@ -21,7 +21,7 @@ interface BaseRequest {
    */
   userName?: string;
 
-  returnType?: 'map' | 'list'
+  returnType?: 'map' | 'list';
 }
 
 export interface SamplingRequest extends BaseRequest {
@@ -87,8 +87,17 @@ export const enum ConnectionState {
   ERROR,
 }
 
-export class ConnectionSource<T> extends Observable<T> {
+export interface FirstMessage {
+  firstMessageTag: true;
+}
+
+export interface RawSamplingFirstMessage extends FirstMessage {
+  eventMap: Record<string, string>;
+}
+
+export class ConnectionSource<T, F extends FirstMessage> extends Observable<T> {
   private readonly stateListener: ((state: ConnectionState) => void)[] = [];
+  public readonly firstMessage: Subject<F> = new Subject<F>();
 
   onStateChange(cb: (state: ConnectionState) => void) {
     this.stateListener.push(cb);
@@ -108,7 +117,12 @@ export class ConnectionSource<T> extends Observable<T> {
       subscribers.add(subscriber);
 
       const handleMessage = (event: MessageEvent) => {
-        subscriber.next(JSON.parse(event.data));
+        const firstMessage = JSON.parse(event.data);
+        if (firstMessage.firstMessageTag) {
+          this.firstMessage.next(firstMessage);
+        } else {
+          subscriber.next(JSON.parse(event.data));
+        }
       };
 
       const subscribe = (conn: Connection) => {
@@ -174,6 +188,6 @@ export class ConnectionSource<T> extends Observable<T> {
   }
 }
 
-export function sampling<Event = Partial<GithubEvent>>(req: SamplingRequest): ConnectionSource<Event> {
+export function sampling<Event = Partial<GithubEvent>>(req: SamplingRequest): ConnectionSource<Event, RawSamplingFirstMessage> {
   return new ConnectionSource('sampling', req);
 }
