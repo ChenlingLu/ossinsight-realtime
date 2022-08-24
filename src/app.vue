@@ -5,7 +5,7 @@
     </a>
     <header class="heading">
       <h1>
-        How We Build the World by Coding
+        How Developers Build the Open Source Software World Together!
       </h1>
       <p>
         {{ formattedDate }}
@@ -92,6 +92,8 @@ header h1 {
   margin: 0 auto;
   text-align: center;
   color: white;
+  font-size: 20px;
+  font-weight: bold;
 }
 
 header p {

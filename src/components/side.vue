@@ -3,7 +3,9 @@
     <flex class="banner">
       <h2 class="banner-title">
         <span>
-          Total Pull Request Events in GitHub World since {{ (new Date()).getUTCFullYear() }}
+          Total <a
+            href="https://docs.github.com/en/developers/webhooks-and-events/events/github-event-types#pullrequestevent"
+            target="_blank">Pull Request Events</a> made by developers {{ (new Date()).getUTCFullYear() }}
         </span>
         <flex direction="row" justify="center" align="center" style="margin-top: 8px">
           <Dot :color="colorMap[state]" style="margin-right: 4px" />
@@ -50,10 +52,10 @@ const usePrEvents = prEventsPollStore('pullRequestEvents');
 
 const getEventCount = (firstEventMessage?: RawSamplingFirstMessage) => {
   if (!firstEventMessage) {
-    return 0
+    return 0;
   }
-  return Object.values(firstEventMessage.eventMap).reduce((a, b) => a + parseInt(b), 0)
-}
+  return Object.values(firstEventMessage.eventMap).reduce((a, b) => a + parseInt(b), 0);
+};
 
 const active = useActive();
 const prEvents = usePrEvents();
@@ -98,6 +100,11 @@ const number = computed(() => (events.value + total.value).toLocaleString('en'))
   position: relative;
   margin: 16px;
 
+  a {
+    color: unset !important;
+    pointer-events: auto;
+  }
+
   &:before {
     display: block;
     content: ' ';
@@ -108,6 +115,7 @@ const number = computed(() => (events.value + total.value).toLocaleString('en'))
     background: linear-gradient(95.09deg, #34A352 1.97%, #0085FF 94.72%);
     opacity: 0.15;
     border-radius: 6px;
+    pointer-events: none;
   }
 
   &-title {

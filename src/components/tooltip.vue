@@ -4,7 +4,7 @@
       <div class="content">
         <p class="headline bold">
           <template v-if="props.isToday">
-            Total Pull Requests Events today
+            Total <a href="https://docs.github.com/en/developers/webhooks-and-events/events/github-event-types#pullrequestevent" target="_blank">Pull Request Events</a> today
           </template>
           <template v-else>
             Total Pull Requests at {{ props.date }}
@@ -110,5 +110,10 @@ hr {
 
 .data{
   line-height: 1.5;
+}
+
+a {
+  color: unset !important;
+  pointer-events: auto;
 }
 </style>
