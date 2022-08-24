@@ -77,6 +77,10 @@ prEvents.stream.onStateChange(newState => state.value = newState);
 watchEffect((onCleanup) => {
   if (active.value) {
     const subscription = prEvents.stream.subscribe(() => total.value++);
+    if (prEvents.stream.lastFirstMessage) {
+      events.value = getEventCount(prEvents.stream.lastFirstMessage);
+      total.value = 0;
+    }
     subscription.add(prEvents.firstMessage.subscribe(fm => {
       events.value = getEventCount(fm);
       total.value = 0;
