@@ -9,9 +9,10 @@
         :style="{ opacity: focused ? 1 : 0 }"
         placeholder="Search..."
         v-model="search"
-        @keydown.down="keyboardFocused = Math.min((selectFocused ?? -1) + 1, filteredLanguages.length - 1); mouseFocused = undefined; scrollIfNeed()"
-        @keydown.up="keyboardFocused = Math.max((selectFocused ?? 1) - 1, 0); mouseFocused = undefined; scrollIfNeed()"
+        @keydown.down="keyboardFocused = Math.min((selectFocused ?? -1) + 1, filteredLanguages.length - 1); mouseFocused = undefined; scrollIfNeed(); mouseDisabled = true;"
+        @keydown.up="keyboardFocused = Math.max((selectFocused ?? 1) - 1, 0); mouseFocused = undefined; scrollIfNeed(); mouseDisabled = true;"
         @keydown.enter="handleEnter"
+        @mousemove="mouseDisabled = false;"
     />
     <list
         class="lang-list"
@@ -49,13 +50,14 @@ const search = ref('');
 const input = ref<HTMLInputElement>();
 const list = ref<HTMLUListElement>();
 
+const mouseDisabled = ref(false);
 const mouseFocused = ref<number>();
 const keyboardFocused = ref<number>();
 
 const selectFocused = computed(() => mouseFocused.value || keyboardFocused.value);
 
 const handleEnter = () => {
-  if (selectFocused.value) {
+  if (selectFocused.value && !mouseDisabled.value) {
     emits('update:modelValue', filteredLanguages.value[selectFocused.value]);
     focused.value = false;
   }
@@ -64,6 +66,9 @@ const handleEnter = () => {
 watchEffect(() => {
   if (focused.value) {
     search.value = '';
+    mouseDisabled.value = false;
+    mouseFocused.value = undefined;
+    keyboardFocused.value = undefined;
   } else {
     input.value?.blur();
   }
@@ -71,7 +76,7 @@ watchEffect(() => {
 
 const scrollIfNeed = () => {
   if (selectFocused.value && list.value) {
-    list.value.children.item(selectFocused.value)?.scrollIntoView({ behavior: 'smooth', block: 'nearest' })
+    list.value.children.item(selectFocused.value)?.scrollIntoView({ block: 'center' })
   }
 }
 
