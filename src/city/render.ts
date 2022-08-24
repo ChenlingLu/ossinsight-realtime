@@ -108,7 +108,7 @@ function renderBuilding(
   group.scale.y = realHeight / height;
 
   scene.add(group);
-  registerEvents(scene, group, interactables, building.data);
+  makeInteractable(scene, group, interactables, building.data);
 
   return group;
 }
@@ -150,7 +150,7 @@ function renderRoad(
   );
 
   scene.add(group);
-  registerEvents(scene, group, interactables);
+  makeInteractable(scene, group, interactables);
 
   return group;
 }
@@ -204,24 +204,24 @@ function renderGrass(
   }
 
   scene.add(group);
-  registerEvents(scene, group, interactables);
+  makeInteractable(scene, group, interactables);
 
   return group;
 }
 
-function registerEvents(scene: Scene, group: Group, interactables: Set<Object3D>, data?: any) {
-  group.userData.interactable = true;
-  interactables.add(group);
+export function makeInteractable(scene: Scene, obj: Object3D, interactables: Set<Object3D>, data?: any) {
+  obj.userData.interactable = true;
+  interactables.add(obj);
 
-  group.addEventListener('removed', () => {
-    interactables.delete(group);
+  obj.addEventListener('removed', () => {
+    interactables.delete(obj);
   });
 
-  group.addEventListener('focus', () => {
+  obj.addEventListener('focus', ({ isCurrentBuilding }) => {
     scene.dispatchEvent({
       type: 'focus',
-      group,
       data,
+      isCurrentBuilding,
     });
   });
 }

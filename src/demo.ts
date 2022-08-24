@@ -22,7 +22,7 @@ import {
 import { GLTF_ENVIRONMENT, GLTF_ENVIRONMENT_ANIMATED, GLTF_ENVIRONMENT_OBJECTS } from "./assets";
 import { setShadow } from "./engine/shadow";
 import { getCity } from "./city/algo";
-import { renderShiftX, renderShiftY, renderShiftZ, renderTiles } from "./city/render";
+import { makeInteractable, renderShiftX, renderShiftY, renderShiftZ, renderTiles } from "./city/render";
 import { DEFAULT_CURVE, genVec3Curve, randomNumber, randomVector3 } from "./city/seed";
 import { makeVector3 } from "./engine/vectors";
 import ObjectCache from "./engine/cache";
@@ -32,7 +32,6 @@ import Engine from "./engine";
 import { FLOOR_HEIGHT, INIT_CONTRIBUTIONS, INIT_RAW } from "./city/constants";
 import { transitionVec3 } from "./utils/transition";
 import { createPlaceholder } from "./engine/html-placeholder";
-import { GithubEvent } from "./api/poll";
 import { RawData } from "./api/total";
 import { dispose } from "./engine/dispose";
 import { makeAnimation } from "./engine/animations";
@@ -79,11 +78,13 @@ export class DemoEngine extends Engine {
     this.numbers = createPlaceholder(this.window.document);
 
     this.scene.addEventListener('focus', (e) => {
-      if (!e.data) {
-        return;
-      }
-      if (e.data) {
-        const isToday = this.week === e.data.week && this.day === e.data.day
+      if (e.isCurrentBuilding) {
+        this.showTooltip(this.week, this.day);
+        this.controls.autoRotate = true;
+        this.focusingToday = true;
+        this.setControlPosition(getPos(this.week, this.day));
+      } else if (e.data) {
+        const isToday = (this.week === e.data.week && this.day === e.data.day);
         this.showTooltip(e.data.week, e.data.day);
         this.controls.autoRotate = isToday;
         this.focusingToday = isToday;
@@ -221,22 +222,24 @@ export class DemoEngine extends Engine {
       gltf.scene.position.copy(pos);
       gltf.scene.position.setY(renderShiftZ);
       gltf.scene.scale.copy(makeVector3(0.6));
+      gltf.scene.userData.isCurrentBuilding = true;
+      makeInteractable(this.scene, gltf.scene, this.interactables);
       this.scene.add(gltf.scene);
     });
   }
 
-  showNumbers (pos: Vector3, week: number, day: number) {
+  showNumbers(pos: Vector3, week: number, day: number) {
     const numbers = this.numbers!;
     numbers.object.position.copy(pos);
     numbers.object.position.y += 1.5;
     numbers.object.scale.set(5, 5, 5);
     if (!numbers.rendered) {
       this.scene.add(numbers.object);
-      numbers.rendered = true
+      numbers.rendered = true;
     }
   }
 
-  hideNumbers () {
+  hideNumbers() {
     if (this.numbers?.rendered) {
       this.numbers.rendered = false;
       this.numbers.object.removeFromParent();
@@ -281,7 +284,7 @@ export class DemoEngine extends Engine {
 
   private async _addBrick(from: Vector3, to: Vector3, scale: number, color: Color, duration: number, cb: () => void) {
     if (!this.running) {
-      cb()
+      cb();
       return;
     }
 
