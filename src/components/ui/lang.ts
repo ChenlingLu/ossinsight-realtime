@@ -1,13 +1,22 @@
+import all from './lang.txt?raw';
+
+
+const once = <T>() => {
+  const set = new Set<T>();
+
+  return (value: T) => {
+    if (set.has(value)) {
+      return false;
+    } else {
+      set.add(value);
+      return true;
+    }
+  }
+}
 
 export const languages: string[] = [
   'All',
-  'Java',
-  'C',
-  'C++',
-  'C#',
-  'Python',
-  'JavaScript',
-  'TypeScript',
-  'Rust',
-  'Others',
+  ...all.split('\n')
+    .filter(Boolean)
+    .filter(once()),
 ];

@@ -20,5 +20,11 @@ const onChange = (event: any) => {
   font-size: 14px;
   border-radius: 3px;
   outline: none;
+  transition: box-shadow .2s ease, border-color .2s ease;
+}
+
+.repo-filter:focus {
+  box-shadow: 0 0 3px 0 #0085FF;
+  border-color: #0085FF80;
 }
 </style>
