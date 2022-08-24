@@ -1,12 +1,20 @@
 import type { Mesh, Object3D, Scene } from "three";
-import { Vector2 } from "three";
+import { BufferGeometry, Material, Vector2 } from "three";
 
 export function isMesh(t: Object3D): t is Mesh {
   return t.type === 'Mesh';
 }
 
 export function isObject3D(t: any): t is Object3D {
-  return !!(t as Object3D)?.isObject3D
+  return !!(t as Object3D)?.isObject3D;
+}
+
+export function isMaterial(t: any): t is Material {
+  return !!(t as Material)?.isMaterial;
+}
+
+export function isBufferGeometry(t: any): t is BufferGeometry {
+  return !!(t as BufferGeometry)?.isBufferGeometry;
 }
 
 export function isScene(t: Object3D): t is Scene {

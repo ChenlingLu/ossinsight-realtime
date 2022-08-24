@@ -32,7 +32,7 @@ import { FLOOR_HEIGHT, INIT_CONTRIBUTIONS, INIT_RAW } from "./city/constants";
 import { transitionVec3 } from "./utils/transition";
 import { createPlaceholder } from "./engine/html-placeholder";
 import { RawData } from "./api/total";
-import { dispose } from "./engine/dispose";
+import { dispose, markNoDispose } from "./engine/dispose";
 import { makeTransition } from "./engine/animations";
 import { FilteredEvent } from "./store/poll";
 import { ObjectEvent } from "@/engine/events";
@@ -146,14 +146,14 @@ export class DemoEngine extends Engine<DemoEngineEvent> {
   }
 
   smoke?: Object3D;
-  smokeMaterial = new MeshLambertMaterial({
+  readonly smokeMaterial = markNoDispose(new MeshLambertMaterial({
     map: this.textureLoader.load('textures/smoke.png'),
     opacity: 0.01,
     transparent: true,
     emissive: new Color(0xffffff),
     fog: true,
-  });
-  smokeGeometry = new PlaneGeometry();
+  }));
+  readonly smokeGeometry = markNoDispose(new PlaneGeometry());
   addSmoke?: () => void;
 
   createSmoke(pos: Vector3) {
@@ -274,7 +274,7 @@ export class DemoEngine extends Engine<DemoEngineEvent> {
     }
   }
 
-  boxGeometry: BoxGeometry = new BoxGeometry();
+  readonly boxGeometry: BoxGeometry = markNoDispose(new BoxGeometry());
 
   private createBox(): Mesh {
     const material = new MeshStandardMaterial({ transparent: true });
@@ -307,6 +307,7 @@ export class DemoEngine extends Engine<DemoEngineEvent> {
       this.cache.add(mesh);
       cb();
     });
+
     this.scene.add(mesh);
   }
 
