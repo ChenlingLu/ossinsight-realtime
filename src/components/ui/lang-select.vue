@@ -12,7 +12,6 @@
         @keydown.down="keyboardFocused = Math.min((selectFocused ?? -1) + 1, filteredLanguages.length - 1); mouseFocused = undefined; scrollIfNeed(); mouseDisabled = true;"
         @keydown.up="keyboardFocused = Math.max((selectFocused ?? 1) - 1, 0); mouseFocused = undefined; scrollIfNeed(); mouseDisabled = true;"
         @keydown.enter="handleEnter"
-        @mousemove="mouseDisabled = false;"
     />
     <list
         class="lang-list"
@@ -25,8 +24,9 @@
           v-for="(language, i) in filteredLanguages"
           :key="language"
           @click="emits('update:modelValue', language)"
-          @mouseenter="mouseFocused = i; keyboardFocused = undefined;"
-          @mouseleave="mouseFocused = undefined; keyboardFocused = undefined;"
+          @mouseenter="handleMouseEnter(i)"
+          @mouseleave="handleMouseLeave"
+          @mousemove="handleMouseMove"
       >
         {{ language }}
       </li>
@@ -57,11 +57,29 @@ const keyboardFocused = ref<number>();
 const selectFocused = computed(() => mouseFocused.value || keyboardFocused.value);
 
 const handleEnter = () => {
-  if (selectFocused.value && !mouseDisabled.value) {
+  if (typeof selectFocused.value === 'number') {
     emits('update:modelValue', filteredLanguages.value[selectFocused.value]);
     focused.value = false;
   }
 };
+
+const handleMouseMove = () => {
+  mouseDisabled.value = false;
+}
+
+const handleMouseEnter = (i: number) => {
+  if (!mouseDisabled.value) {
+    mouseFocused.value = i;
+    keyboardFocused.value = undefined;
+  }
+};
+
+const handleMouseLeave = () => {
+  if (!mouseDisabled.value) {
+    mouseFocused.value = undefined;
+    keyboardFocused.value = undefined;
+  }
+}
 
 watchEffect(() => {
   if (focused.value) {
@@ -76,9 +94,9 @@ watchEffect(() => {
 
 const scrollIfNeed = () => {
   if (selectFocused.value && list.value) {
-    list.value.children.item(selectFocused.value)?.scrollIntoView({ block: 'center' })
+    list.value.children.item(selectFocused.value)?.scrollIntoView({ block: 'center' });
   }
-}
+};
 
 const filteredLanguages = computed(() => {
   if (search.value) {
