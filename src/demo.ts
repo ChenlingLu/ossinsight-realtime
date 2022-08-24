@@ -37,6 +37,7 @@ import { makeTransition } from "./engine/animations";
 import { FilteredEvent } from "./store/poll";
 import { ObjectEvent } from "@/engine/events";
 import { once } from "@/engine/utils";
+import { w } from "vitest/dist/global-74489cc9";
 
 export class DemoEngine extends Engine<DemoEngineEvent> {
   cache: ObjectCache<Mesh>;
@@ -219,6 +220,10 @@ export class DemoEngine extends Engine<DemoEngineEvent> {
 
     // create numbers
     // this.showNumbers(pos, week, day)
+    this.dispatchEvent({
+      type: 'update:current-number',
+      value: this.rawData[day][week]?.events ?? 0,
+    })
 
     // add base
     this.gltfLoader.load('models/building_base.glb', gltf => {
@@ -347,7 +352,7 @@ export interface UpdateTooltipEvent extends Event {
 
 export interface UpdateCurrentNumberEvent extends Event {
   type: 'update:current-number';
-  value: string;
+  value: number;
 }
 
 type DemoEngineEvent =

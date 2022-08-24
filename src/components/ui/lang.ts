@@ -15,7 +15,7 @@ const once = <T>() => {
 }
 
 export const languages: string[] = [
-  'All',
+  'Any Language',
   ...all.split('\n')
     .filter(Boolean)
     .filter(once()),

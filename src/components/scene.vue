@@ -5,7 +5,7 @@
   </div>
 </template>
 <script setup lang="ts">
-import { ref, watchEffect } from "vue";
+import { ref, watch, watchEffect } from "vue";
 import { prEventsPollStore, process } from "@/store/poll";
 import { useActive } from "./hooks/lifecycle";
 import { map } from "rxjs";
@@ -34,13 +34,13 @@ const usePREvents = prEventsPollStore('pullRequestEvents');
 const prEvents = usePREvents();
 const events = ref<RawData[]>(processFirstMessage(prEvents.stream.lastFirstMessage));
 
-const { CSSElements, tooltip } = useEngineCssElements(engineRef);
+const { CSSElements, tooltip, todayNumber } = useEngineCssElements(engineRef);
 
 watchEffect(() => {
   const engine = engineRef.value;
-  const newEvents = events.value;
-  if (engine && newEvents) {
-    engine.setTotal(newEvents);
+  const ev = events.value;
+  if (engine && ev) {
+    engine.setTotal(ev);
   }
 });
 
@@ -56,6 +56,9 @@ watchEffect((onCleanup) => {
         .subscribe(event => engine.addBrick(event, () => {
           newEvents.value++;
         }));
+    if (prEvents.stream.lastFirstMessage) {
+      events.value = processFirstMessage(prEvents.stream.lastFirstMessage);
+    }
     subscription.add(prEvents.firstMessage.subscribe(firstMessage => {
       events.value = processFirstMessage(firstMessage);
     }));
@@ -66,11 +69,15 @@ watchEffect((onCleanup) => {
   }
 });
 
+watch(todayNumber, () => {
+  newEvents.value = 0;
+})
+
 watchEffect(() => {
   const engine = engineRef.value;
   if (engine) {
     if (tooltip.props.isToday) {
-      tooltip.props.value = engine.todayEvents + newEvents.value;
+      tooltip.props.value = todayNumber.value + newEvents.value;
     }
   }
 });

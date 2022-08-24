@@ -151,18 +151,19 @@ export class ConnectionSource<T, F extends FirstMessage> extends Subject<T> {
       } else {
         theConn.addEventListener('open', () => subscribe(theConn), { once: true });
       }
-      s.add(() => {
-        if (!this.observed && this.conn) {
-          this.debug('disconnect');
-          const conn = this.conn;
-          if (conn.readyState === WebSocket.OPEN) {
-            conn.close();
-          }
-          conn.removeEventListener('message', this.handleMessage);
-          this.conn = undefined;
-        }
-      });
     }
+
+    s.add(() => {
+      if (!this.observed && this.conn) {
+        this.debug('disconnect');
+        const conn = this.conn;
+        if (conn.readyState === WebSocket.OPEN) {
+          conn.close();
+        }
+        conn.removeEventListener('message', this.handleMessage);
+        this.conn = undefined;
+      }
+    });
     return s;
   }
 

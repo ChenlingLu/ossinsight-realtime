@@ -89,7 +89,7 @@ watch([() => props.language, () => props.repo], ([language, repo]) => {
       }
       return true;
     });
-  } else if (language !== 'All') {
+  } else if (language !== 'Any Language') {
     filters.push(ev => ev["payload.pull_request.base.repo.language"] === language);
   }
 

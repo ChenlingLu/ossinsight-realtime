@@ -60,7 +60,7 @@ const prEvents = usePrEvents();
 const events = ref(getEventCount(prEvents.stream.lastFirstMessage));
 const total = ref(0);
 const state = ref(ConnectionState.CONNECTING);
-const language = ref('All');
+const language = ref('Any Language');
 const repo = ref('');
 
 const colorMap = {
