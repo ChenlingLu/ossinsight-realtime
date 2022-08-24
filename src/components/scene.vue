@@ -69,7 +69,9 @@ watchEffect((onCleanup) => {
 watchEffect(() => {
   const engine = engineRef.value;
   if (engine) {
-    tooltip.props.value = engine.todayEvents + newEvents.value;
+    if (tooltip.props.isToday) {
+      tooltip.props.value = engine.todayEvents + newEvents.value;
+    }
   }
 });
 </script>

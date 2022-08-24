@@ -4,7 +4,7 @@
       <div class="content">
         <p class="headline bold">
           <template v-if="props.isToday">
-            Total Pull Requests today
+            Total Pull Requests Events today
           </template>
           <template v-else>
             Total Pull Requests at {{ props.date }}
@@ -16,7 +16,7 @@
         </p>
         <hr />
         <p class="headline">
-          <span class="colored">
+          <span>
             <template v-if="props.isToday">
               Current floor:
             </template>
@@ -27,7 +27,7 @@
           </span>
         </p>
         <p class="headline extra">
-          *100,000 pull requests extrude 1 floor
+          *100,000 pull requests events extrude 1 floor
         </p>
       </div>
     </div>
