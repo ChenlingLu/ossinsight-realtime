@@ -1,5 +1,5 @@
-import type { Mesh, Object3D, Scene } from "three";
-import { BufferGeometry, Material, Vector2 } from "three";
+import type { BaseEvent, EventListener, Mesh, Object3D, Scene } from "three";
+import { BufferGeometry, EventDispatcher, Material, Vector2 } from "three";
 
 export function isMesh(t: Object3D): t is Mesh {
   return t.type === 'Mesh';
@@ -35,4 +35,12 @@ export function getSize(el: Window | HTMLElement): Vector2 {
   } else {
     return new Vector2(el.innerWidth, el.innerHeight);
   }
+}
+
+export function once<E extends BaseEvent, D extends EventDispatcher<E>>(dispatcher: D, event: E['type'], handler: EventListener<E, E['type'], D>) {
+  const _handler = (e: E & { type: E['type'] } & { target: D }) => {
+    handler(e);
+    dispatcher.removeEventListener(event, _handler);
+  };
+  dispatcher.addEventListener(event, _handler);
 }

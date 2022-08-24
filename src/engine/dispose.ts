@@ -66,21 +66,34 @@ export function dispose(object3D: Object3D<any>) {
 
 const NO_DISPOSE = Symbol('no-dispose');
 
-export function markNoDispose<T extends DisposableTarget>(target: T): T {
-  target.userData[NO_DISPOSE] = true;
-
-
-  if (import.meta.hot) {
-    import.meta.hot.on('vite:beforeUpdate', () => {
-      delete target.userData[NO_DISPOSE];
-      if (isObject3D(target)) {
-        dispose(target);
-      } else if (isBufferGeometry(target)) {
-        _dispose(target);
-      } else if (isMaterial(target)) {
-        _dispose(target);
+export function markNoDispose<T extends Object3D | DisposableTarget | DisposableTarget[] | null | undefined>(target: T): T {
+  if (!target) {
+    return target;
+  } else if (isObject3D(target)) {
+    target.traverse(obj => {
+      if (isRenderItem(obj)) {
+        if (obj.geometry) {
+          markNoDispose(obj.geometry);
+        }
+        markNoDispose(obj.material);
       }
     });
+  } else if (target instanceof Array) {
+    target.forEach(markNoDispose);
+  } else if (!target.userData[NO_DISPOSE]) {
+    target.userData[NO_DISPOSE] = true;
+    if (import.meta.hot) {
+      import.meta.hot.on('vite:beforeUpdate', () => {
+        delete target.userData[NO_DISPOSE];
+        if (isObject3D(target)) {
+          dispose(target);
+        } else if (isBufferGeometry(target)) {
+          _dispose(target);
+        } else if (isMaterial(target)) {
+          _dispose(target);
+        }
+      });
+    }
   }
   return target;
 }

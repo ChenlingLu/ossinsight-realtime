@@ -36,6 +36,7 @@ import { dispose, markNoDispose } from "./engine/dispose";
 import { makeTransition } from "./engine/animations";
 import { FilteredEvent } from "./store/poll";
 import { ObjectEvent } from "@/engine/events";
+import { once } from "@/engine/utils";
 
 export class DemoEngine extends Engine<DemoEngineEvent> {
   cache: ObjectCache<Mesh>;
@@ -45,7 +46,6 @@ export class DemoEngine extends Engine<DemoEngineEvent> {
   day: number = 0;
   data: number[][] = INIT_CONTRIBUTIONS;
   rawData: (RawData | undefined)[][] = INIT_RAW;
-  bricks: number = 0;
   groups?: Group[][];
   focusingToday: boolean = true;
 
@@ -57,6 +57,10 @@ export class DemoEngine extends Engine<DemoEngineEvent> {
   dispose() {
     this.cache.clear();
     super.dispose();
+  }
+
+  get todayEvents () {
+    return this.rawData[this.day][this.week]?.events ?? 0
   }
 
   setup() {
@@ -102,9 +106,9 @@ export class DemoEngine extends Engine<DemoEngineEvent> {
   setControlPosition(newPosition: Vector3, duration = 1.5, curve = DEFAULT_CURVE) {
     const controlPositionTransition = transitionVec3(this.controls.target, newPosition, duration, curve);
     this.updatables.add(controlPositionTransition);
-    controlPositionTransition.addEventListener('finished', () => {
+    once(controlPositionTransition, 'finished', () => {
       this.updatables.delete(controlPositionTransition);
-    });
+    })
   }
 
   setTotal(raw: RawData[]) {
@@ -256,7 +260,7 @@ export class DemoEngine extends Engine<DemoEngineEvent> {
     this.dispatchEvent({
       type: 'update:tooltip',
       date: fmt.format(new Date(event_day)),
-      value: events.toLocaleString('en'),
+      value: events,
       isToday: week === this.week && day === this.day,
       floor: Math.floor(events / 100000),
     });
@@ -278,7 +282,7 @@ export class DemoEngine extends Engine<DemoEngineEvent> {
 
   private createBox(): Mesh {
     const material = new MeshStandardMaterial({ transparent: true });
-    return new Mesh(this.boxGeometry, material);
+    return markNoDispose(new Mesh(this.boxGeometry, material));
   }
 
   private async _addBrick(from: Vector3, to: Vector3, scale: number, color: Color, duration: number, cb: () => void) {
@@ -303,7 +307,7 @@ export class DemoEngine extends Engine<DemoEngineEvent> {
     ]);
 
     // remove when animation done
-    (<Object3D<ObjectEvent>>mesh).addEventListener('removed', () => {
+    once(<Object3D<ObjectEvent>>mesh, 'removed', () => {
       this.cache.add(mesh);
       cb();
     });
@@ -311,7 +315,7 @@ export class DemoEngine extends Engine<DemoEngineEvent> {
     this.scene.add(mesh);
   }
 
-  addBrick(_event: FilteredEvent) {
+  addBrick(_event: FilteredEvent, cb: () => void) {
     // add bricks
     const fromPos = getPos(this.week, this.day).setY(40);
     const toPos = fromPos.clone().setY(this.data[this.day][this.week] * FLOOR_HEIGHT * 2);
@@ -321,16 +325,8 @@ export class DemoEngine extends Engine<DemoEngineEvent> {
     const scale = randomNumber(3, 0.4);
     const color = randomVector3(makeVector3(0), makeVector3(1));
     this._addBrick(from, toPos, scale, new Color(color.x, color.y, color.z), duration, () => {
-      this.bricks += 1;
-      this.setCurrent((this.rawData[this.day][this.week]?.events ?? 0) + this.bricks);
+      cb();
       this.addSmoke?.();
-    });
-  }
-
-  setCurrent(val: number) {
-    this.dispatchEvent({
-      type: 'update:current-number',
-      value: val.toLocaleString('en'),
     });
   }
 }
@@ -344,7 +340,7 @@ const fmt = Intl.DateTimeFormat('en', { year: 'numeric', month: '2-digit', day: 
 export interface UpdateTooltipEvent extends Event {
   type: 'update:tooltip';
   date: string;
-  value: string;
+  value: number;
   isToday: boolean;
   floor: number;
 }

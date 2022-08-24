@@ -12,6 +12,7 @@ import { map } from "rxjs";
 import { useEngine, useEngineCssElements } from "@/components/hooks/engine";
 import { RawData } from "@/api/total";
 import { RawSamplingFirstMessage } from "@/api/poll";
+import { createDebugLogger } from "@/utils/debug";
 
 const active = useActive();
 
@@ -33,7 +34,7 @@ const usePREvents = prEventsPollStore('pullRequestEvents');
 const prEvents = usePREvents();
 const events = ref<RawData[]>(processFirstMessage(prEvents.stream.lastFirstMessage));
 
-const CSSElements = useEngineCssElements(engineRef);
+const { CSSElements, tooltip } = useEngineCssElements(engineRef);
 
 watchEffect(() => {
   const engine = engineRef.value;
@@ -43,16 +44,32 @@ watchEffect(() => {
   }
 });
 
+const newEvents = ref(0);
+const log = createDebugLogger('scene');
+
 watchEffect((onCleanup) => {
   const engine = engineRef.value;
   if (active.value && engine) {
+    log('start subscription');
     const subscription = prEvents.stream
         .pipe(map(process))
-        .subscribe(event => engine.addBrick(event));
+        .subscribe(event => engine.addBrick(event, () => {
+          newEvents.value++;
+        }));
     subscription.add(prEvents.firstMessage.subscribe(firstMessage => {
       events.value = processFirstMessage(firstMessage);
     }));
-    onCleanup(() => subscription.unsubscribe());
+    onCleanup(() => {
+      subscription.unsubscribe();
+      log('dispose subscription');
+    });
+  }
+});
+
+watchEffect(() => {
+  const engine = engineRef.value;
+  if (engine) {
+    tooltip.props.value = engine.todayEvents + newEvents.value;
   }
 });
 </script>

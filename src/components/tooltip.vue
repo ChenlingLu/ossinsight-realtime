@@ -12,7 +12,7 @@
         </p>
         <p class="data">
           <PrIcon />
-          <code class="number">{{ props.value }}</code>
+          <code class="number">{{ props.value.toLocaleString('en') }}</code>
         </p>
         <hr />
         <p class="headline">
@@ -37,7 +37,7 @@
 import { defineProps, Teleport } from "vue";
 import PrIcon from '@primer/octicons/build/svg/git-pull-request-16.svg?component';
 
-const props = defineProps<{ container?: HTMLElement, isToday: boolean, date: string, value: string, floor: number }>();
+const props = defineProps<{ container?: HTMLElement, isToday: boolean, date: string, value: number, floor: number }>();
 
 </script>
 <style scoped>

@@ -1,6 +1,6 @@
 import { readonly, ref } from "vue";
 
-export function useThrottleToggle(initial: boolean, throttle?: number) {
+export function useThrottleToggle(initial: boolean, throttle: number) {
   const result = ref(initial);
 
   let throttleHandle: ReturnType<typeof setTimeout> | undefined = undefined;
@@ -20,8 +20,8 @@ export function useThrottleToggle(initial: boolean, throttle?: number) {
     toggle: (value: boolean) => {
       if (throttle) {
         clearTimeout(throttleHandle);
-        result.value = value;
       }
+      result.value = value;
     },
   };
 }

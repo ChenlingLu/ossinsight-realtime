@@ -19,7 +19,8 @@ import { Group, MathUtils, Object3D, Scene, Vector3 } from "three";
 import { FLOOR_HEIGHT, GRASS_ASSET, ROAD_TYPES, TREES_SMALL } from "./constants";
 import { setShadow } from "@/engine/shadow";
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader";
-import { ObjectEvent } from "@/engine/events";
+import { FocusBuildingEvent, ObjectEvent } from "@/engine/events";
+import { once } from "@/engine/utils";
 
 export const renderShiftX = -26;
 export const renderShiftY = -4;
@@ -214,15 +215,19 @@ export function makeInteractable(scene: Scene, obj: Object3D<ObjectEvent>, inter
   obj.userData.interactable = true;
   interactables.add(obj);
 
-  obj.addEventListener('removed', () => {
-    interactables.delete(obj);
-  });
-
-  obj.addEventListener('focus', ({ isCurrentBuilding }) => {
+  const focusListener = ({ isCurrentBuilding }: FocusBuildingEvent) => {
     scene.dispatchEvent({
       type: 'focus',
       data,
       isCurrentBuilding,
     });
+  };
+
+  obj.addEventListener('focus', focusListener);
+
+  once(obj, 'removed', () => {
+    interactables.delete(obj);
+    obj.removeEventListener('focus', focusListener);
   });
+
 }

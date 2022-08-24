@@ -1,5 +1,5 @@
 import type { components } from '@octokit/openapi-types';
-import { Observable, Subject, Subscriber } from 'rxjs';
+import { Observer, Subject, Subscription } from 'rxjs';
 import { createDebugLogger } from "@/utils/debug";
 
 export type GithubEvent = components['schemas']['event']
@@ -95,10 +95,22 @@ export interface RawSamplingFirstMessage extends FirstMessage {
   eventMap: Record<string, string>;
 }
 
-export class ConnectionSource<T, F extends FirstMessage> extends Observable<T> {
+export class ConnectionSource<T, F extends FirstMessage> extends Subject<T> {
   private readonly stateListener: ((state: ConnectionState) => void)[] = [];
-  public readonly firstMessage: Subject<F> = new Subject<F>();
-  public lastFirstMessage?: F
+  public readonly firstMessage = new Subject<F>();
+  public lastFirstMessage?: F;
+  private conn: Connection | undefined = undefined;
+  private debug = createDebugLogger('ws');
+  private handleMessage = (event: MessageEvent) => {
+    const firstMessage = JSON.parse(event.data);
+    if (firstMessage.firstMessageTag) {
+      this.debug('firstMessage', firstMessage);
+      this.firstMessage.next(firstMessage);
+      this.lastFirstMessage = firstMessage;
+    } else {
+      this.next(JSON.parse(event.data));
+    }
+  };
 
   onStateChange(cb: (state: ConnectionState) => void) {
     this.stateListener.push(cb);
@@ -108,86 +120,54 @@ export class ConnectionSource<T, F extends FirstMessage> extends Observable<T> {
     this.stateListener.forEach(cb => cb(state));
   }
 
-  constructor(type: string, initReq?: any) {
-    const debug = createDebugLogger('ws');
+  subscribe(observer?: Partial<Observer<T>> | ((value: T) => void) | null): Subscription {
+    const s = super.subscribe(observer as any);
+    this.debug('subscribe');
 
-    let conn: Connection | undefined = undefined;
-    let subscribers: Set<Subscriber<T>> = new Set();
-    super(subscriber => {
-      debug('subscribe');
-      subscribers.add(subscriber);
-
-      const handleMessage = (event: MessageEvent) => {
-        const firstMessage = JSON.parse(event.data);
-        if (firstMessage.firstMessageTag) {
-          debug('firstMessage', firstMessage);
-          this.firstMessage.next(firstMessage);
-          this.lastFirstMessage = firstMessage;
-        } else {
-          subscriber.next(JSON.parse(event.data));
-        }
-      };
+    s.add(() => {
+      this.debug('teardown');
+    });
+    if (this.observed && !this.conn) {
+      const theConn = this.conn = new Connection(this.type, this.initReq);
+      this.stateChange(ConnectionState.CONNECTING);
+      theConn.addEventListener('open', () => {
+        this.debug('connect');
+        theConn.init();
+        this.stateChange(ConnectionState.CONNECTED);
+      }, { once: true });
+      theConn.addEventListener('close', () => {
+        this.stateChange(ConnectionState.CLOSED);
+      }, { once: true });
+      theConn.addEventListener('error', () => {
+        this.stateChange(ConnectionState.ERROR);
+      }, { once: true });
 
       const subscribe = (conn: Connection) => {
-        conn.addEventListener("message", handleMessage);
+        conn.addEventListener("message", this.handleMessage);
       };
 
-      const tryTearDown = () => {
-        debug('teardown');
-        if (conn) {
-          subscribers.delete(subscriber);
-          if (subscribers.size === 0) {
-            if (conn.readyState === WebSocket.OPEN) {
-              conn.close();
-            }
-            conn.removeEventListener('message', handleMessage);
-            conn.removeEventListener('close', handleClose);
-            conn.removeEventListener('error', handleError);
-          }
-        }
-      };
-
-      // init or reopen new one
-      if (!conn || conn.readyState >= WebSocket.CLOSING) {
-        const theConn = conn = new Connection(type, initReq);
-        this.stateChange(ConnectionState.CONNECTING);
-        theConn.addEventListener('open', () => {
-          debug('open');
-          theConn.init();
-          this.stateChange(ConnectionState.CONNECTED);
-        }, { once: true });
-        theConn.addEventListener('close', () => {
-          this.stateChange(ConnectionState.CLOSED);
-        }, { once: true });
-        theConn.addEventListener('error', () => {
-          this.stateChange(ConnectionState.ERROR);
-        }, { once: true });
-      }
-
-      if (conn.readyState === WebSocket.OPEN) {
-        subscribe(conn);
+      if (theConn.readyState === WebSocket.OPEN) {
+        subscribe(theConn);
       } else {
-        // wait ready
-        let theConn = conn;
         theConn.addEventListener('open', () => subscribe(theConn), { once: true });
       }
+      s.add(() => {
+        if (!this.observed && this.conn) {
+          this.debug('disconnect');
+          const conn = this.conn;
+          if (conn.readyState === WebSocket.OPEN) {
+            conn.close();
+          }
+          conn.removeEventListener('message', this.handleMessage);
+          this.conn = undefined;
+        }
+      });
+    }
+    return s;
+  }
 
-      const handleClose = () => {
-        debug('close');
-        subscriber.complete();
-        subscriber.unsubscribe();
-      };
-      const handleError = () => {
-        debug('error');
-        subscriber.error(new Error('websocket error'));
-        subscriber.unsubscribe();
-      };
-
-      conn.addEventListener('close', handleClose);
-      conn.addEventListener('error', handleError);
-
-      subscriber.add(tryTearDown);
-    });
+  constructor(private type: string, private initReq?: any) {
+    super();
   }
 }
 

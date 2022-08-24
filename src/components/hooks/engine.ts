@@ -30,7 +30,7 @@ export function useEngine(canvasRef: Ref<HTMLCanvasElement | undefined>, contain
 }
 
 export function useEngineCssElements(engineRef: EngineRef) {
-  const tooltip = useCSS2DObject(Tooltip, { date: '', value: '', isToday: true, floor: 0 });
+  const tooltip = useCSS2DObject(Tooltip, { date: '', value: 0, isToday: true, floor: 0 });
   const numbers = useCSS2DObject(Numbers, { text: '' });
 
   watchEffect((onCleanup) => {
@@ -46,22 +46,16 @@ export function useEngineCssElements(engineRef: EngineRef) {
         tooltip.props.floor = event.floor;
       };
 
-      const numbersUpdateHandler = (event: UpdateCurrentNumberEvent) => {
-        numbers.props.text = event.value;
-        if (engine.focusingToday) {
-          tooltip.props.value = event.value;
-        }
-      };
-
       engine.addEventListener('update:tooltip', tooltipUpdateHandler);
-      engine.addEventListener('update:current-number', numbersUpdateHandler);
 
       onCleanup(() => {
         engine.removeEventListener('update:tooltip', tooltipUpdateHandler);
-        engine.removeEventListener('update:current-number', numbersUpdateHandler);
       });
     }
   });
 
-  return makeVNodesRenderer([tooltip.vnode, numbers.vnode]);
+  return {
+    tooltip,
+    CSSElements: makeVNodesRenderer([tooltip.vnode, numbers.vnode])
+  };
 }
