@@ -13,7 +13,6 @@ import { AnimationMixerSet, UpdatableSet } from "./updatables";
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
 import { CSS2DRenderer } from "three/examples/jsm/renderers/CSS2DRenderer";
-import { isMesh } from "./utils";
 import { dispose } from "./dispose";
 
 DefaultLoadingManager.setURLModifier(url => {
@@ -62,7 +61,7 @@ export class Engine<E extends BaseEvent> extends EventDispatcher<E> {
     };
     this.stop = () => {
       this.running = false;
-      stop()
+      stop();
     };
     this.mixers = animationMixers;
     this.updatables = updatables;
@@ -74,7 +73,7 @@ export class Engine<E extends BaseEvent> extends EventDispatcher<E> {
   }
 
   dispose() {
-    this.stop()
+    this.stop();
     this.renderer.dispose();
     this.mixers.clear();
     this.updatables.clear();

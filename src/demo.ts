@@ -1,5 +1,4 @@
 import {
-  AnimationClip,
   AnimationMixer,
   BoxGeometry,
   Color,
@@ -7,7 +6,6 @@ import {
   Event,
   Group,
   InterpolateLinear,
-  LoopOnce,
   Mesh,
   MeshLambertMaterial,
   MeshStandardMaterial,
@@ -35,8 +33,9 @@ import { transitionVec3 } from "./utils/transition";
 import { createPlaceholder } from "./engine/html-placeholder";
 import { RawData } from "./api/total";
 import { dispose } from "./engine/dispose";
-import { makeAnimation } from "./engine/animations";
+import { makeTransition } from "./engine/animations";
 import { FilteredEvent } from "./store/poll";
+import { ObjectEvent } from "@/engine/events";
 
 export class DemoEngine extends Engine<DemoEngineEvent> {
   cache: ObjectCache<Mesh>;
@@ -52,13 +51,11 @@ export class DemoEngine extends Engine<DemoEngineEvent> {
 
   constructor(window: Window, canvas: HTMLCanvasElement, container?: HTMLElement) {
     super(window, canvas, container);
-    this.cache = new ObjectCache(() => this.createBox());
+    this.cache = new ObjectCache(() => this.createBox(), 'bricks');
   }
 
   dispose() {
-    this.cache.allLoaded.forEach(obj => {
-      dispose(obj);
-    });
+    this.cache.clear();
     super.dispose();
   }
 
@@ -175,7 +172,6 @@ export class DemoEngine extends Engine<DemoEngineEvent> {
       const element = new Mesh(geometry, material.clone());
       element.scale.set(1, 1, 1);
       element.position.copy(randomVector3(makeVector3(0), makeVector3(0.5)));
-      smoke.add(element);
 
       const from = element.position;
       const to = from.clone().add(new Vector3(0.2 * Math.random(), 3 * Math.random(), 0.2 * Math.random()));
@@ -184,11 +180,13 @@ export class DemoEngine extends Engine<DemoEngineEvent> {
       const qInitial = new Quaternion().setFromEuler(new Euler(0, 0, s, 'XYZ'));
       const qFinal = new Quaternion().setFromEuler(new Euler(0, 0, s + Math.random() * 360, 'XYZ'));
 
-      makeAnimation(this.mixers, element, 'smoke', duration, [
+      makeTransition(this.mixers, element, 'smoke', duration, [
         new VectorKeyframeTrack('.position', [0, duration], [from, to].flatMap(vec => vec.toArray())),
         new NumberKeyframeTrack('.material.opacity', [0, duration * 0.4, duration * 0.6, duration], [0, 0.6, 0.6, 0], InterpolateLinear),
         new QuaternionKeyframeTrack('.quaternion', [0, duration], [qInitial, qFinal].flatMap(q => q.toArray())),
-      ], NormalAnimationBlendMode).setLoop(LoopOnce, 1).play();
+      ], NormalAnimationBlendMode);
+
+      smoke.add(element);
     };
 
     smoke.scale.set(2, 2, 2);
@@ -296,29 +294,20 @@ export class DemoEngine extends Engine<DemoEngineEvent> {
     const material = <MeshStandardMaterial>mesh.material;
     material.color.set(color);
 
-    const mixer = new AnimationMixer(mesh);
-
     const [positionTimes, positions] = genVec3Curve(DEFAULT_CURVE, from, randomVector3(to, makeVector3(1)));
     const [scaleTimes, scales] = genVec3Curve(DEFAULT_CURVE, makeVector3(scale), makeVector3(0));
 
-    const action = mixer.clipAction(new AnimationClip('brick-entrance', duration, [
+    makeTransition(this.mixers, mesh, 'brick-entrance', duration, [
       new VectorKeyframeTrack('.position', positionTimes.map(i => i * duration), positions.flatMap(vec3 => vec3.toArray())),
       new VectorKeyframeTrack('.scale', scaleTimes.map(i => i * duration), scales.flatMap(vec3 => vec3.toArray())),
-    ]));
-    action.setLoop(LoopOnce, 1);
-    // action.clampWhenFinished = true;
-    action.play();
-    this.mixers.add(mixer);
-
-    this.scene.add(mesh);
+    ]);
 
     // remove when animation done
-    mixer.addEventListener('finished', (e) => {
-      this.mixers.delete(mixer);
-      this.scene.remove(mesh);
+    (<Object3D<ObjectEvent>>mesh).addEventListener('removed', () => {
       this.cache.add(mesh);
       cb();
     });
+    this.scene.add(mesh);
   }
 
   addBrick(_event: FilteredEvent) {

@@ -5,6 +5,10 @@ export function isMesh(t: Object3D): t is Mesh {
   return t.type === 'Mesh';
 }
 
+export function isObject3D(t: any): t is Object3D {
+  return !!(t as Object3D)?.isObject3D
+}
+
 export function isScene(t: Object3D): t is Scene {
   return t.type === 'Scene';
 }
