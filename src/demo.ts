@@ -4,6 +4,7 @@ import {
   BoxGeometry,
   Color,
   Euler,
+  Event,
   Group,
   InterpolateLinear,
   LoopOnce,
@@ -37,7 +38,7 @@ import { dispose } from "./engine/dispose";
 import { makeAnimation } from "./engine/animations";
 import { FilteredEvent } from "./store/poll";
 
-export class DemoEngine extends Engine {
+export class DemoEngine extends Engine<DemoEngineEvent> {
   cache: ObjectCache<Mesh>;
   tooltip?: ReturnType<typeof createPlaceholder>;
   numbers?: ReturnType<typeof createPlaceholder>;
@@ -312,7 +313,7 @@ export class DemoEngine extends Engine {
     this.scene.add(mesh);
 
     // remove when animation done
-    mixer.addEventListener('finished', () => {
+    mixer.addEventListener('finished', (e) => {
       this.mixers.delete(mixer);
       this.scene.remove(mesh);
       this.cache.add(mesh);
@@ -349,3 +350,20 @@ export function getPos(week: number, day: number, h?: number) {
 }
 
 const fmt = Intl.DateTimeFormat('en', { year: 'numeric', month: '2-digit', day: '2-digit' });
+
+export interface UpdateTooltipEvent extends Event {
+  type: 'update:tooltip';
+  date: string;
+  value: string;
+  isToday: boolean;
+  floor: number;
+}
+
+export interface UpdateCurrentNumberEvent extends Event {
+  type: 'update:current-number';
+  value: string;
+}
+
+type DemoEngineEvent =
+  UpdateTooltipEvent
+  | UpdateCurrentNumberEvent;

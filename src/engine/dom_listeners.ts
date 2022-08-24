@@ -4,6 +4,7 @@ import { getSize, isInteractable } from "./utils";
 import { EffectComposer } from "three/examples/jsm/postprocessing/EffectComposer";
 import { highlight, unhighlight } from "./highlight";
 import { CSS2DRenderer } from "three/examples/jsm/renderers/CSS2DRenderer";
+import { ObjectEvent } from "@/engine/events";
 
 export function setupDOMListeners(window: Window, container: Window | HTMLElement, canvas: HTMLCanvasElement, scene: Scene, camera: PerspectiveCamera, renderer: WebGLRenderer, renderer2d: CSS2DRenderer, interactables: Set<Object3D>, composer: EffectComposer) {
   const raycaster = new Raycaster();
@@ -34,7 +35,7 @@ export function setupDOMListeners(window: Window, container: Window | HTMLElemen
         target = target.parent;
       }
       if (isInteractable(target)) {
-        highlight(target);
+        highlight(<Object3D<ObjectEvent>>target);
         return;
       }
     }

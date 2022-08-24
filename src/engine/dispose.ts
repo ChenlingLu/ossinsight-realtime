@@ -49,6 +49,6 @@ export function disposeObjectTree(obj: Object3D, disposeOptions: DisposeOptions 
   })
 }
 
-export function dispose(object3D: Object3D) {
+export function dispose(object3D: Object3D<any>) {
   disposeObjectTree(object3D);
 }

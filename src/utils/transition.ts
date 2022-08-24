@@ -1,7 +1,8 @@
 import { EventDispatcher, Vector2, Vector3 } from "three";
 import { Updatable } from "@/engine/updatables";
+import { TransitionEvent } from "@/engine/events";
 
-abstract class Transition extends EventDispatcher implements Updatable {
+abstract class Transition extends EventDispatcher<TransitionEvent> implements Updatable {
   finished = false;
   abstract update(delta: number): void
 }

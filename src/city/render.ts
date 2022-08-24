@@ -19,6 +19,7 @@ import { Group, MathUtils, Object3D, Scene, Vector3 } from "three";
 import { FLOOR_HEIGHT, GRASS_ASSET, ROAD_TYPES, TREES_SMALL } from "./constants";
 import { setShadow } from "@/engine/shadow";
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader";
+import { ObjectEvent } from "@/engine/events";
 
 export const renderShiftX = -26;
 export const renderShiftY = -4;
@@ -209,7 +210,7 @@ function renderGrass(
   return group;
 }
 
-export function makeInteractable(scene: Scene, obj: Object3D, interactables: Set<Object3D>, data?: any) {
+export function makeInteractable(scene: Scene, obj: Object3D<ObjectEvent>, interactables: Set<Object3D>, data?: any) {
   obj.userData.interactable = true;
   interactables.add(obj);
 

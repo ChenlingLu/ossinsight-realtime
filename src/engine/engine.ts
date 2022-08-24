@@ -1,5 +1,14 @@
 import { setup } from "./setup";
-import { Camera, DefaultLoadingManager, EventDispatcher, Object3D, Scene, TextureLoader, WebGLRenderer } from "three";
+import {
+  BaseEvent,
+  Camera,
+  DefaultLoadingManager,
+  EventDispatcher,
+  Object3D,
+  Scene,
+  TextureLoader,
+  WebGLRenderer,
+} from "three";
 import { AnimationMixerSet, UpdatableSet } from "./updatables";
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
@@ -11,7 +20,7 @@ DefaultLoadingManager.setURLModifier(url => {
   return import.meta.env.BASE_URL.replace(/\/$/, '') + '/' + url.replace(/^\//, '');
 });
 
-export class Engine extends EventDispatcher {
+export class Engine<E extends BaseEvent> extends EventDispatcher<E> {
   camera!: Camera;
   controls!: OrbitControls;
   scene!: Scene;

@@ -1,4 +1,4 @@
-import { DemoEngine } from "@/demo";
+import { DemoEngine, UpdateCurrentNumberEvent, UpdateTooltipEvent } from "@/demo";
 import { markRaw, ref, Ref, shallowReadonly, watchEffect } from "vue";
 import { useCSS2DObject } from "@/components/hooks/css2d";
 import Tooltip from "@/components/tooltip.vue";
@@ -39,14 +39,14 @@ export function useEngineCssElements(engineRef: EngineRef) {
       tooltip.container.value = engine.tooltip!.element;
       numbers.container.value = engine.numbers!.element;
 
-      const tooltipUpdateHandler = (event: Event) => {
+      const tooltipUpdateHandler = (event: UpdateTooltipEvent) => {
         tooltip.props.date = event.date;
         tooltip.props.value = event.value;
         tooltip.props.isToday = event.isToday;
         tooltip.props.floor = event.floor;
       };
 
-      const numbersUpdateHandler = (event: Event) => {
+      const numbersUpdateHandler = (event: UpdateCurrentNumberEvent) => {
         numbers.props.text = event.value;
         if (engine.focusingToday) {
           tooltip.props.value = event.value;
