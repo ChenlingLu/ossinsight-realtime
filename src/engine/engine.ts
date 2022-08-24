@@ -14,6 +14,7 @@ import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
 import { CSS2DRenderer } from "three/examples/jsm/renderers/CSS2DRenderer";
 import { dispose } from "./dispose";
+import { CachedGLTFLoader } from "@/engine/cached-loaders";
 
 DefaultLoadingManager.setURLModifier(url => {
   return import.meta.env.BASE_URL.replace(/\/$/, '') + '/' + url.replace(/^\//, '');
@@ -36,7 +37,11 @@ export class Engine<E extends BaseEvent> extends EventDispatcher<E> {
 
   constructor(public window: Window, public canvas: HTMLCanvasElement, public container?: HTMLElement) {
     super();
-    this.gltfLoader = new GLTFLoader();
+    this.gltfLoader = new CachedGLTFLoader(gltf => {
+      gltf = { ...gltf };
+      gltf.scene = gltf.scene.clone();
+      return gltf;
+    });
     this.textureLoader = new TextureLoader();
     this.running = false;
   }
