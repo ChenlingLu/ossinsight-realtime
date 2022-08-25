@@ -17,6 +17,7 @@
   },
   "devDependencies": {
     "@octokit/openapi-types": "^13.0.1",
+    "@popperjs/core": "^2.11.6",
     "@primer/octicons": "^17.4.1",
     "@types/node": "^18.7.3",
     "@types/primer__octicons": "^17.3.0",

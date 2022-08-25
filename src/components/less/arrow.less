@@ -1,0 +1,48 @@
+.__arrow() {
+  width: 0;
+  height: 0;
+}
+
+.__arrow-vertical(@size) {
+  border-left: @size solid transparent;
+  border-right: @size solid transparent;
+}
+
+.__arrow-horizontal(@size) {
+  border-top: @size solid transparent;
+  border-bottom: @size solid transparent;
+}
+
+.arrow() {
+  display: block;
+  position: absolute;
+  content: ' ';
+}
+
+.arrow-up(@size, @color) {
+  .__arrow;
+  .__arrow-vertical(@size);
+
+  border-bottom: @size solid @color;
+}
+
+.arrow-down(@size, @color) {
+  .__arrow;
+  .__arrow-vertical(@size);
+
+  border-top: @size solid @color;
+}
+
+.arrow-left(@size, @color) {
+  .__arrow;
+  .__arrow-horizontal(@size);
+
+  border-right: @size solid @color;
+}
+
+.arrow-right(@size, @color) {
+  .__arrow;
+  .__arrow-horizontal(@size);
+
+  border-left: @size solid @color;
+}

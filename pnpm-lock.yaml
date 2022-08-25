@@ -2,6 +2,7 @@ lockfileVersion: 5.4
 
 specifiers:
   '@octokit/openapi-types': ^13.0.1
+  '@popperjs/core': ^2.11.6
   '@primer/octicons': ^17.4.1
   '@types/node': ^18.7.3
   '@types/primer__octicons': ^17.3.0
@@ -25,6 +26,7 @@ dependencies:
 
 devDependencies:
   '@octokit/openapi-types': 13.0.1
+  '@popperjs/core': 2.11.6
   '@primer/octicons': 17.4.1
   '@types/node': 18.7.3
   '@types/primer__octicons': 17.3.0
@@ -101,6 +103,10 @@ packages:
 
   /@octokit/openapi-types/13.0.1:
     resolution: {integrity: sha512-40U39YoFBhJhmkAg6gbJnh9U8aueJwCuiTW0mXY2pNl9/+E7dUxXiMPOrIUGT12XqLinroaXYA3FUiw3BMeNfg==}
+    dev: true
+
+  /@popperjs/core/2.11.6:
+    resolution: {integrity: sha512-50/17A98tWUfQ176raKiOGXuYpLyyVMkxxG6oylzL3BPOlA6ADGdK7EYunSa4I064xerltq9TGXs8HmOk5E+vw==}
     dev: true
 
   /@primer/octicons/17.4.1:
