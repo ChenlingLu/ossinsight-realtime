@@ -50,6 +50,7 @@ const fmt = new Intl.DateTimeFormat('en', {
   hour12: false,
   timeStyle: 'full',
   dateStyle: 'full',
+  timeZone: 'UTC',
 });
 
 const formattedDate = computed(() => {
