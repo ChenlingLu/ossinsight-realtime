@@ -31,6 +31,7 @@ const props = defineProps<{
   source: PollStore<RawFilteredEvent, RawSamplingFirstMessage>,
   language: string,
   repo: string,
+  play: boolean,
 }>();
 
 const refEl = (i: number, el: any) => {
@@ -38,7 +39,9 @@ const refEl = (i: number, el: any) => {
 };
 
 subject.pipe(bufferTime(300)).subscribe(items => {
-  realtimeEvents.unshift(...items);
+  if (props.play) {
+    realtimeEvents.unshift(...items);
+  }
 });
 
 watchEffect((onCleanup) => {

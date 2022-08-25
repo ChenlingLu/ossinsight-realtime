@@ -17,14 +17,17 @@
     </flex>
     <hr class="divider" />
     <flex class="info" direction="row" justify="space-between">
-      <h2>Real-Time Pull Requests</h2>
+      <h2>
+        <PlayButton v-model="play" />
+        Real-Time Pull Requests
+      </h2>
       <a href="https://ossinsight.io/blog/why-we-choose-tidb-to-support-ossinsight">🤖️ how to make it</a>
     </flex>
     <flex class="info" direction="row" justify="space-between">
       <LangSelect v-model="language" />
       <RepoFilter v-model="repo" style="margin-left: 16px; flex: 1" />
     </flex>
-    <event-list :source="prEvents" :language="language" :repo="repo" />
+    <event-list :source="prEvents" :language="language" :repo="repo" :play="play" />
     <hr class="divider" />
     <flex class="info" direction="row" justify="center">
       <span style="color: #7c7c7c; font-size: 16px">Powered by</span>
@@ -47,6 +50,7 @@ import { ConnectionState, RawSamplingFirstMessage } from "@/api/poll";
 import LangSelect from "./ui/lang-select.vue";
 import RepoFilter from "./ui/repo-filter.vue";
 import EventList from "./event-list.vue";
+import PlayButton from "@/components/ui/play-button.vue";
 
 const usePrEvents = prEventsPollStore('pullRequestEvents');
 
@@ -64,6 +68,7 @@ const total = ref(0);
 const state = ref(ConnectionState.CONNECTING);
 const language = ref('Any Language');
 const repo = ref('');
+const play = ref(true);
 
 const colorMap = {
   [ConnectionState.ERROR]: 'red',
