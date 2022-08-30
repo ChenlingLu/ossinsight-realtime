@@ -53,29 +53,23 @@ class Connection extends WebSocket {
     this.initialized = false;
   }
 
-  private sendInitialMessage() {
+  sendInitialMessage() {
     const initialMessage = this.initialMessage;
     if (typeof initialMessage === 'undefined' || initialMessage === null) {
       return;
     }
+    let data: string
     if (typeof initialMessage === 'string') {
-      this.send(initialMessage);
+      data = initialMessage;
     } else {
-      this.send(JSON.stringify(initialMessage));
+      data = JSON.stringify(initialMessage);
     }
-  }
-
-  init() {
-    if (this.initialized) {
-      return;
-    }
-    this.initialized = true;
     if (this.readyState === 0) {
       this.addEventListener('open', () => {
-        this.sendInitialMessage();
-      });
+        this.send(data);
+      }, { once: true });
     } else if (this.readyState === 1) {
-      this.sendInitialMessage();
+      this.send(data);
     }
   }
 }
@@ -89,24 +83,38 @@ export const enum ConnectionState {
 
 export interface FirstMessage {
   firstMessageTag: true;
+  apiVersion: number
 }
 
 export interface RawSamplingFirstMessage extends FirstMessage {
   eventMap: Record<string, string>;
+  yearCountMap: {
+    dev: number
+    merge: number
+    open: number
+  },
+  dayCountMap: {
+    dev: number
+    merge: number
+    open: number
+  }
 }
 
 export class ConnectionSource<T, F extends FirstMessage> extends Subject<T> {
   private readonly stateListener: ((state: ConnectionState) => void)[] = [];
   public readonly firstMessage = new Subject<F>();
   public lastFirstMessage?: F;
+  public apiVersion: number | undefined;
   private conn: Connection | undefined = undefined;
   private debug = createDebugLogger('ws');
   private handleMessage = (event: MessageEvent) => {
-    const firstMessage = JSON.parse(event.data);
-    if (firstMessage.firstMessageTag) {
+    const firstMessage: F = JSON.parse(event.data);
+    if (!this.lastFirstMessage && firstMessage.firstMessageTag) {
+      this.apiVersion = firstMessage.apiVersion
       this.debug('firstMessage', firstMessage);
       this.firstMessage.next(firstMessage);
       this.lastFirstMessage = firstMessage;
+      this.conn?.sendInitialMessage()
     } else {
       this.next(JSON.parse(event.data));
     }
@@ -132,10 +140,10 @@ export class ConnectionSource<T, F extends FirstMessage> extends Subject<T> {
       this.stateChange(ConnectionState.CONNECTING);
       theConn.addEventListener('open', () => {
         this.debug('connect');
-        theConn.init();
         this.stateChange(ConnectionState.CONNECTED);
       }, { once: true });
       theConn.addEventListener('close', () => {
+        this.lastFirstMessage = undefined;
         this.stateChange(ConnectionState.CLOSED);
       }, { once: true });
       theConn.addEventListener('error', () => {

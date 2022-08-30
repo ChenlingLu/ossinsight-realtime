@@ -84,7 +84,7 @@ watch([() => props.language, () => props.repo], ([language, repo]) => {
   let filters: (typeof allPass)[] = [];
   if (language === 'Others') {
     filters.push(ev => {
-      const lang = ev["payload.pull_request.base.repo.language"];
+      const lang = ev.language;
       for (let exists of languages) {
         if (lang === exists) {
           return false;
@@ -93,11 +93,11 @@ watch([() => props.language, () => props.repo], ([language, repo]) => {
       return true;
     });
   } else if (language !== 'Any Language') {
-    filters.push(ev => ev["payload.pull_request.base.repo.language"] === language);
+    filters.push(ev => ev.language === language);
   }
 
   if (repo !== '') {
-    filters.push(ev => ev["actor.login"].toLowerCase().indexOf(repo) !== -1 || ev['repo.name'].toLowerCase().indexOf(repo) !== -1);
+    filters.push(ev => ev.actorLogin.toLowerCase().indexOf(repo) !== -1 || ev.repoName.toLowerCase().indexOf(repo) !== -1);
   }
 
   if (filters.length === 0) {

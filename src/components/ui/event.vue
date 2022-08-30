@@ -1,6 +1,6 @@
 <template>
   <span class="event">
-    <GhUser :login='event["actor.login"]' /> {{ event['payload.action'] }} PR<GhPr :repo='event["repo.name"]' :number='event["payload.pull_request.number"]' /> in <GhRepo :name='event["repo.name"]' />
+    <GhUser :login='event.actorLogin' /> {{ event.action }} PR<GhPr :repo='event.repoName' :number='event.pr' /> in <GhRepo :name='event.repoName' />
   </span>
 </template>
 <script setup lang="ts">
