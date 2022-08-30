@@ -21,7 +21,7 @@
         </p>
         <p class="headline extra">
           <span class="dot merged"/>
-          Closed <span class="number">{{ props.merged.toLocaleString('en') }}</span> PRs
+          Merged <span class="number">{{ props.merged.toLocaleString('en') }}</span> PRs
         </p>
         <p class="headline extra">
           <span class="dot opened"/>
