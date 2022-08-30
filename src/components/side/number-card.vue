@@ -6,7 +6,7 @@
         {{ props.title }}
       </flex>
       <flex class="number-card-content-value" align="center" direction="row">
-        <dot :color="`var(--c${props.colorStart})`" style="margin-right: 4px" />
+        <dot :color="`var(--c${props.colorStart})`" style="margin-right: 8px" />
         {{ props.value.toLocaleString('en') }}
       </flex>
     </flex>
@@ -26,25 +26,25 @@ const props = defineProps<{
 <style lang="less" scoped>
 
 @border-radius: 6px;
-@padding: 4px;
+@padding: 3px;
 
 .number-card {
   position: relative;
   flex: 1;
-  height: 71px;
+  height: 76px;
   padding: @padding;
   background: transparent;
   border-radius: @border-radius;
   overflow: hidden;
 
-  margin-left: 5px;
+  margin-left: 4px;
 
   &:first-child {
     margin-left: 0;
   }
 
   &-bg {
-    opacity: 0.15;
+    opacity: 0.2;
     position: absolute;
     left: 0;
     top: 0;
@@ -73,10 +73,10 @@ const props = defineProps<{
     border-radius: @border-radius - @padding;
     align-items: flex-start;
     z-index: 1;
-    padding: 8px 16px;
-    font-size: 12px;
+    padding: 8px 12px;
 
     &-title {
+      font-size: 12px;
       flex: 1;
       color: var(--text-secondary);
     }
@@ -84,6 +84,7 @@ const props = defineProps<{
     &-value {
       flex: 1;
       color: black;
+      font-size: 18px;
       font-weight: bold;
       font-family: monospace;
     }
