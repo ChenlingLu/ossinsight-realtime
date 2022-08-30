@@ -1,4 +1,4 @@
-name: Build GH Pages
+name: Verify
 
 on:
   pull_request:
