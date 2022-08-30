@@ -11,9 +11,9 @@
       </h2>
     </flex>
     <flex class="info" direction="row">
-      <number-card title="Developers" :value="summary.year.dev" color-start="3" color-stop="7"/>
-      <number-card title="Opened PRs" :value="summary.year.open" color-start="1" color-stop="6"/>
-      <number-card title="Merged PRs" :value="summary.year.merge" color-start="7" color-stop="5"/>
+      <number-card title="Developers" :value="summary.year.dev" color-start="3" color-stop="7" />
+      <number-card title="Opened PRs" :value="summary.year.open" color-start="1" color-stop="6" />
+      <number-card title="Merged PRs" :value="summary.year.merge" color-start="7" color-stop="5" />
     </flex>
     <hr class="divider" />
     <flex class="info" direction="row" justify="space-between">
@@ -42,7 +42,7 @@
 </template>
 <script setup lang="ts">
 import Flex from "../ui/flex.vue";
-import { computed, markRaw, reactive, ref, watchEffect } from "vue";
+import { computed, reactive, ref, watchEffect } from "vue";
 import { prEventsPollStore, process } from "@/store/poll";
 import { useActive } from "../hooks/lifecycle";
 import { ConnectionState, RawSamplingFirstMessage } from "@/api/poll";
@@ -73,22 +73,17 @@ const repo = ref('');
 const play = ref(true);
 
 const summary = reactive({
-  day: {
-    dev: 0,
-    merge: 0,
-    open: 0,
-  },
   year: {
     dev: 0,
     merge: 0,
     open: 0,
-  }
-})
+  },
+});
 
 prEvents.stream.onStateChange(newState => state.value = newState);
 
-function mergeCount (map: Record<string, string>) {
-  return Object.values(map).reduce((p, c) => p + parseInt(c), 0)
+function mergeCount(map: Record<string, string>) {
+  return Object.values(map).reduce((p, c) => p + parseInt(c), 0);
 }
 
 watchEffect((onCleanup) => {
@@ -98,34 +93,22 @@ watchEffect((onCleanup) => {
       if (ev.isDevYear) {
         summary.year.dev++;
       }
-      if (ev.isDevDay) {
-        summary.day.dev++;
-      }
       switch (ev.prEventType) {
         case 'merged':
           summary.year.merge++;
-          summary.day.merge++;
           break;
         case 'opened':
           summary.year.open++;
-          summary.day.open++;
           break;
       }
     });
     subscription.add(prEvents.firstMessage.subscribe(fm => {
-      const dates = Object.keys(fm.eventMap)
-      const today = dates[dates.length - 1]
       events.value = getEventCount(fm);
       total.value = 0;
       summary.year = {
         dev: parseInt(fm.devMap.total),
         merge: mergeCount(fm.mergeMap),
         open: mergeCount(fm.openMap),
-      };
-      summary.day = {
-        dev: parseInt(fm.devMap[today]),
-        merge: parseInt(fm.mergeMap[today]),
-        open: parseInt(fm.openMap[today]),
       };
     }));
     onCleanup(() => subscription.unsubscribe());

@@ -5,7 +5,7 @@
   </div>
 </template>
 <script setup lang="ts">
-import { ref, watch, watchEffect } from "vue";
+import { reactive, ref, watch, watchEffect } from "vue";
 import { prEventsPollStore, process } from "@/store/poll";
 import { useActive } from "./hooks/lifecycle";
 import { map } from "rxjs";
@@ -20,13 +20,17 @@ const canvas = ref<HTMLCanvasElement>();
 const container = ref<HTMLElement>();
 const engineRef = useEngine(canvas, container);
 
-const processFirstMessage = (firstMessage?: RawSamplingFirstMessage) => {
+const processFirstMessage = (firstMessage?: RawSamplingFirstMessage): RawData[] => {
   if (!firstMessage) {
     return [];
   }
-  return Object.entries(firstMessage.eventMap).map(([event_day, events]) => ({
-    event_day,
-    events: parseInt(events),
+  const dates = Object.keys(firstMessage.eventMap);
+  return dates.map(date => ({
+    event_day: date,
+    events: parseInt(firstMessage.eventMap[date]),
+    opened: parseInt(firstMessage.openMap[date]),
+    merged: parseInt(firstMessage.mergeMap[date]),
+    developers: parseInt(firstMessage.devMap[date]),
   }));
 };
 
@@ -34,7 +38,7 @@ const usePREvents = prEventsPollStore('pullRequestEvents');
 const prEvents = usePREvents();
 const events = ref<RawData[]>(processFirstMessage(prEvents.stream.lastFirstMessage));
 
-const { CSSElements, tooltip, todayNumber } = useEngineCssElements(engineRef);
+const { CSSElements, tooltip, today: todayHistory } = useEngineCssElements(engineRef);
 
 watchEffect(() => {
   const engine = engineRef.value;
@@ -44,7 +48,12 @@ watchEffect(() => {
   }
 });
 
-const newEvents = ref(0);
+const today = reactive({
+  events: 0,
+  developers: 0,
+  merged: 0,
+  opened: 0,
+})
 const log = createDebugLogger('scene');
 
 watchEffect((onCleanup) => {
@@ -54,7 +63,18 @@ watchEffect((onCleanup) => {
     const subscription = prEvents.stream
         .pipe(map(process))
         .subscribe(event => engine.addBrick(event, () => {
-          newEvents.value++;
+          today.events++;
+          switch (event.prEventType) {
+            case 'opened':
+              today.opened++;
+              break;
+            case 'merged':
+              today.merged++;
+              break
+          }
+          if (event.isDevDay) {
+            today.developers++;
+          }
         }));
     if (prEvents.stream.lastFirstMessage) {
       events.value = processFirstMessage(prEvents.stream.lastFirstMessage);
@@ -69,15 +89,21 @@ watchEffect((onCleanup) => {
   }
 });
 
-watch(todayNumber, () => {
-  newEvents.value = 0;
-})
+watch(todayHistory, () => {
+  today.events = 0;
+  today.developers = 0;
+  today.merged = 0;
+  today.opened = 0;
+});
 
 watchEffect(() => {
   const engine = engineRef.value;
   if (engine) {
     if (tooltip.props.isToday) {
-      tooltip.props.value = todayNumber.value + newEvents.value;
+      tooltip.props.value = todayHistory.events + today.events;
+      tooltip.props.merged = todayHistory.merged + today.merged;
+      tooltip.props.developers = todayHistory.developers + today.developers;
+      tooltip.props.opened = todayHistory.opened + today.opened;
     }
   }
 });

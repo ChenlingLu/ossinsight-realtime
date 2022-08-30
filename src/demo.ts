@@ -60,8 +60,12 @@ export class DemoEngine extends Engine<DemoEngineEvent> {
     super.dispose();
   }
 
-  get todayEvents () {
-    return this.rawData[this.day][this.week]?.events ?? 0
+  get today(): RawData | undefined {
+    return this.rawData[this.day][this.week]
+  }
+
+  get todayEvents() {
+    return this.rawData[this.day][this.week]?.events ?? 0;
   }
 
   setup() {
@@ -109,7 +113,7 @@ export class DemoEngine extends Engine<DemoEngineEvent> {
     this.updatables.add(controlPositionTransition);
     once(controlPositionTransition, 'finished', () => {
       this.updatables.delete(controlPositionTransition);
-    })
+    });
   }
 
   setTotal(raw: RawData[]) {
@@ -220,10 +224,14 @@ export class DemoEngine extends Engine<DemoEngineEvent> {
 
     // create numbers
     // this.showNumbers(pos, week, day)
+    const today = this.today
     this.dispatchEvent({
       type: 'update:current-number',
-      value: this.rawData[day][week]?.events ?? 0,
-    })
+      value: today?.events ?? 0,
+      developers: today?.developers ?? 0,
+      opened: today?.opened ?? 0,
+      merged: today?.merged ?? 0,
+    });
 
     // add base
     this.gltfLoader.load('models/building_base.glb', gltf => {
@@ -258,7 +266,7 @@ export class DemoEngine extends Engine<DemoEngineEvent> {
     if (!this.rawData) {
       return;
     }
-    const { events, event_day } = this.rawData[day][week] ?? { events: 0, event_day: 'unknown' };
+    const { events, developers, opened, merged, event_day } = this.rawData[day][week] ?? { events: 0, developers: 0, opened: 0, merged: 0, event_day: 'unknown' };
     const pos = getPos(week, day, events / 100000 * FLOOR_HEIGHT * 2);
     const tooltip = this.tooltip!;
 
@@ -268,6 +276,9 @@ export class DemoEngine extends Engine<DemoEngineEvent> {
       value: events,
       isToday: week === this.week && day === this.day,
       floor: Math.floor(events / 100000),
+      developers,
+      opened,
+      merged,
     });
     tooltip.object.position.copy(pos.clone().setY(pos.y));
     if (!tooltip.rendered) {
@@ -348,11 +359,17 @@ export interface UpdateTooltipEvent extends Event {
   value: number;
   isToday: boolean;
   floor: number;
+  developers: number;
+  opened: number;
+  merged: number;
 }
 
 export interface UpdateCurrentNumberEvent extends Event {
   type: 'update:current-number';
   value: number;
+  developers: number;
+  opened: number;
+  merged: number;
 }
 
 type DemoEngineEvent =

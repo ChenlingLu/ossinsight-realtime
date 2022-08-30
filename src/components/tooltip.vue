@@ -12,22 +12,20 @@
         </p>
         <p class="data">
           <PrIcon />
-          <code class="number">{{ props.value.toLocaleString('en') }}</code>
+          <span class="number">{{ props.value.toLocaleString('en') }}</span>
         </p>
         <hr />
-        <p class="headline">
-          <span>
-            <template v-if="props.isToday">
-              Current floor:
-            </template>
-            <template v-else>
-              Total floors:
-            </template>
-            {{ props.floor }}
-          </span>
+        <p class="headline extra">
+          <span class="dot developers"/>
+          Contributed by <span class="number">{{ props.developers.toLocaleString('en') }}</span> developers
         </p>
         <p class="headline extra">
-          *100,000 pull requests events extrude 1 floor
+          <span class="dot merged"/>
+          Closed <span class="number">{{ props.merged.toLocaleString('en') }}</span> PRs
+        </p>
+        <p class="headline extra">
+          <span class="dot opened"/>
+          Opened <span class="number">{{ props.opened.toLocaleString('en') }}</span> PRs
         </p>
       </div>
     </div>
@@ -37,7 +35,7 @@
 import { Teleport } from "vue";
 import PrIcon from '@primer/octicons/build/svg/git-pull-request-16.svg?component';
 
-const props = defineProps<{ container?: HTMLElement, isToday: boolean, date: string, value: number, floor: number }>();
+const props = defineProps<{ container?: HTMLElement, isToday: boolean, date: string, value: number, floor: number, developers: number, merged: number, opened: number }>();
 
 </script>
 <style scoped>
@@ -85,8 +83,12 @@ svg {
 }
 
 .number {
-  font-size: 28px;
   font-weight: bold;
+  font-family: monospace;
+}
+
+.data .number {
+  font-size: 28px;
 }
 
 hr {
@@ -101,6 +103,7 @@ hr {
 }
 
 .extra {
+  font-size: 12px;
   color: var(--text-secondary);
 }
 
@@ -115,5 +118,27 @@ hr {
 a {
   color: unset !important;
   pointer-events: auto;
+}
+
+
+.dot {
+  display: inline-block;
+  width: 6px;
+  height: 6px;
+  border-radius: 3px;
+  margin-right: 3px;
+  vertical-align: middle;
+}
+
+.opened.dot {
+  background: var(--c1);
+}
+
+.developers.dot {
+  background: var(--c3);
+}
+
+.merged.dot {
+  background: var(--c7);
 }
 </style>
