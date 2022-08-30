@@ -31,7 +31,7 @@ function poll<TMap extends Record<K, T>, F extends FirstMessage, K extends strin
   };
 }
 
-export type RawFilteredEvent = [number, string, number, string, string, string]
+export type RawFilteredEvent = any[]
 
 export interface FilteredEvent {
   'id': number;
@@ -40,35 +40,47 @@ export interface FilteredEvent {
   'repoName': string;
   'actorLogin': string;
   'language': string;
+  'merged': string;
+  'isDevDay': number;
+  'isDevYear': number;
+  prEventType: 'opened' | 'reopened' | 'closed' | 'merged';
 }
 
+type FilterConfig = {
+  field: keyof FilteredEvent;
+  path: string;
+}
+
+const CONFIG: FilterConfig[] = [
+  { field: 'id', path: 'event.id' },
+  { field: 'action', path: 'event.payload.action' },
+  { field: 'pr', path: 'event.payload.pull_request.number' },
+  { field: 'repoName', path: 'event.repo.name' },
+  { field: 'actorLogin', path: 'event.actor.login' },
+  { field: 'merged', path: 'event.payload.pull_request.merged' },
+  { field: 'language', path: 'event.payload.pull_request.base.repo.language' },
+  { field: 'isDevDay', path: 'payload.devDay' },
+  { field: 'isDevYear', path: 'payload.devYear' },
+];
+
 export function process(raw: RawFilteredEvent): FilteredEvent {
-  return {
-    'id': raw[0],
-    'action': raw[1],
-    'pr': raw[2],
-    'repoName': raw[3],
-    'actorLogin': raw[4],
-    'language': raw[5],
-  };
+  let res = {} as FilteredEvent;
+  for (let i = 0; i < CONFIG.length; i++) {
+    // @ts-ignore
+    res[CONFIG[i].field] = raw[i];
+  }
+  if (res.action === 'closed') {
+    res.prEventType = res.merged ? 'merged' : 'closed';
+  } else {
+    res.prEventType = res.action as any;
+  }
+  return res;
 }
 
 export const prEventsPollStore = poll<{ 'pullRequestEvents': RawFilteredEvent }, RawSamplingFirstMessage>('sampling', sampling, {
   pullRequestEvents: {
     samplingRate: 1,
-    filter: [
-      'event.id',
-      'event.payload.action',
-      'event.payload.pull_request.number',
-      'event.repo.name',
-      'event.actor.login',
-      'event.payload.pull_request.base.repo.language',
-      'payload.devDay',
-      'payload.devYear',
-      'payload.merge',
-      'payload.open',
-      'payload.pr',
-    ],
+    filter: CONFIG.map(config => config.path),
     eventType: 'PullRequestEvent',
     returnType: 'list',
   } as SamplingRequest,

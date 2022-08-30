@@ -74,7 +74,7 @@ watch([anchorRef, popperRef, arrowRef, props], ([anchor, popper, arrow, props], 
 @import "../less/arrow";
 
 @arrow-size: 4px;
-@bg-color: #7c7c7c;
+@bg-color: var(--tooltip-bg);
 
 .popper-anchor {
   display: inline-block;

@@ -26,7 +26,7 @@
   </div>
 </template>
 <script setup lang="ts">
-import Side from "./components/side.vue";
+import Side from "./components/side";
 import { computed, defineAsyncComponent, ref } from "vue";
 import GhRepo from "./components/ui/gh-repo.vue";
 import DemoTag from "./components/ui/demo-tag.vue";

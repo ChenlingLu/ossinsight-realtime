@@ -111,10 +111,10 @@ const filteredLanguages = computed(() => {
 .select-container {
   position: relative;
   font-family: -apple-system, "PingFang SC", "Helvetica", sans-serif;
-  border: 1px solid #c7c7c780;
+  border: 1px solid var(--border);
   background: white;
   padding: 8px;
-  color: #2c2c2c;
+  color: var(--text-primary);
   font-size: 14px;
   font-weight: 400;
   border-radius: 3px;
@@ -145,7 +145,7 @@ const filteredLanguages = computed(() => {
   box-sizing: border-box;
   border-radius: 3px;
   padding: 8px;
-  color: #2c2c2c;
+  color: var(--text-primary);
   font-size: 14px;
   font-weight: 400;
   outline: none;
@@ -158,7 +158,7 @@ const filteredLanguages = computed(() => {
   left: 0;
   border-radius: 3px;
   background: white;
-  border: 1px solid #c7c7c780;
+  border: 1px solid var(--border);
   z-index: 1;
   max-height: 200px;
   min-width: 140px;
@@ -167,9 +167,11 @@ const filteredLanguages = computed(() => {
   opacity: 0;
   transform: translateY(-10px);
   transition: all .2s ease;
+  pointer-events: none;
 }
 
 .lang-list.show {
+  pointer-events: auto;
   opacity: 1;
   transform: translateY(0);
 }
@@ -189,7 +191,7 @@ const filteredLanguages = computed(() => {
   height: 48px;
   width: 100%;
   font-size: 16px;
-  color: #7c7c7c;
+  color: var(--text-secondary);
   align-items: center;
   justify-content: center;
 }
@@ -203,7 +205,7 @@ const filteredLanguages = computed(() => {
   border-left: 4px solid transparent;
   border-right: 4px solid transparent;
 
-  border-top: 4px solid #7c7c7c;
+  border-top: 4px solid var(--text-secondary);
 
   transition: transform .2s ease;
 }

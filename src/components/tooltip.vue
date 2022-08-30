@@ -51,7 +51,7 @@ const props = defineProps<{ container?: HTMLElement, isToday: boolean, date: str
   transform: translate3d(-2px, -8px, 0);
   border-radius: 4px;
   color: white;
-  background: #2c2c2c;
+  background: var(--tooltip-bg);
   white-space: pre-wrap;
   padding: 8px;
   font-family: -apple-system, "PingFang SC", "Helvetica", sans-serif;
@@ -91,7 +91,7 @@ svg {
 
 hr {
   border: none;
-  background: #7c7c7c;
+  background: var(--text-secondary);
   height: 1px;
   margin: 8px;
 }
@@ -101,7 +101,7 @@ hr {
 }
 
 .extra {
-  color: #7c7c7c;
+  color: var(--text-secondary);
 }
 
 .bold {

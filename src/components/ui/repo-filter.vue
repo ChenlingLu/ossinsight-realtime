@@ -13,8 +13,8 @@ const onChange = (event: any) => {
 .repo-filter {
   font-family: -apple-system, "PingFang SC", "Helvetica", sans-serif;
   appearance: none;
-  border: 1px solid #c7c7c780;
-  color: #2c2c2c;
+  border: 1px solid var(--border);
+  color: var(--text-primary);
   font-weight: 400;
   padding: 8px;
   font-size: 14px;

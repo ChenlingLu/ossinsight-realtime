@@ -7,13 +7,13 @@
             href="https://docs.github.com/en/developers/webhooks-and-events/events/github-event-types#pullrequestevent"
             target="_blank">Pull Request Events</a> made by developers {{ (new Date()).getUTCFullYear() }}
         </span>
-        <flex direction="row" justify="center" align="center" style="margin-top: 8px">
-          <Dot :color="colorMap[state]" style="margin-right: 4px" />
-          <span class="numbers">
-            {{ number }}
-          </span>
-        </flex>
+        <total-card :state="state" :number="number" />
       </h2>
+    </flex>
+    <flex class="info" direction="row">
+      <number-card title="Developers" :value="developerCount" color-start="3" color-stop="7"/>
+      <number-card title="Opened PRs" :value="openCount" color-start="1" color-stop="6"/>
+      <number-card title="Merged PRs" :value="mergeCount" color-start="7" color-stop="5"/>
     </flex>
     <hr class="divider" />
     <flex class="info" direction="row" justify="space-between">
@@ -30,7 +30,7 @@
     <event-list :source="prEvents" :language="language" :repo="repo" :play="play" />
     <hr class="divider" />
     <flex class="info" direction="row" justify="center">
-      <span style="color: #7c7c7c; font-size: 16px">Powered by</span>
+      <span style="color: var(--text-secondary); font-size: 16px">Powered by</span>
       &nbsp;
       &nbsp;
       <img src="/logos/tidbcloud.png" alt="TiDB Cloud" height="20" />
@@ -41,16 +41,18 @@
   </flex>
 </template>
 <script setup lang="ts">
-import Flex from "./ui/flex.vue";
-import { computed, ref, watchEffect } from "vue";
-import { prEventsPollStore } from "@/store/poll";
-import { useActive } from "./hooks/lifecycle";
-import Dot from "./ui/dot.vue";
+import Flex from "../ui/flex.vue";
+import { computed, markRaw, reactive, ref, watchEffect } from "vue";
+import { prEventsPollStore, process } from "@/store/poll";
+import { useActive } from "../hooks/lifecycle";
 import { ConnectionState, RawSamplingFirstMessage } from "@/api/poll";
-import LangSelect from "./ui/lang-select.vue";
-import RepoFilter from "./ui/repo-filter.vue";
-import EventList from "./event-list.vue";
+import LangSelect from "../ui/lang-select.vue";
+import RepoFilter from "../ui/repo-filter.vue";
+import EventList from "../event-list.vue";
 import PlayButton from "@/components/ui/play-button.vue";
+import NumberCard from "@/components/side/number-card.vue";
+import TotalCard from "@/components/side/total-card.vue";
+import { map } from "rxjs";
 
 const usePrEvents = prEventsPollStore('pullRequestEvents');
 
@@ -70,31 +72,59 @@ const language = ref('Any Language');
 const repo = ref('');
 const play = ref(true);
 
-const colorMap = {
-  [ConnectionState.ERROR]: 'red',
-  [ConnectionState.CLOSED]: 'gray',
-  [ConnectionState.CONNECTING]: 'yellow',
-  [ConnectionState.CONNECTED]: '#34A352',
-};
+const summary = reactive({
+  day: {
+    dev: 0,
+    merge: 0,
+    open: 0,
+  },
+  year: {
+    dev: 0,
+    merge: 0,
+    open: 0,
+  }
+})
 
 prEvents.stream.onStateChange(newState => state.value = newState);
 
 watchEffect((onCleanup) => {
   if (active.value) {
-    const subscription = prEvents.stream.subscribe(() => total.value++);
-    if (prEvents.stream.lastFirstMessage) {
-      events.value = getEventCount(prEvents.stream.lastFirstMessage);
-      total.value = 0;
-    }
+    const subscription = prEvents.stream.pipe(map(process)).subscribe((ev) => {
+      total.value++;
+      if (ev.isDevYear) {
+        summary.year.dev++;
+      }
+      switch (ev.prEventType) {
+        case 'merged':
+          summary.year.merge++;
+          break;
+        case 'opened':
+          summary.year.open++;
+          break;
+      }
+    });
     subscription.add(prEvents.firstMessage.subscribe(fm => {
       events.value = getEventCount(fm);
       total.value = 0;
+      summary.year = {
+        dev: parseInt(fm.yearCountMap.dev),
+        merge: parseInt(fm.yearCountMap.merge),
+        open: parseInt(fm.yearCountMap.open),
+      };
+      summary.day = {
+        dev: parseInt(fm.dayCountMap.dev),
+        merge: parseInt(fm.dayCountMap.merge),
+        open: parseInt(fm.dayCountMap.open),
+      };
     }));
     onCleanup(() => subscription.unsubscribe());
   }
 });
 
-const number = computed(() => (events.value + total.value).toLocaleString('en'));
+const number = computed(() => events.value + total.value);
+const developerCount = computed(() => summary.year.dev + summary.day.dev);
+const mergeCount = computed(() => summary.year.merge + summary.day.merge);
+const openCount = computed(() => summary.year.open + summary.day.open);
 </script>
 <style scoped lang="less">
 .container {
@@ -107,7 +137,7 @@ const number = computed(() => (events.value + total.value).toLocaleString('en'))
   width: 100%;
   box-sizing: border-box;
   position: relative;
-  margin: 16px;
+  margin: 16px 16px 0;
 
   a {
     color: unset !important;
@@ -131,12 +161,6 @@ const number = computed(() => (events.value + total.value).toLocaleString('en'))
     text-align: center;
     font-size: 14px;
     font-weight: normal;
-
-    .numbers {
-      font-size: 24px;
-      font-weight: bold;
-      font-family: monospace;
-    }
   }
 }
 
@@ -144,7 +168,7 @@ const number = computed(() => (events.value + total.value).toLocaleString('en'))
   width: 100%;
   border: none;
   height: 1px;
-  background: #e5e5e5;
+  background: var(--divider);
 }
 
 .info {
@@ -154,13 +178,13 @@ const number = computed(() => (events.value + total.value).toLocaleString('en'))
   h2 {
     font-size: 18px;
     font-weight: normal;
-    color: #2c2c2c;
+    color: var(--text-primary);
     line-height: 1;
     margin: 0;
   }
 
   a {
-    color: #abaaaa !important;
+    color: var(--text-light) !important;
     text-decoration: none;
     font-size: 12px;
   }

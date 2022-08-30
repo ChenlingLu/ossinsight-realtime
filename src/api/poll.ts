@@ -89,14 +89,14 @@ export interface FirstMessage {
 export interface RawSamplingFirstMessage extends FirstMessage {
   eventMap: Record<string, string>;
   yearCountMap: {
-    dev: number
-    merge: number
-    open: number
+    dev: string
+    merge: string
+    open: string
   },
   dayCountMap: {
-    dev: number
-    merge: number
-    open: number
+    dev: string
+    merge: string
+    open: string
   }
 }
 

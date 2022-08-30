@@ -30,6 +30,7 @@ export default {
 <style scoped>
 .flexbox {
   display: flex;
+  box-sizing: border-box;
   flex-direction: v-bind(direction);
   align-items: v-bind(align);
   justify-content: v-bind(justify);
