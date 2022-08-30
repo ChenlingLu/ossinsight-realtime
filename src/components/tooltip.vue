@@ -34,7 +34,7 @@
   </Teleport>
 </template>
 <script setup lang="ts">
-import { defineProps, Teleport } from "vue";
+import { Teleport } from "vue";
 import PrIcon from '@primer/octicons/build/svg/git-pull-request-16.svg?component';
 
 const props = defineProps<{ container?: HTMLElement, isToday: boolean, date: string, value: number, floor: number }>();

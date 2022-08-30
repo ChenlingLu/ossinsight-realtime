@@ -88,16 +88,9 @@ export interface FirstMessage {
 
 export interface RawSamplingFirstMessage extends FirstMessage {
   eventMap: Record<string, string>;
-  yearCountMap: {
-    dev: string
-    merge: string
-    open: string
-  },
-  dayCountMap: {
-    dev: string
-    merge: string
-    open: string
-  }
+  devMap: Record<string, string> & { 'total': string };
+  mergeMap: Record<string, string>;
+  openMap: Record<string, string>;
 }
 
 export class ConnectionSource<T, F extends FirstMessage> extends Subject<T> {

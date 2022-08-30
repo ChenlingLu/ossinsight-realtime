@@ -87,6 +87,10 @@ const summary = reactive({
 
 prEvents.stream.onStateChange(newState => state.value = newState);
 
+function mergeCount (map: Record<string, string>) {
+  return Object.values(map).reduce((p, c) => p + parseInt(c), 0)
+}
+
 watchEffect((onCleanup) => {
   if (active.value) {
     const subscription = prEvents.stream.pipe(map(process)).subscribe((ev) => {
@@ -109,17 +113,19 @@ watchEffect((onCleanup) => {
       }
     });
     subscription.add(prEvents.firstMessage.subscribe(fm => {
+      const dates = Object.keys(fm.eventMap)
+      const today = dates[dates.length - 1]
       events.value = getEventCount(fm);
       total.value = 0;
       summary.year = {
-        dev: parseInt(fm.yearCountMap.dev),
-        merge: parseInt(fm.yearCountMap.merge),
-        open: parseInt(fm.yearCountMap.open),
+        dev: parseInt(fm.devMap.total),
+        merge: mergeCount(fm.mergeMap),
+        open: mergeCount(fm.openMap),
       };
       summary.day = {
-        dev: parseInt(fm.dayCountMap.dev),
-        merge: parseInt(fm.dayCountMap.merge),
-        open: parseInt(fm.dayCountMap.open),
+        dev: parseInt(fm.devMap[today]),
+        merge: parseInt(fm.mergeMap[today]),
+        open: parseInt(fm.openMap[today]),
       };
     }));
     onCleanup(() => subscription.unsubscribe());

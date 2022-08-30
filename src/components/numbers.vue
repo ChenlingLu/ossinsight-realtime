@@ -8,7 +8,7 @@
   </Teleport>
 </template>
 <script setup lang="ts">
-import { defineProps, Teleport } from "vue";
+import { Teleport } from "vue";
 
 const props = defineProps<{ container?: HTMLElement, text: string }>();
 </script>

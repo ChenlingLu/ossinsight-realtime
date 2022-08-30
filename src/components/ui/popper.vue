@@ -15,7 +15,7 @@
 </template>
 <script lang="ts" setup>
 import { createPopper, Options, State } from "@popperjs/core";
-import { defineProps, ref, watch } from "vue";
+import { ref, watch } from "vue";
 
 const show = ref(false);
 
