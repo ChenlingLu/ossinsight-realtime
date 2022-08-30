@@ -11,9 +11,9 @@
       </h2>
     </flex>
     <flex class="info" direction="row">
-      <number-card title="Developers" :value="developerCount" color-start="3" color-stop="7"/>
-      <number-card title="Opened PRs" :value="openCount" color-start="1" color-stop="6"/>
-      <number-card title="Merged PRs" :value="mergeCount" color-start="7" color-stop="5"/>
+      <number-card title="Developers" :value="summary.year.dev" color-start="3" color-stop="7"/>
+      <number-card title="Opened PRs" :value="summary.year.open" color-start="1" color-stop="6"/>
+      <number-card title="Merged PRs" :value="summary.year.merge" color-start="7" color-stop="5"/>
     </flex>
     <hr class="divider" />
     <flex class="info" direction="row" justify="space-between">
@@ -94,12 +94,17 @@ watchEffect((onCleanup) => {
       if (ev.isDevYear) {
         summary.year.dev++;
       }
+      if (ev.isDevDay) {
+        summary.day.dev++;
+      }
       switch (ev.prEventType) {
         case 'merged':
           summary.year.merge++;
+          summary.day.merge++;
           break;
         case 'opened':
           summary.year.open++;
+          summary.day.open++;
           break;
       }
     });
@@ -122,9 +127,6 @@ watchEffect((onCleanup) => {
 });
 
 const number = computed(() => events.value + total.value);
-const developerCount = computed(() => summary.year.dev + summary.day.dev);
-const mergeCount = computed(() => summary.year.merge + summary.day.merge);
-const openCount = computed(() => summary.year.open + summary.day.open);
 </script>
 <style scoped lang="less">
 .container {
