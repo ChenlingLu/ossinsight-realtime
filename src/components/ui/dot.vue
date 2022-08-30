@@ -42,11 +42,15 @@ const size = computed(() => `${props.size ?? 8}px`);
 
 @keyframes animate {
   0% {
-    opacity: 0.6;
+    opacity: 0.8;
     transform: scale3d(1, 1, 1);
   }
+  50% {
+    opacity: 0.3;
+    transform: scale3d(2, 2, 1);
+  };
   100% {
-    opacity: 0;
+    opacity: 0.2;
     transform: scale3d(2, 2, 1);
   }
 }

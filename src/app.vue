@@ -5,7 +5,7 @@
     </a>
     <header class="heading">
       <h1>
-        How Developers Build the Open Source Software World Together!
+        How Developers Build the Open Source Software World Together !
       </h1>
       <p>
         {{ formattedDate }}
@@ -32,7 +32,7 @@ import GhRepo from "./components/ui/gh-repo.vue";
 import DemoTag from "./components/ui/demo-tag.vue";
 const Scene = defineAsyncComponent(() => import("./components/scene.vue"));
 
-const sideSize = '450px';
+const sideSize = '500px';
 const now = ref(new Date());
 
 setInterval(() => {

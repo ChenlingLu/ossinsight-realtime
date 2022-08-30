@@ -1,6 +1,6 @@
 <template>
-  <flex direction="row" justify="center" align="center" style="margin-top: 8px">
-    <Dot :color="colorMap[state]" style="margin-right: 4px" />
+  <flex direction="row" justify="center" align="center" style="margin-top: 4px">
+    <Dot :color="colorMap[state]" style="margin-right: 12px" />
     <span class="numbers">
       {{ number.toLocaleString('en') }}
     </span>
@@ -26,7 +26,7 @@ const colorMap = {
 </script>
 <style scoped>
 .numbers {
-  font-size: 24px;
+  font-size: 30px;
   font-weight: bold;
   font-family: monospace;
 }

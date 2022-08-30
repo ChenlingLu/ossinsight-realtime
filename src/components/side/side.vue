@@ -30,13 +30,13 @@
     <event-list :source="prEvents" :language="language" :repo="repo" :play="play" />
     <hr class="divider" />
     <flex class="info" direction="row" justify="center">
-      <span style="color: var(--text-secondary); font-size: 16px">Powered by</span>
+      <span style="color: var(--text-secondary); font-size: 12px">Powered by</span>
       &nbsp;
       &nbsp;
-      <img src="/logos/tidbcloud.png" alt="TiDB Cloud" height="20" />
+      <img src="/logos/tidbcloud.png" alt="TiDB Cloud" height="16" />
       &nbsp;
       &nbsp;
-      <img src="/logos/pulsar.png" alt="Pulsar" height="20" />
+      <img src="/logos/pulsar.png" alt="Pulsar" height="16" />
     </flex>
   </flex>
 </template>
@@ -137,6 +137,7 @@ const number = computed(() => events.value + total.value);
 
 .banner {
   width: 100%;
+  height: 90px;
   box-sizing: border-box;
   position: relative;
   margin: 16px 16px 0;
@@ -163,6 +164,7 @@ const number = computed(() => events.value + total.value);
     text-align: center;
     font-size: 14px;
     font-weight: normal;
+    padding:8px;
   }
 }
 
@@ -170,18 +172,19 @@ const number = computed(() => events.value + total.value);
   width: 100%;
   border: none;
   height: 1px;
+  margin: 2px;
   background: var(--divider);
 }
 
 .info {
   width: 100%;
-  padding: 16px 0;
+  padding: 8px 0;
 
   h2 {
-    font-size: 18px;
-    font-weight: normal;
+    font-size: 16px;
+    font-weight: bold;
     color: var(--text-primary);
-    line-height: 1;
+    line-height: 2;
     margin: 0;
   }
 
