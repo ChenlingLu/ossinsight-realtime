@@ -4,7 +4,7 @@
   </a>
   <header class="heading">
     <h1>
-      How Developers Build the Open Source Software World Together !
+      Real-time GitHub Contribution City 2022
     </h1>
     <p>
       {{ formattedDate }}
@@ -34,7 +34,7 @@ setInterval(() => {
 const fmt = new Intl.DateTimeFormat('en', {
   hour12: false,
   timeStyle: 'full',
-  dateStyle: 'full',
+  dateStyle: 'short',
   timeZone: 'UTC',
 });
 
@@ -69,7 +69,7 @@ header h1 {
   margin: 0 auto;
   text-align: center;
   color: white;
-  font-size: 20px;
+  font-size: 24px;
   font-weight: bold;
 }
 
