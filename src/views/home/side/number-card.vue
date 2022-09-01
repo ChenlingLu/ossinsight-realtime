@@ -100,14 +100,18 @@ const size = useSize();
 
   &:not(.small) {
     min-height: 76px;
+    .number-card-content {
+      // why need this on safari?
+      min-height: 70px;
 
-    .number-card-content-title {
-      flex: 1;
-      height: 100%;
-    }
-    .number-card-content-value {
-      flex: 1;
-      height: 100%;
+      &-title {
+        flex: 1;
+        height: 100%;
+      }
+      &-value {
+        flex: 1;
+        height: 100%;
+      }
     }
   }
 }
