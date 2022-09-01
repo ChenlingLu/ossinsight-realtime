@@ -16,11 +16,11 @@
   </div>
 </template>
 <script lang="ts" setup>
-import { CSSProperties, PropType } from "vue";
+import { CSSProperties } from "vue";
 
 const props = defineProps<{
   direction?: CSSProperties['flex-direction']
-  align?: PropType<CSSProperties['align-items']>
+  align?: CSSProperties['align-items']
   justify?: CSSProperties['justify-content']
   wrap?: CSSProperties['flex-wrap']
   gap?: CSSProperties['gap']
