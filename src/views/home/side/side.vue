@@ -10,26 +10,49 @@
         <total-card :state="state" :number="number" />
       </h2>
     </flex>
-    <flex info direction="row">
+    <flex class="number-cards" info :direction="size.down('xs') ? 'column' : 'row'" gap="4px">
       <number-card title="Developers" :value="summary.year.dev" color-start="3" color-stop="7" />
       <number-card title="Opened PRs" :value="summary.year.open" color-start="1" color-stop="6" />
       <number-card title="Merged PRs" :value="summary.year.merge" color-start="7" color-stop="5" />
     </flex>
-    <divider />
-    <events-player />
+    <template v-if="size.height >= 450">
+      <divider />
+      <events-player />
+      <divider />
+    </template>
+    <template v-else>
+      <flex-spacer />
+    </template>
+    <flex info direction="row" justify="center">
+      <a class="more-info" href="https://ossinsight.io/blog/why-we-choose-tidb-to-support-ossinsight">🤖️ how to make it</a>
+      <flex-spacer />
+      <span style="color: var(--text-secondary); font-size: 12px" v-if="size.up('sm')">Powered by</span>
+      &nbsp;
+      &nbsp;
+      <a href="https://en.pingcap.com/tidb-cloud?utm_source=ossinsight&utm_medium=referral" target="_blank">
+        <img src="/logos/tidbcloud.png" alt="TiDB Cloud" height="16" />
+      </a>
+      &nbsp;
+      &nbsp;
+      <a href="https://pulsar.apache.org" target="_blank">
+        <img src="/logos/pulsar.png" alt="Pulsar" height="16" />
+      </a>
+    </flex>
   </flex>
 </template>
 <script setup lang="ts">
-import Flex from "@/components/ui/flex.vue";
 import { computed, reactive, ref, watchEffect } from "vue";
 import { prEventsPollStore, process } from "@/store/poll";
 import { useActive } from "@/components/hooks/lifecycle";
 import { ConnectionState, RawSamplingFirstMessage } from "@/api/poll";
 import NumberCard from "@/views/home/side/number-card.vue";
 import TotalCard from "@/views/home/side/total-card.vue";
-import { map } from "rxjs";
+import Flex from "@/components/ui/flex.vue";
+import FlexSpacer from "@/components/ui/flex-spacer.vue";
 import EventsPlayer from "@/components/events-player.vue";
 import Divider from "@/components/ui/divider.vue";
+import { useSize } from "@/store";
+import { map } from "rxjs";
 
 const usePrEvents = prEventsPollStore('pullRequestEvents');
 
@@ -45,6 +68,8 @@ const prEvents = usePrEvents();
 const events = ref(getEventCount(prEvents.stream.lastFirstMessage));
 const total = ref(0);
 const state = ref(ConnectionState.CONNECTING);
+
+const size = useSize()
 
 const summary = reactive({
   year: {
@@ -94,13 +119,14 @@ const number = computed(() => events.value + total.value);
 <style scoped lang="less">
 .container {
   height: 100%;
+  height: -webkit-fill-available;
   box-sizing: border-box;
   margin: 0 16px;
 }
 
 .banner {
   width: 100%;
-  height: 90px;
+  min-height: 90px;
   box-sizing: border-box;
   position: relative;
   margin: 16px 16px 0;
@@ -130,5 +156,9 @@ const number = computed(() => events.value + total.value);
     padding:8px;
   }
 }
-
+.more-info {
+  color: var(--text-light) !important;
+  text-decoration: none;
+  font-size: 12px;
+}
 </style>

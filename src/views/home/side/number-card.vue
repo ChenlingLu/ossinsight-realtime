@@ -1,13 +1,18 @@
 <template>
-  <div class="number-card">
+  <div class="number-card" :class="{ small: size.down('xs') }">
     <div class="number-card-bg" :class="`number-card-bg-c${props.colorStart}-c${props.colorStop}`" />
-    <flex class="number-card-content">
-      <flex class="number-card-content-title" justify="center">
+    <flex class="number-card-content"
+          :direction="size.down('xs') ? 'row' : 'column'"
+          :align="size.down('xs') ? 'center' : 'flex-start'"
+    >
+      <flex class="number-card-content-title" justify="center" align="flex-start">
         {{ props.title }}
       </flex>
-      <flex class="number-card-content-value" align="center" direction="row">
-        <dot :color="`var(--c${props.colorStart})`" style="margin-right: 8px" />
-        {{ props.value.toLocaleString('en') }}
+      <flex class="number-card-content-value" align="center" :direction="size.down('xs') ? 'row-reverse' : 'row'" gap="8px">
+        <dot :color="`var(--c${props.colorStart})`" />
+        <span>
+          {{ props.value.toLocaleString('en') }}
+        </span>
       </flex>
     </flex>
   </div>
@@ -15,6 +20,7 @@
 <script lang="ts" setup>
 import Flex from "@/components/ui/flex.vue";
 import Dot from "@/components/ui/dot.vue";
+import { useSize } from "@/store";
 
 const props = defineProps<{
   title: string
@@ -22,6 +28,8 @@ const props = defineProps<{
   colorStart: number | string,
   colorStop: number | string,
 }>();
+
+const size = useSize();
 </script>
 <style lang="less" scoped>
 
@@ -31,17 +39,13 @@ const props = defineProps<{
 .number-card {
   position: relative;
   flex: 1;
-  height: 76px;
+  width: 100%;
+  box-sizing: border-box;
+  height: 100%;
   padding: @padding;
   background: transparent;
   border-radius: @border-radius;
   overflow: hidden;
-
-  margin-left: 4px;
-
-  &:first-child {
-    margin-left: 0;
-  }
 
   &-bg {
     opacity: 0.2;
@@ -76,17 +80,34 @@ const props = defineProps<{
     padding: 8px 12px;
 
     &-title {
+      text-align: left;
+      width: 100%;
       font-size: 12px;
-      flex: 1;
+      flex: unset;
       color: var(--text-secondary);
+      line-height: 1;
     }
 
     &-value {
-      flex: 1;
+      flex: unset;
       color: black;
       font-size: 18px;
       font-weight: bold;
       font-family: monospace;
+      line-height: 1;
+    }
+  }
+
+  &:not(.small) {
+    min-height: 76px;
+
+    .number-card-content-title {
+      flex: 1;
+      height: 100%;
+    }
+    .number-card-content-value {
+      flex: 1;
+      height: 100%;
     }
   }
 }

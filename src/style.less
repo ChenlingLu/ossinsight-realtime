@@ -29,16 +29,32 @@
 }
 
 // sizes
-:root {
-  --side-size: @side-size;
-  --main-size: calc(~"100% - var(--side-size)");
+@media screen and (max-width: @md) {
+  :root {
+    --side-size: 100%;
+    --main-size: 0;
+  }
 }
 
-body {
+@media screen and (min-width: @md - 1) {
+  :root {
+    --side-size: @side-size;
+    --main-size: calc(~"100% - var(--side-size)");
+  }
+}
+
+// breakpoints
+:root {
+  --md: @md;
+  --lg: @lg;
+}
+
+body, #app {
   position: fixed;
   margin: 0;
   padding: 0;
   height: 100vh;
+  height: -webkit-fill-available;
   font-family: -apple-system, "PingFang SC", "Helvetica", sans-serif;
   overflow: hidden;
 }
@@ -46,4 +62,6 @@ body {
 html {
   margin: 0;
   padding: 0;
+  height: 100%;
+  height: -webkit-fill-available;
 }

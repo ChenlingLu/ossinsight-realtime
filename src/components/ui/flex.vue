@@ -1,46 +1,74 @@
 <template>
-  <div class="flexbox" :class="{ info }">
+  <div class="flexbox"
+       :class="{
+          info,
+          [`flexbox-${props.direction ?? 'column'}`]: true,
+          'gap': !!props.gap
+       }"
+       :style="{
+          flexDirection: props.direction || 'column',
+          alignItems: props.align || 'center',
+          justifyContent: props.justify || 'flex-start',
+          flexWrap: props.wrap || 'nowrap',
+          '--gap': props.gap,
+       }">
     <slot />
   </div>
 </template>
-<script lang="ts">
+<script lang="ts" setup>
 import { CSSProperties, PropType } from "vue";
 
-export default {
-  props: {
-    direction: {
-      type: String as PropType<CSSProperties['flex-direction']>,
-      default: 'column',
-    },
-    align: {
-      type: String as PropType<CSSProperties['align-items']>,
-      default: 'center',
-    },
-    justify: {
-      type: String as PropType<CSSProperties['justify-content']>,
-      default: 'flex-start',
-    },
-    wrap: {
-      type: String as PropType<CSSProperties['flex-wrap']>,
-      default: 'nowrap',
-    },
-
-    info: {
-      type: Boolean as PropType<boolean>,
-      default: false,
-    }
-  },
-};
+const props = defineProps<{
+  direction?: CSSProperties['flex-direction']
+  align?: PropType<CSSProperties['align-items']>
+  justify?: CSSProperties['justify-content']
+  wrap?: CSSProperties['flex-wrap']
+  gap?: CSSProperties['gap']
+  info?: boolean
+}>();
 </script>
-<style scoped>
+<style scoped lang="less">
 .flexbox {
   display: flex;
   box-sizing: border-box;
-  flex-direction: v-bind(direction);
-  align-items: v-bind(align);
-  justify-content: v-bind(justify);
-  flex-wrap: v-bind(wrap);
+
+  &-row.gap {
+    & > :deep(*) {
+      margin-left: var(--gap);
+    }
+    & > :deep(*:first-child, *:only-child) {
+      margin-left: 0;
+    }
+  }
+
+  &-column.gap {
+    & > :deep(*) {
+      margin-top: var(--gap);
+    }
+    & > :deep(*:first-child, *:only-child) {
+      margin-top: 0;
+    }
+  }
+
+  &-row-reverse.gap {
+    & > :deep(*) {
+      margin-right: var(--gap);
+    }
+    & > :deep(*:first-child, *:only-child) {
+      margin-right: 0;
+    }
+  }
+
+  &-column-reverse.gap {
+    & > :deep(*) {
+      margin-bottom: var(--gap);
+    }
+    & > :deep(*:first-child, *:only-child) {
+      margin-bottom: 0;
+    }
+  }
 }
+
 
 .info {
   width: 100%;

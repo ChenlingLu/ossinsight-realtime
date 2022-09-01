@@ -27,10 +27,10 @@ const size = computed(() => `${props.size ?? 8}px`);
   background: v-bind(color);
   border-radius: 50%;
   transform-origin: center center;
-  animation-duration: 2s;
+  animation-duration: 1.5s;
   animation-play-state: running;
   animation-iteration-count: 9999999;
-  animation-timing-function: ease;
+  animation-timing-function: linear;
 
   z-index: 1;
   top: 0;
@@ -45,13 +45,13 @@ const size = computed(() => `${props.size ?? 8}px`);
     opacity: 0.8;
     transform: scale3d(1, 1, 1);
   }
-  50% {
+  61% {
     opacity: 0.3;
     transform: scale3d(2, 2, 1);
-  };
+  }
   100% {
-    opacity: 0.2;
-    transform: scale3d(2, 2, 1);
+    opacity: 0;
+    transform: scale3d(3, 3, 1);
   }
 }
 </style>

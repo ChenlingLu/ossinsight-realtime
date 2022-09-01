@@ -13,6 +13,7 @@ import { useEngine, useEngineCssElements } from "@/components/hooks/engine";
 import { RawData } from "@/api/total";
 import { RawSamplingFirstMessage } from "@/api/poll";
 import { createDebugLogger } from "@/utils/debug";
+import stats from "@/engine/debug";
 
 const active = useActive();
 
@@ -47,6 +48,17 @@ watchEffect(() => {
     engine.setTotal(ev);
   }
 });
+
+watchEffect((onCleanup) => {
+  if (stats) {
+    document.body.append(stats.dom);
+    onCleanup(() => {
+      if (stats) {
+        document.body.removeChild(stats.dom);
+      }
+    })
+  }
+})
 
 const today = reactive({
   events: 0,
