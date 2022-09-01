@@ -1,7 +1,14 @@
 <template>
   <span class="event" :class="event.prEventType">
     <span class="dot" />
-    <GhUser :login='event.actorLogin' /> {{ event.prEventType }} PR<GhPr :repo='event.repoName' :number='event.pr' /> in <GhRepo :name='event.repoName' />
+    <GhUser :login='event.actorLogin' :is-new="!!event.isDevDay" />
+    {{ event.prEventType }}
+    <GhPr :repo='event.repoName' :number='event.pr' />
+    in
+    <GhRepo :name='event.repoName' />
+    <span v-if="event.language" class="language">{{ event.language }}</span>
+    <span v-if="event.additions" class="code-changes addition">+{{event.additions}}</span>
+    <span v-if="event.deletions" class="code-changes deletion">-{{event.deletions}}</span>
   </span>
 </template>
 <script setup lang="ts">
@@ -9,7 +16,7 @@ import GhUser from './gh-user.vue';
 import GhPr from './gh-pr.vue';
 import GhRepo from './gh-repo.vue';
 import { FilteredEvent } from "@/store/poll";
-import { computed, toRefs } from "vue";
+import { toRefs } from "vue";
 
 const props = defineProps<{ event: FilteredEvent }>();
 const { event } = toRefs(props)
@@ -21,6 +28,7 @@ const { event } = toRefs(props)
   font-size: 12px;
   color: var(--text-secondary);
   margin-bottom: 8px;
+  user-select: none;
 
   &:deep(a) {
     text-decoration: none !important;
@@ -57,6 +65,31 @@ const { event } = toRefs(props)
   &.merged {
     .dot {
       background: var(--c7);
+    }
+  }
+
+  .language {
+    display: inline-block;
+    padding: 2px 4px;
+    line-height: 1;
+    font-size: 12px;
+    font-weight: bolder;
+    background: var(--b6);
+    color: var(--text-primary);
+    border-radius: 3px;
+    transform: scale(calc(10 / 12));
+  }
+
+  .code-changes {
+    display: inline-block;
+    margin-left: 4px;
+    font-size: 12px;
+    font-weight: bold;
+    &.addition {
+      color: var(--c1);
+    }
+    &.deletion {
+      color: var(--c2);
     }
   }
 }

@@ -1,5 +1,5 @@
 <template>
-  <div class="flexbox">
+  <div class="flexbox" :class="{ info }">
     <slot />
   </div>
 </template>
@@ -24,6 +24,11 @@ export default {
       type: String as PropType<CSSProperties['flex-wrap']>,
       default: 'nowrap',
     },
+
+    info: {
+      type: Boolean as PropType<boolean>,
+      default: false,
+    }
   },
 };
 </script>
@@ -35,5 +40,14 @@ export default {
   align-items: v-bind(align);
   justify-content: v-bind(justify);
   flex-wrap: v-bind(wrap);
+}
+
+.info {
+  width: 100%;
+  margin: 8px 0;
+}
+
+.info + .info {
+  margin-top: 0;
 }
 </style>

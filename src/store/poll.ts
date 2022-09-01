@@ -2,10 +2,6 @@ import { acceptHMRUpdate, defineStore } from "pinia";
 import { ConnectionSource, FirstMessage, RawSamplingFirstMessage, sampling, SamplingRequest } from "@/api/poll";
 import { markRaw } from "vue";
 
-export interface PollStore<T, F extends FirstMessage> {
-  stream: ConnectionSource<T, F>;
-}
-
 export type CreatePoller<P, T, F extends FirstMessage> = (params: P) => ConnectionSource<T, F>
 
 function poll<TMap extends Record<K, T>, F extends FirstMessage, K extends string = string & keyof TMap, T = TMap[K], R extends Record<K, any> = any>(name: string, createPoller: CreatePoller<R[K], T, F>, options: R) {
@@ -34,15 +30,17 @@ function poll<TMap extends Record<K, T>, F extends FirstMessage, K extends strin
 export type RawFilteredEvent = any[]
 
 export interface FilteredEvent {
-  'id': number;
-  'action': string;
-  'pr': number;
-  'repoName': string;
-  'actorLogin': string;
-  'language': string;
-  'merged': string;
-  'isDevDay': number;
-  'isDevYear': number;
+  id: number;
+  action: string;
+  pr: number;
+  repoName: string;
+  actorLogin: string;
+  language: string;
+  additions: string;
+  deletions: string;
+  merged: string;
+  isDevDay: number;
+  isDevYear: number;
   prEventType: 'opened' | 'reopened' | 'closed' | 'merged';
 }
 
@@ -59,6 +57,8 @@ const CONFIG: FilterConfig[] = [
   { field: 'actorLogin', path: 'event.actor.login' },
   { field: 'merged', path: 'event.payload.pull_request.merged' },
   { field: 'language', path: 'event.payload.pull_request.base.repo.language' },
+  { field: 'additions', path: 'event.payload.pull_request.additions' },
+  { field: 'deletions', path: 'event.payload.pull_request.deletions' },
   { field: 'isDevDay', path: 'payload.devDay' },
   { field: 'isDevYear', path: 'payload.devYear' },
 ];

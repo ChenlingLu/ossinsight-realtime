@@ -1,64 +1,13 @@
 <template>
   <div class="app">
-    <a href="https://ossinsight.io" target="_blank">
-      <img class="logo" src="/logos/ossinsight.svg" height="45" alt="OSSInsight Logo">
-    </a>
-    <header class="heading">
-      <h1>
-        How Developers Build the Open Source Software World Together !
-      </h1>
-      <p>
-        {{ formattedDate }}
-      </p>
-    </header>
     <main class="main">
-      <Scene />
+      <router-view name="default" />
     </main>
-    <footer>
-      <p>Inspired by
-        <GhRepo name="honzaap/GithubCity" />
-      </p>
-    </footer>
-    <demo-tag />
     <aside class="side">
-      <Side />
+      <router-view name="side" />
     </aside>
   </div>
 </template>
-<script setup lang="ts">
-import Side from "./components/side";
-import { computed, defineAsyncComponent, ref } from "vue";
-import GhRepo from "./components/ui/gh-repo.vue";
-import DemoTag from "./components/ui/demo-tag.vue";
-const Scene = defineAsyncComponent(() => import("./components/scene.vue"));
-
-const sideSize = '500px';
-const now = ref(new Date());
-
-setInterval(() => {
-  now.value = new Date();
-}, 1000);
-
-const fmt = new Intl.DateTimeFormat('en', {
-  // year: 'numeric',
-  // month: '2-digit',
-  // day: '2-digit',
-  // hour: '2-digit',
-  // minute: '2-digit',
-  // second: '2-digit',
-  // timeZoneName: "shortOffset",
-  hour12: false,
-  timeStyle: 'full',
-  dateStyle: 'full',
-  timeZone: 'UTC',
-});
-
-const formattedDate = computed(() => {
-  const date = now.value;
-  return fmt.format(date);
-});
-
-</script>
 <style scoped>
 .app {
   width: 100vw;
@@ -67,62 +16,11 @@ const formattedDate = computed(() => {
 }
 
 .main {
-  width: calc(100% - v-bind(sideSize));
+  width: var(--main-size);
 }
 
 .side {
-  width: v-bind(sideSize);
+  width: var(--side-size);
 }
 
-.logo {
-  position: fixed;
-  z-index: 1000;
-  left: 8px;
-  top: 8px;
-}
-
-header {
-  width: calc(100% - v-bind(sideSize));
-  position: fixed;
-  left: 0;
-  top: 16px;
-  pointer-events: none;
-}
-
-header h1 {
-  margin: 0 auto;
-  text-align: center;
-  color: white;
-  font-size: 20px;
-  font-weight: bold;
-}
-
-header p {
-  margin-top: 16px;
-  margin-left: auto;
-  margin-right: auto;
-  text-align: center;
-  color: white;
-}
-
-footer {
-  width: calc(100% - v-bind(sideSize));
-  position: fixed;
-  left: 0;
-  bottom: 16px;
-  pointer-events: none;
-}
-
-footer p {
-  font-size: 12px;
-  margin: 0 auto;
-  text-align: center;
-  color: white;
-}
-
-footer p a {
-  color: white !important;
-  text-decoration: underline;
-  pointer-events: auto;
-}
 </style>

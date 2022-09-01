@@ -37,7 +37,6 @@ import { makeTransition } from "./engine/animations";
 import { FilteredEvent } from "./store/poll";
 import { ObjectEvent } from "@/engine/events";
 import { once } from "@/engine/utils";
-import { w } from "vitest/dist/global-74489cc9";
 
 export class DemoEngine extends Engine<DemoEngineEvent> {
   cache: ObjectCache<Mesh>;
@@ -61,7 +60,7 @@ export class DemoEngine extends Engine<DemoEngineEvent> {
   }
 
   get today(): RawData | undefined {
-    return this.rawData[this.day][this.week]
+    return this.rawData[this.day][this.week];
   }
 
   get todayEvents() {
@@ -224,7 +223,7 @@ export class DemoEngine extends Engine<DemoEngineEvent> {
 
     // create numbers
     // this.showNumbers(pos, week, day)
-    const today = this.today
+    const today = this.today;
     this.dispatchEvent({
       type: 'update:current-number',
       value: today?.events ?? 0,
@@ -266,7 +265,13 @@ export class DemoEngine extends Engine<DemoEngineEvent> {
     if (!this.rawData) {
       return;
     }
-    const { events, developers, opened, merged, event_day } = this.rawData[day][week] ?? { events: 0, developers: 0, opened: 0, merged: 0, event_day: 'unknown' };
+    const { events, developers, opened, merged, event_day } = this.rawData[day][week] ?? {
+      events: 0,
+      developers: 0,
+      opened: 0,
+      merged: 0,
+      event_day: 'unknown',
+    };
     const pos = getPos(week, day, events / 100000 * FLOOR_HEIGHT * 2);
     const tooltip = this.tooltip!;
 
@@ -339,11 +344,21 @@ export class DemoEngine extends Engine<DemoEngineEvent> {
     const from = randomVector3(fromPos, new Vector3(25, 10, 25));
     const duration = randomNumber(2, 0.5);
     const scale = randomNumber(3, 0.4);
-    const color = randomVector3(makeVector3(0), makeVector3(1));
-    this._addBrick(from, toPos, scale, new Color(color.x, color.y, color.z), duration, () => {
+    this._addBrick(from, toPos, scale, new Color(getEventColor(_event.prEventType)), duration, () => {
       cb();
       this.addSmoke?.();
     });
+  }
+}
+
+function getEventColor(type: FilteredEvent['prEventType']) {
+  switch (type) {
+    case "closed":
+      return '#D34764';
+    case 'merged':
+      return '#8253F6';
+    default:
+      return '#34A352';
   }
 }
 

@@ -12,10 +12,10 @@ import List from "./ui/list.vue";
 import Event from "./ui/event.vue";
 import { markRaw, reactive, ref, watch, watchEffect } from "vue";
 import { useActive } from "./hooks/lifecycle";
-import { FilteredEvent, PollStore, process, RawFilteredEvent } from "@/store/poll";
+import { FilteredEvent, process, RawFilteredEvent } from "@/store/poll";
 import { bufferTime, filter, map, Subject } from "rxjs";
 import { languages } from "./ui/lang";
-import { RawSamplingFirstMessage } from "@/api/poll";
+import { ConnectionSource, RawSamplingFirstMessage } from "@/api/poll";
 
 const allPass = (_: FilteredEvent) => true;
 
@@ -28,7 +28,7 @@ const active = useActive();
 const subject = new Subject<FilteredEvent>();
 
 const props = defineProps<{
-  source: PollStore<RawFilteredEvent, RawSamplingFirstMessage>,
+  stream: ConnectionSource<RawFilteredEvent, RawSamplingFirstMessage>,
   language: string,
   repo: string,
   play: boolean,
@@ -46,7 +46,7 @@ subject.pipe(bufferTime(300)).subscribe(items => {
 
 watchEffect((onCleanup) => {
   if (active.value) {
-    const subscription = props.source.stream
+    const subscription = props.stream
         .pipe(map(process))
         .pipe(filter(eventFilter.value))
         .subscribe(subject);

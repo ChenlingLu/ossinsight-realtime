@@ -23,7 +23,7 @@
           :class="{ focused: selectFocused === i }"
           v-for="(language, i) in filteredLanguages"
           :key="language"
-          @click="emits('update:modelValue', language)"
+          @mousedown="emits('update:modelValue', language)"
           @mouseenter="handleMouseEnter(i)"
           @mouseleave="handleMouseLeave"
           @mousemove="handleMouseMove"

@@ -1,5 +1,6 @@
 @import "theme";
 
+// colors
 :root {
   --c1: @C1;
   --c2: @C2;
@@ -25,6 +26,12 @@
   --tooltip-bg: var(--b1);
   --border: var(--b4);
   --divider: var(--b6);
+}
+
+// sizes
+:root {
+  --side-size: @side-size;
+  --main-size: calc(~"100% - var(--side-size)");
 }
 
 body {
