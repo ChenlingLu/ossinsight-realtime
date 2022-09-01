@@ -126,7 +126,7 @@ const number = computed(() => events.value + total.value);
 
 .banner {
   width: 100%;
-  min-height: 90px;
+  min-height: 94px;
   box-sizing: border-box;
   position: relative;
   margin: 16px 16px 0;
