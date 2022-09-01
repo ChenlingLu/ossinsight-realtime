@@ -1,6 +1,6 @@
 <template>
   <a href="https://ossinsight.io" target="_blank">
-    <img class="logo" src="/logos/ossinsight.svg" height="45" alt="OSSInsight Logo">
+    <Logo class="logo" height="42" alt="OSSInsight Logo" />
   </a>
   <header class="heading">
     <h1>
@@ -20,6 +20,7 @@
 </template>
 <script lang="ts" setup>
 import { computed, ref } from "vue";
+import Logo from './ossinsight.svg?component';
 import Scene from "@/components/scene.vue";
 import GhRepo from "@/components/ui/gh-repo.vue";
 import DemoTag from "@/components/ui/demo-tag.vue";
@@ -56,6 +57,12 @@ header {
   left: 0;
   top: 16px;
   pointer-events: none;
+}
+
+@media screen and (max-width: 1350px) {
+  header {
+    top: 56px;
+  }
 }
 
 header h1 {
