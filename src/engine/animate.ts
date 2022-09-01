@@ -3,11 +3,13 @@ import { EffectComposer } from "three/examples/jsm/postprocessing/EffectComposer
 import { Updatable } from "./updatables";
 import stats from "./debug";
 import { CSS2DRenderer } from "three/examples/jsm/renderers/CSS2DRenderer";
+import { createDebugLogger } from "@/utils/debug";
 
 const FPS = 60;
 const FRAME_INTERVAL = 1 / FPS;
 
 export function createAnimate(scene: Scene, camera: Camera, composer: EffectComposer, renderer2d: CSS2DRenderer, ...updatableList: Updatable[]) {
+  const log = createDebugLogger('animate')
   const clock = new Clock();
   let animateHandle: number = 0;
   let stopped = true;
@@ -41,12 +43,14 @@ export function createAnimate(scene: Scene, camera: Camera, composer: EffectComp
 
   function start() {
     if (stopped) {
+      log('start');
       stopped = false;
       animate();
     }
   }
 
   function stop() {
+    log('stop');
     stopped = true;
     cancelAnimationFrame(animateHandle);
   }

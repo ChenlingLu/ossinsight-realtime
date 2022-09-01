@@ -1,4 +1,4 @@
-import { useVisible } from "./visible";
+import { useVisible, useVisibleInstant } from "./visible";
 import { computed, onActivated, onBeforeUnmount, onDeactivated, onMounted, ref } from "vue";
 import { useThrottleToggle } from "./throttle-toggle";
 import { VISIBLE_THROTTLE } from "@/plugins/visible";
@@ -36,10 +36,10 @@ export function useActivated(throttle: number) {
 /**
  * Combines useVisible, useMounted and useActivated.
  */
-export function useActive() {
-  const visible = useVisible();
+export function useActive(throttle: number = VISIBLE_THROTTLE) {
+  const visible = throttle > 0 ? useVisible() : useVisibleInstant();
   const mounted = useMounted();
-  const activated = useActivated(VISIBLE_THROTTLE);
+  const activated = useActivated(throttle);
 
   return computed(() => visible.value && mounted.value && activated.value);
 }

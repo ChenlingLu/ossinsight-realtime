@@ -16,6 +16,7 @@ import { createDebugLogger } from "@/utils/debug";
 import stats from "@/engine/debug";
 
 const active = useActive();
+const activeInstant = useActive(0);
 
 const canvas = ref<HTMLCanvasElement>();
 const container = ref<HTMLElement>();
@@ -57,6 +58,14 @@ watchEffect((onCleanup) => {
         document.body.removeChild(stats.dom);
       }
     })
+  }
+})
+
+watch(activeInstant, active => {
+  if (active) {
+    engineRef.value?.start();
+  } else {
+    engineRef.value?.stop();
   }
 })
 
