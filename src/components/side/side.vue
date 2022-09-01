@@ -5,7 +5,7 @@
         <span>
           Total <a
             href="https://docs.github.com/en/developers/webhooks-and-events/events/github-event-types#pullrequestevent"
-            target="_blank">Pull Request Events</a> made by developers {{ (new Date()).getUTCFullYear() }}
+            target="_blank">Pull Request Events</a> created by developers {{ (new Date()).getUTCFullYear() }}
         </span>
         <total-card :state="state" :number="number" />
       </h2>

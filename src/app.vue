@@ -5,7 +5,7 @@
     </a>
     <header class="heading">
       <h1>
-        How Developers Build the Open Source Software World Together!
+        Real-time GitHub Contribution City 2022
       </h1>
       <p>
         {{ formattedDate }}
@@ -49,7 +49,7 @@ const fmt = new Intl.DateTimeFormat('en', {
   // timeZoneName: "shortOffset",
   hour12: false,
   timeStyle: 'full',
-  dateStyle: 'full',
+  dateStyle: 'short',
   timeZone: 'UTC',
 });
 
