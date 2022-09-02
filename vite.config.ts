@@ -6,7 +6,24 @@ import svgLoader from 'vite-svg-loader';
 export default defineConfig({
   plugins: [
     vue(),
-    svgLoader()
+    // https://github.com/jpkleemans/vite-svg-loader/issues/56
+    svgLoader({
+      svgo: true,
+      svgoConfig: {
+        plugins: [
+          {
+            name: 'preset-default',
+            params: {
+              overrides: {
+                inlineStyles: {
+                  onlyMatchedOnce: false,
+                },
+              },
+            },
+          },
+        ],
+      }
+    })
   ],
   test: {},
   resolve: {
