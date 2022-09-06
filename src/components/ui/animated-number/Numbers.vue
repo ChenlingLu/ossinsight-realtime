@@ -17,29 +17,32 @@ const props = defineProps<{
   value: number;
   comma?: boolean;
   duration?: number
+  delay?: number
 }>();
 
 function ease(t: number): number {
   return t * t * (3.0 - 2.0 * t);
 }
 
-const duration = computed(() => props.duration || 150);
+const duration = computed(() => props.duration || 400);
+const delay = computed(() => currentValue.value === 0 ? (props.delay || 0) : 0);
 const ts = ref(0);
 const progress = ref(0);
 
-const currentValue = ref(0);
-const currentTarget = ref(0);
+const currentValue = ref(props.value);
+const currentTarget = ref(props.value);
 const nextTarget = ref(props.value);
 const running = ref(false);
 
 function animate(t: number) {
-  if ((t - ts.value) > duration.value) {
+  const delta = (t - ts.value - delay.value)
+  if (delta > duration.value) {
     progress.value = 1;
     running.value = false;
     return;
   }
 
-  progress.value = ease((t - ts.value) / duration.value);
+  progress.value = ease(delta / duration.value);
   requestAnimationFrame(animate);
 }
 
@@ -96,7 +99,7 @@ const array = computed(() => {
   }
 
   if (res.length === 0) {
-    res.push({ comma: false, number: 0, state: 0, key: cnt });
+    res.push({ comma: false, number: 0, state: 0, key: 1 });
   }
   return res.reverse();
 });
@@ -123,6 +126,7 @@ const array = computed(() => {
 
 .numbers-enter-from,
 .numbers-leave-to {
+  position: absolute;
   opacity: 0;
   transform: translateX(-100%);
 }

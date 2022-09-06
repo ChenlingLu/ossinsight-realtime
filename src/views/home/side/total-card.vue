@@ -1,9 +1,7 @@
 <template>
   <flex direction="row" justify="center" align="center" style="margin-top: 4px">
     <Dot :color="colorMap[state]" style="margin-right: 12px" />
-    <span class="numbers">
-      <animated-number :value="number" comma />
-    </span>
+    <animated-number class="numbers" :value="number" comma />
   </flex>
 </template>
 <script lang="ts" setup>
