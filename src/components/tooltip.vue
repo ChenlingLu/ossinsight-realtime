@@ -12,20 +12,20 @@
         </p>
         <p class="data">
           <PrIcon />
-          <span class="number">{{ props.value.toLocaleString('en') }}</span>
+          <AnimatedNumber class="number" :value="props.value" comma />
         </p>
         <hr />
         <p class="headline extra">
           <span class="dot developers"/>
-          Contributed by <span class="number">{{ props.developers.toLocaleString('en') }}</span> developers
+          Contributed by <AnimatedNumber class="number" :value="props.developers" comma /> developers
         </p>
         <p class="headline extra">
           <span class="dot merged"/>
-          Merged <span class="number">{{ props.merged.toLocaleString('en') }}</span> PRs
+          Merged <AnimatedNumber class="number" :value="props.merged" comma /> PRs
         </p>
         <p class="headline extra">
           <span class="dot opened"/>
-          Opened <span class="number">{{ props.opened.toLocaleString('en') }}</span> PRs
+          Opened <AnimatedNumber class="number" :value="props.opened" comma /> PRs
         </p>
       </div>
     </div>
@@ -34,6 +34,7 @@
 <script setup lang="ts">
 import { Teleport } from "vue";
 import PrIcon from '@primer/octicons/build/svg/git-pull-request-16.svg?component';
+import AnimatedNumber from '@/components/ui/animated-number';
 
 const props = defineProps<{ container?: HTMLElement, isToday: boolean, date: string, value: number, floor: number, developers: number, merged: number, opened: number }>();
 

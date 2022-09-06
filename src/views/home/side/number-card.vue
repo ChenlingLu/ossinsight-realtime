@@ -10,9 +10,7 @@
       </flex>
       <flex class="number-card-content-value" align="center" :direction="size.down('xs') ? 'row-reverse' : 'row'" gap="8px">
         <dot :color="`var(--c${props.colorStart})`" />
-        <span>
-          {{ props.value.toLocaleString('en') }}
-        </span>
+        <animated-number :value="props.value" comma />
       </flex>
     </flex>
   </div>
@@ -20,6 +18,7 @@
 <script lang="ts" setup>
 import Flex from "@/components/ui/flex.vue";
 import Dot from "@/components/ui/dot.vue";
+import AnimatedNumber from '@/components/ui/animated-number';
 import { useSize } from "@/store";
 
 const props = defineProps<{
@@ -95,6 +94,7 @@ const size = useSize();
       font-weight: bold;
       font-family: monospace;
       line-height: 1;
+      white-space: nowrap;
     }
   }
 
