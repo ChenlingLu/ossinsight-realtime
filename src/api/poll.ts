@@ -5,7 +5,14 @@ import { createDebugLogger } from "@/utils/debug";
 export type GithubEvent = components['schemas']['event']
 const WS_URL = 'wss://api.ossinsight.io/websocket';
 
-interface BaseRequest {
+export interface SamplingRequest {
+  /**
+   * Sampling rate. It means that N events are received that satisfy the conditions but only one of them is returned to the front end. If you want all of them, you need set it to 1.
+   */
+  samplingRate: number;
+
+  filter?: string[];
+
   /**
    * Specify the event type you want to see. If you don't set it, all event types will be returned.
    */
@@ -22,27 +29,7 @@ interface BaseRequest {
   userName?: string;
 
   returnType?: 'map' | 'list';
-}
 
-export interface SamplingRequest extends BaseRequest {
-  /**
-   * Sampling rate. It means that N events are received that satisfy the conditions but only one of them is returned to the front end. If you want all of them, you need set it to 1.
-   */
-  samplingRate: number;
-
-  filter?: string[];
-}
-
-export interface LoopRequest extends BaseRequest {
-  /**
-   * Fixed loop time. Server will send message to Client by per loop time. Unit is millsecond, and must be larger than 500.
-   */
-  loopTime: number;
-
-  /**
-   * Whether send event details to Client, default is false.
-   */
-  detail?: boolean;
 }
 
 class Connection extends WebSocket {
@@ -100,17 +87,20 @@ export class ConnectionSource<T, F extends FirstMessage> extends Subject<T> {
   public apiVersion: number | undefined;
   private conn: Connection | undefined = undefined;
   private debug = createDebugLogger('ws');
-  private handleMessage = (event: MessageEvent) => {
+
+  private handleFirstMessage = (event: MessageEvent) => {
     const firstMessage: F = JSON.parse(event.data);
-    if (!this.lastFirstMessage && firstMessage.firstMessageTag) {
-      this.apiVersion = firstMessage.apiVersion
-      this.debug('firstMessage', firstMessage);
-      this.firstMessage.next(firstMessage);
-      this.lastFirstMessage = firstMessage;
-      this.conn?.sendInitialMessage()
-    } else {
-      this.next(JSON.parse(event.data));
-    }
+    this.debug('firstMessage', firstMessage);
+    this.apiVersion = firstMessage.apiVersion
+    this.firstMessage.next(firstMessage);
+    this.lastFirstMessage = firstMessage;
+    this.adaptVersion?.(this, this.apiVersion)
+    this.conn?.sendInitialMessage()
+    this.conn?.addEventListener('message', this.handleMessage)
+  }
+
+  private handleMessage = (event: MessageEvent) => {
+    this.next(JSON.parse(event.data));
   };
 
   onStateChange(cb: (state: ConnectionState) => void) {
@@ -128,6 +118,8 @@ export class ConnectionSource<T, F extends FirstMessage> extends Subject<T> {
     s.add(() => {
       this.debug('teardown');
     });
+
+    // connect ws if not
     if (this.observed && !this.conn) {
       const theConn = this.conn = new Connection(this.type, this.initReq);
       this.stateChange(ConnectionState.CONNECTING);
@@ -144,7 +136,7 @@ export class ConnectionSource<T, F extends FirstMessage> extends Subject<T> {
       }, { once: true });
 
       const subscribe = (conn: Connection) => {
-        conn.addEventListener("message", this.handleMessage);
+        conn.addEventListener("message", this.handleFirstMessage, { once: true });
       };
 
       if (theConn.readyState === WebSocket.OPEN) {
@@ -155,6 +147,7 @@ export class ConnectionSource<T, F extends FirstMessage> extends Subject<T> {
     }
 
     s.add(() => {
+      // disconnect if not observed
       if (!this.observed && this.conn) {
         this.debug('disconnect');
         const conn = this.conn;
@@ -168,7 +161,7 @@ export class ConnectionSource<T, F extends FirstMessage> extends Subject<T> {
     return s;
   }
 
-  constructor(private type: string, private initReq?: any) {
+  constructor(private type: string, private initReq?: any, private adaptVersion?: (self: ConnectionSource<T, F>, apiVersion: number) => void) {
     super();
   }
 }
