@@ -1,11 +1,9 @@
 <template>
   <span class="animated-numbers">
-    <transition-group name="numbers">
-      <template v-for="{ comma, number, state, key } in array">
-        <span class="animated-numbers__comma" v-if="comma" :key="`comma-${key}`">,</span>
-        <single-number v-else :number="number" :state="state" :key="`number-${key}`" />
-      </template>
-    </transition-group>
+    <template v-for="{ comma, number, state, key } in array">
+      <span class="animated-numbers__comma" v-if="comma" :key="`comma-${key}`">,</span>
+      <single-number v-else :number="number" :state="state" :key="`number-${key}`" />
+    </template>
   </span>
 </template>
 
@@ -35,7 +33,7 @@ const nextTarget = ref(props.value);
 const running = ref(false);
 
 function animate(t: number) {
-  const delta = (t - ts.value - delay.value)
+  const delta = (t - ts.value - delay.value);
   if (delta > duration.value) {
     progress.value = 1;
     running.value = false;
@@ -112,22 +110,5 @@ const array = computed(() => {
 
 .animated-numbers__comma {
   display: inline-block;
-}
-
-.numbers-enter-active,
-.numbers-leave-active {
-  transition: all 0.25s ease;
-  transition-delay: 0.25s;
-}
-
-.numbers-move {
-  transition: all 0.25s ease;
-}
-
-.numbers-enter-from,
-.numbers-leave-to {
-  position: absolute;
-  opacity: 0;
-  transform: translateX(-100%);
 }
 </style>

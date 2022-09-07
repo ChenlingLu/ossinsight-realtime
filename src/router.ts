@@ -11,6 +11,14 @@ const router = createRouter({
         side: () => import('@/views/home/side'),
       },
     },
+    {
+      path: '/__preview__/detail',
+      name: '2D',
+      components: {
+        // default: () => import('@/views/home/main'),
+        side: () => import('@/views/detail/side'),
+      },
+    },
   ],
 });
 

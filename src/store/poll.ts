@@ -50,7 +50,7 @@ type FilterConfig = {
   path: string;
 }
 
-const CONFIG: FilterConfig[] = [
+const PR_EVENTS_POLL_CONFIG: FilterConfig[] = [
   { field: 'id', path: 'event.id' },
   { field: 'action', path: 'event.payload.action' },
   { field: 'pr', path: 'event.payload.pull_request.number' },
@@ -66,9 +66,9 @@ const CONFIG: FilterConfig[] = [
 
 export function process(raw: RawFilteredEvent): FilteredEvent {
   let res = {} as FilteredEvent;
-  for (let i = 0; i < CONFIG.length; i++) {
+  for (let i = 0; i < PR_EVENTS_POLL_CONFIG.length; i++) {
     // @ts-ignore
-    res[CONFIG[i].field] = raw[i];
+    res[PR_EVENTS_POLL_CONFIG[i].field] = raw[i];
   }
   if (res.action === 'closed') {
     res.prEventType = res.merged ? 'merged' : 'closed';
@@ -78,10 +78,10 @@ export function process(raw: RawFilteredEvent): FilteredEvent {
   return res;
 }
 
-export const prEventsPollStore = poll<{ 'pullRequestEvents': FilteredEvent }, RawSamplingFirstMessage>('sampling', sampling, {
+export const prEventsPollStore = poll<{ 'pullRequestEvents': FilteredEvent }, RawSamplingFirstMessage>('sampling', req => sampling(req, process), {
   pullRequestEvents: {
     samplingRate: 1,
-    filter: CONFIG.map(config => config.path),
+    filter: PR_EVENTS_POLL_CONFIG.map(config => config.path),
     eventType: 'PullRequestEvent',
     returnType: 'list',
   } as SamplingRequest,

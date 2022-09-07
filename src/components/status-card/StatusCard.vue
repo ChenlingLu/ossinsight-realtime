@@ -4,7 +4,7 @@
       <AnimatedNumber class="number" :value="developers" comma /> developers collaborated on
       <br />
       <AnimatedNumber class="number" :value="repositories" comma /> repositories
-      <b>in {{time}}</b>.
+      <b>{{time}}</b>.
     </div>
     <div class="code-info">
       Total code line changes:
@@ -21,6 +21,7 @@
       <number-card title="Merged PRs" :value="merged" color-start="7" color-stop="5" />
       <number-card title="Closed PRs" :value="closed" color-start="3" color-stop="7" />
     </flex>
+    <slot name="footer" />
   </flex>
 </template>
 <script lang="ts" setup>
@@ -38,7 +39,7 @@ const props = defineProps<{
   closed: number
   additions: number
   deletions: number
-  time: string | number
+  time: string
 }>();
 
 const size = useSize();

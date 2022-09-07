@@ -12,8 +12,8 @@ import List from "./ui/list.vue";
 import Event from "./ui/event.vue";
 import { markRaw, reactive, ref, watch, watchEffect } from "vue";
 import { useActive } from "./hooks/lifecycle";
-import { FilteredEvent, process, RawFilteredEvent } from "@/store/poll";
-import { bufferTime, filter, map, Subject } from "rxjs";
+import { FilteredEvent } from "@/store/poll";
+import { bufferTime, filter, Subject } from "rxjs";
 import { languages } from "./ui/lang";
 import { ConnectionSource, RawSamplingFirstMessage } from "@/api/poll";
 

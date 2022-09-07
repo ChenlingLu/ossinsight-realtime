@@ -1,10 +1,7 @@
-import type { components } from '@octokit/openapi-types';
 import { Observer, Subject, Subscription } from 'rxjs';
 import { createDebugLogger } from "@/utils/debug";
 import { ref } from "vue";
-import { FilteredEvent, process } from "@/store";
 
-export type GithubEvent = components['schemas']['event']
 const WS_URL = 'wss://api.ossinsight.io/websocket';
 
 export interface SamplingRequest {
@@ -47,7 +44,7 @@ class Connection extends WebSocket {
     if (typeof initialMessage === 'undefined' || initialMessage === null) {
       return;
     }
-    let data: string
+    let data: string;
     if (typeof initialMessage === 'string') {
       data = initialMessage;
     } else {
@@ -72,14 +69,20 @@ export const enum ConnectionState {
 
 export interface FirstMessage {
   firstMessageTag: true;
-  apiVersion: number
+  apiVersion: number;
 }
 
 export interface RawSamplingFirstMessage extends FirstMessage {
   eventMap: Record<string, string>;
-  devMap: Record<string, string> & { 'total': string };
+  devMap: Record<string, string>;
   mergeMap: Record<string, string>;
   openMap: Record<string, string>;
+  sumMap: {
+    additions: string;
+    deletions: string;
+    dev: string;
+    repo: string;
+  }
 }
 
 export class ConnectionSource<T, F extends FirstMessage> extends Subject<T> {
@@ -92,12 +95,12 @@ export class ConnectionSource<T, F extends FirstMessage> extends Subject<T> {
   private handleFirstMessage = (event: MessageEvent) => {
     const firstMessage: F = JSON.parse(event.data);
     this.debug('firstMessage', firstMessage);
-    this.apiVersion = firstMessage.apiVersion
+    this.apiVersion = firstMessage.apiVersion;
     this.firstMessage.value = firstMessage;
-    this.adaptVersion?.(this, this.apiVersion)
-    this.conn?.sendInitialMessage()
-    this.conn?.addEventListener('message', this.handleMessage)
-  }
+    this.adaptVersion?.(this, this.apiVersion);
+    this.conn?.sendInitialMessage();
+    this.conn?.addEventListener('message', this.handleMessage);
+  };
 
   private handleMessage = (event: MessageEvent) => {
     this.next(this.process(JSON.parse(event.data)));
@@ -161,6 +164,6 @@ export class ConnectionSource<T, F extends FirstMessage> extends Subject<T> {
   }
 }
 
-export function sampling(req: SamplingRequest): ConnectionSource<FilteredEvent, RawSamplingFirstMessage> {
+export function sampling<T>(req: SamplingRequest, process: (raw: any) => T): ConnectionSource<T, RawSamplingFirstMessage> {
   return new ConnectionSource('sampling', req, process);
 }

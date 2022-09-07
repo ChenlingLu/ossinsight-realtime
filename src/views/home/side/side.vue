@@ -1,8 +1,8 @@
 <template>
-  <flex class="container">
+  <flex class="side-container">
     <status-card
         v-bind="summary"
-        :time="(new Date()).getUTCFullYear()"
+        :time="`in ${(new Date()).getUTCFullYear()}`"
     />
     <template v-if="size.height >= 420">
       <divider style="margin: 8px 2px" />
@@ -50,11 +50,14 @@ function mergeCount(map: Record<string, string>) {
 
 watch(prEvents.firstMessage, fm => {
   if (fm) {
-    summary.developers = parseInt(fm.devMap.total);
+    summary.developers = parseInt(fm.sumMap.dev);
+    summary.repositories = parseInt(fm.sumMap.repo);
+    summary.additions = parseInt(fm.sumMap.additions);
+    summary.deletions = parseInt(fm.sumMap.deletions);
     summary.merged = mergeCount(fm.mergeMap);
     summary.opened = mergeCount(fm.openMap);
   }
-})
+}, { immediate: true })
 
 watchEffect((onCleanup) => {
   if (active.value) {
@@ -82,10 +85,4 @@ watchEffect((onCleanup) => {
 
 </script>
 <style scoped lang="less">
-.container {
-  height: 100%;
-  height: -webkit-fill-available;
-  box-sizing: border-box;
-  margin: 0 16px;
-}
 </style>
