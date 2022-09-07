@@ -77,6 +77,7 @@ export interface RawSamplingFirstMessage extends FirstMessage {
   devMap: Record<string, string>;
   mergeMap: Record<string, string>;
   openMap: Record<string, string>;
+  closeMap: Record<string, string>;
   sumMap: {
     additions: string;
     deletions: string;

@@ -16,16 +16,20 @@
         </p>
         <hr />
         <p class="headline extra">
-          <span class="dot developers"/>
-          Contributed by <AnimatedNumber class="number" :value="props.developers" comma /> developers
-        </p>
-        <p class="headline extra">
           <span class="dot merged"/>
           Merged <AnimatedNumber class="number" :value="props.merged" comma /> PRs
         </p>
         <p class="headline extra">
           <span class="dot opened"/>
           Opened <AnimatedNumber class="number" :value="props.opened" comma /> PRs
+        </p>
+        <p class="headline extra">
+          <span class="dot developers"/>
+          Closed <AnimatedNumber class="number" :value="props.closed" comma /> PRs
+        </p>
+        <hr />
+        <p class="headline extra">
+          Contributed by <AnimatedNumber class="number" :value="props.developers" comma /> developers
         </p>
       </div>
     </div>
@@ -36,17 +40,16 @@ import { Teleport } from "vue";
 import PrIcon from '@primer/octicons/build/svg/git-pull-request-16.svg?component';
 import AnimatedNumber from '@/components/ui/animated-number';
 
-const props = defineProps<{ container?: HTMLElement, isToday: boolean, date: string, value: number, floor: number, developers: number, merged: number, opened: number }>();
+const props = defineProps<{ container?: HTMLElement, isToday: boolean, date: string, value: number, floor: number, developers: number, merged: number, opened: number, closed: number }>();
 
 </script>
 <style scoped>
 .container {
-  /*height: 305px;*/
+  height: 396px;
 }
 
 .content {
   position: relative;
-  margin-top: -50%;
   transform: translate3d(-2px, -8px, 0);
   border-radius: 4px;
   color: white;
@@ -127,6 +130,7 @@ a {
   width: 6px;
   height: 6px;
   border-radius: 3px;
+  margin-left: 3px;
   margin-right: 3px;
   vertical-align: middle;
 }

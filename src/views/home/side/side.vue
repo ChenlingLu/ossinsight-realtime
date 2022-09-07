@@ -56,6 +56,7 @@ watch(prEvents.firstMessage, fm => {
     summary.deletions = parseInt(fm.sumMap.deletions);
     summary.merged = mergeCount(fm.mergeMap);
     summary.opened = mergeCount(fm.openMap);
+    summary.closed = mergeCount(fm.closeMap);
   }
 }, { immediate: true })
 

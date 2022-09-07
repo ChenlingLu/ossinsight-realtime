@@ -29,12 +29,13 @@ export function useEngine(canvasRef: Ref<HTMLCanvasElement | undefined>, contain
 }
 
 export function useEngineCssElements(engineRef: EngineRef) {
-  const tooltip = useCSS2DObject(Tooltip, { date: '', value: 0, isToday: true, floor: 0, developers: 0, merged: 0, opened: 0 });
+  const tooltip = useCSS2DObject(Tooltip, { date: '', value: 0, isToday: true, floor: 0, developers: 0, merged: 0, opened: 0, closed: 0 });
   const today = reactive({
     events: 0,
     developers: 0,
     merged: 0,
     opened: 0,
+    closed: 0,
   });
   const log = createDebugLogger('demo-engine');
 
@@ -51,6 +52,7 @@ export function useEngineCssElements(engineRef: EngineRef) {
         tooltip.props.developers = event.developers;
         tooltip.props.merged = event.merged;
         tooltip.props.opened = event.opened;
+        tooltip.props.closed = event.closed;
       };
 
       const updateCurrentNumber = (event: UpdateCurrentNumberEvent) => {
@@ -58,6 +60,7 @@ export function useEngineCssElements(engineRef: EngineRef) {
         today.developers = event.developers;
         today.opened = event.opened;
         today.merged = event.merged;
+        today.closed = event.closed;
         log('update today', event.value);
       };
 

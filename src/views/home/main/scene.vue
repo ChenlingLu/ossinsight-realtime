@@ -31,6 +31,7 @@ const processFirstMessage = (firstMessage?: RawSamplingFirstMessage): RawData[] 
     events: parseInt(firstMessage.eventMap[date]),
     opened: parseInt(firstMessage.openMap[date]),
     merged: parseInt(firstMessage.mergeMap[date]),
+    closed: parseInt(firstMessage.closeMap[date]),
     developers: parseInt(firstMessage.devMap[date]),
   }));
 };
@@ -73,6 +74,7 @@ const today = reactive({
   developers: 0,
   merged: 0,
   opened: 0,
+  closed: 0,
 })
 const log = createDebugLogger('scene');
 
@@ -95,7 +97,10 @@ watchEffect((onCleanup) => {
               break;
             case 'merged':
               today.merged++;
-              break
+              break;
+            case 'closed':
+              today.closed++;
+              break;
           }
           if (event.isDevDay) {
             today.developers++;
@@ -113,6 +118,7 @@ watch(todayHistory, () => {
   today.developers = 0;
   today.merged = 0;
   today.opened = 0;
+  today.closed = 0;
 });
 
 watchEffect(() => {
@@ -123,6 +129,7 @@ watchEffect(() => {
       tooltip.props.merged = todayHistory.merged + today.merged;
       tooltip.props.developers = todayHistory.developers + today.developers;
       tooltip.props.opened = todayHistory.opened + today.opened;
+      tooltip.props.closed = todayHistory.closed + today.closed;
     }
   }
 });

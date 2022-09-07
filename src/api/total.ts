@@ -3,5 +3,6 @@ export type RawData = {
   events: number
   opened: number
   merged: number
+  closed: number
   developers: number
 }

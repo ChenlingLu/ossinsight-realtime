@@ -230,6 +230,7 @@ export class DemoEngine extends Engine<DemoEngineEvent> {
       developers: today?.developers ?? 0,
       opened: today?.opened ?? 0,
       merged: today?.merged ?? 0,
+      closed: today?.closed ?? 0,
     });
 
     // add base
@@ -265,11 +266,12 @@ export class DemoEngine extends Engine<DemoEngineEvent> {
     if (!this.rawData) {
       return;
     }
-    const { events, developers, opened, merged, event_day } = this.rawData[day][week] ?? {
+    const { events, developers, opened, merged, closed, event_day } = this.rawData[day][week] ?? {
       events: 0,
       developers: 0,
       opened: 0,
       merged: 0,
+      closed: 0,
       event_day: 'unknown',
     };
     const pos = getPos(week, day, events / 100000 * FLOOR_HEIGHT * 2);
@@ -284,6 +286,7 @@ export class DemoEngine extends Engine<DemoEngineEvent> {
       developers,
       opened,
       merged,
+      closed,
     });
     tooltip.object.position.copy(pos.clone().setY(pos.y));
     if (!tooltip.rendered) {
@@ -376,6 +379,7 @@ export interface UpdateTooltipEvent extends Event {
   floor: number;
   developers: number;
   opened: number;
+  closed: number;
   merged: number;
 }
 
@@ -385,6 +389,7 @@ export interface UpdateCurrentNumberEvent extends Event {
   developers: number;
   opened: number;
   merged: number;
+  closed: number;
 }
 
 type DemoEngineEvent =
