@@ -32,6 +32,7 @@ export default defineConfig({
         description: 'A 3D city created with GitHub contribution graph, you can see how developers build the open source world with corporations in real-time.',
         keywords: 'GitHub contribution graph,3d GitHub contribution,GitHub city,Real-time GitHub Contribution,live GitHub contribution city,open-source corporation,data flow,pull requests in GitHub',
         home: 'https://live.ossinsight.io/',
+        domain: 'live.ossinsight.io',
         image: '/thumbnail.png',
         gtag: 'G-KW4FDPBLLJ',
       }
