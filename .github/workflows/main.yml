@@ -27,7 +27,9 @@ jobs:
         run: pnpm i --frozen-lockfile --strict-peer-dependencies
       
       - name: Build
-        run: npm run build
+        run: | 
+          npm run build
+          npm run build:404
 
       - name: GH Pages deploy
         uses: Cecilapp/GitHub-Pages-deploy@3.2.1
