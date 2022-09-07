@@ -4,6 +4,8 @@ specifiers:
   '@octokit/openapi-types': ^13.0.1
   '@popperjs/core': ^2.11.6
   '@primer/octicons': ^17.4.1
+  '@sentry/tracing': ^7.12.1
+  '@sentry/vue': ^7.12.1
   '@types/node': ^18.7.3
   '@types/primer__octicons': ^17.3.0
   '@types/three': ^0.143.0
@@ -31,6 +33,8 @@ devDependencies:
   '@octokit/openapi-types': 13.0.1
   '@popperjs/core': 2.11.6
   '@primer/octicons': 17.4.1
+  '@sentry/tracing': 7.12.1
+  '@sentry/vue': 7.12.1_vue@3.2.37
   '@types/node': 18.7.3
   '@types/primer__octicons': 17.3.0
   '@types/three': 0.143.0
@@ -117,6 +121,72 @@ packages:
     resolution: {integrity: sha512-DPlnpsARphzx9+kQexKsfLafOa+3FL3MKxaIPxz/isXiiZWgOuNTV8awHZ2Mm1M45mPqsBerucrFE8z2zVCbrg==}
     dependencies:
       object-assign: 4.1.1
+    dev: true
+
+  /@sentry/browser/7.12.1:
+    resolution: {integrity: sha512-pgyL65CrGFLe8sKcEG8KXAuVTE8zkAsyTlv/AuME06cSdxzO/memPK/r3BI6EM7WupIdga+V5tQUldeT1kgHNA==}
+    engines: {node: '>=8'}
+    dependencies:
+      '@sentry/core': 7.12.1
+      '@sentry/types': 7.12.1
+      '@sentry/utils': 7.12.1
+      tslib: 1.14.1
+    dev: true
+
+  /@sentry/core/7.12.1:
+    resolution: {integrity: sha512-DFHbzHFjukhlkRZ5xzfebx0IBzblW43kmfnalBBq7xEMscUvnhsYnlvL9Y20tuPZ/PrTcq4JAHbFluAvw6M0QQ==}
+    engines: {node: '>=8'}
+    dependencies:
+      '@sentry/hub': 7.12.1
+      '@sentry/types': 7.12.1
+      '@sentry/utils': 7.12.1
+      tslib: 1.14.1
+    dev: true
+
+  /@sentry/hub/7.12.1:
+    resolution: {integrity: sha512-KLVnVqXf+CRmXNy9/T8K2/js7QvOQ94xtgP5KnWJbu2rl+JhxnIGiBRF51lPXFIatt7zWwB9qNdMS8lVsvLMGQ==}
+    engines: {node: '>=8'}
+    dependencies:
+      '@sentry/types': 7.12.1
+      '@sentry/utils': 7.12.1
+      tslib: 1.14.1
+    dev: true
+
+  /@sentry/tracing/7.12.1:
+    resolution: {integrity: sha512-WnweIt//IqkEkJSjA8DtnIeCdItYIqJSxNQ6qK+r546/ufxRYFBck2fbmM0oKZJVg2evbwhadrBTIUzYkqNj4A==}
+    engines: {node: '>=8'}
+    dependencies:
+      '@sentry/hub': 7.12.1
+      '@sentry/types': 7.12.1
+      '@sentry/utils': 7.12.1
+      tslib: 1.14.1
+    dev: true
+
+  /@sentry/types/7.12.1:
+    resolution: {integrity: sha512-VGZs39SZgMcCGv7H0VyFy1LEFGsnFZH590JUopmz6nG63EpeYQ2xzhIoPNAiLKbyUvBEwukn+faCg3u3MGqhgQ==}
+    engines: {node: '>=8'}
+    dev: true
+
+  /@sentry/utils/7.12.1:
+    resolution: {integrity: sha512-Dh8B13pC0u8uLM/zf+oZngyg808c6BDEO94F7H+h3IciCVVd92A0cOQwLGAEdf8srnJgpZJNAlSC8lFDhbFHzQ==}
+    engines: {node: '>=8'}
+    dependencies:
+      '@sentry/types': 7.12.1
+      tslib: 1.14.1
+    dev: true
+
+  /@sentry/vue/7.12.1_vue@3.2.37:
+    resolution: {integrity: sha512-p8Z1CrjVgHBK+Udb/X+bl5MTs3faGMMwZlcTtcMG0ZIY54V1GkvAsGBn3EFoe0yGCv6UFiuS90CxTfh0XtZavg==}
+    engines: {node: '>=8'}
+    peerDependencies:
+      vue: 2.x || 3.x
+    dependencies:
+      '@sentry/browser': 7.12.1
+      '@sentry/core': 7.12.1
+      '@sentry/types': 7.12.1
+      '@sentry/utils': 7.12.1
+      tslib: 1.14.1
+      vue: 3.2.37
     dev: true
 
   /@trysound/sax/0.2.0:
@@ -1277,6 +1347,10 @@ packages:
   /to-fast-properties/2.0.0:
     resolution: {integrity: sha512-/OaKK0xYrs3DmxRYqL/yDc+FxFUVYhDlXMhRmv3z915w2HF1tnN1omB354j8VUGO/hbRzyD6Y3sA7v7GS/ceog==}
     engines: {node: '>=4'}
+
+  /tslib/1.14.1:
+    resolution: {integrity: sha512-Xni35NKzjgMrwevysHTCArtLDpPvye8zV/0E4EyYn43P7/7qvQwPh9BGkHewbMulVntbigmcT7rdX3BNo9wRJg==}
+    dev: true
 
   /tslib/2.4.0:
     resolution: {integrity: sha512-d6xOpEDfsi2CZVlPQzGeux8XMwLT9hssAsaPYExaQMuYskwb+x1x7J371tWlbBdWHroy99KnVB6qIkUbs5X3UQ==}
