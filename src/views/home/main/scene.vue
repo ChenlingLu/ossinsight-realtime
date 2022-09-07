@@ -6,9 +6,8 @@
 </template>
 <script setup lang="ts">
 import { reactive, ref, watch, watchEffect } from "vue";
-import { prEventsPollStore, process } from "@/store/poll";
-import { useActive } from "./hooks/lifecycle";
-import { map } from "rxjs";
+import { prEventsPollStore } from "@/store/poll";
+import { useActive } from "@/components/hooks/lifecycle";
 import { useEngine, useEngineCssElements } from "@/components/hooks/engine";
 import { RawData } from "@/api/total";
 import { RawSamplingFirstMessage } from "@/api/poll";

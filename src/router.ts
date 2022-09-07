@@ -7,7 +7,7 @@ const router = createRouter({
       path: '/',
       name: 'Home',
       components: {
-        default: () => import('@/views/home/main.vue'),
+        default: () => import('@/views/home/main'),
         side: () => import('@/views/home/side'),
       },
     },

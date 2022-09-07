@@ -20,8 +20,8 @@
 </template>
 <script lang="ts" setup>
 import { computed, ref } from "vue";
-import Logo from './ossinsight.svg?component';
-import Scene from "@/components/scene.vue";
+import Logo from '../ossinsight.svg?component';
+import Scene from "@/views/home/main/scene.vue";
 import GhRepo from "@/components/ui/gh-repo.vue";
 import DemoTag from "@/components/ui/demo-tag.vue";
 
