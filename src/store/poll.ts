@@ -42,6 +42,7 @@ export interface FilteredEvent {
   merged: string;
   isDevDay: number;
   isDevYear: number;
+  isRepoYear: number;
   prEventType: 'opened' | 'reopened' | 'closed' | 'merged';
 }
 
@@ -62,6 +63,7 @@ const PR_EVENTS_POLL_CONFIG: FilterConfig[] = [
   { field: 'deletions', path: 'event.payload.pull_request.deletions' },
   { field: 'isDevDay', path: 'payload.devDay' },
   { field: 'isDevYear', path: 'payload.devYear' },
+  { field: 'isRepoYear', path: 'payload.repoYear' },
 ];
 
 export function process(raw: RawFilteredEvent): FilteredEvent {

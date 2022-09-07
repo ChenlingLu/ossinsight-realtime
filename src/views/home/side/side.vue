@@ -66,6 +66,9 @@ watchEffect((onCleanup) => {
       if (ev.isDevYear) {
         summary.developers++;
       }
+      if (ev.isRepoYear) {
+        summary.repositories++;
+      }
       switch (ev.prEventType) {
         case 'merged':
           summary.merged++;
