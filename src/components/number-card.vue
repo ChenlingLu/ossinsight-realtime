@@ -90,7 +90,7 @@ const size = useSize();
     &-value {
       flex: unset;
       color: black;
-      font-size: 18px;
+      font-size: 17px;
       font-weight: bold;
       font-family: monospace;
       line-height: 1;
