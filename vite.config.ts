@@ -33,6 +33,7 @@ export default defineConfig({
         keywords: 'GitHub contribution graph,3d GitHub contribution,GitHub city,Real-time GitHub Contribution,live GitHub contribution city,open-source corporation,data flow,pull requests in GitHub',
         home: 'https://live.ossinsight.io/',
         image: '/thumbnail.png',
+        gtag: 'G-KW4FDPBLLJ',
       }
     })
   ],
