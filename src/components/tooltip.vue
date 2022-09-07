@@ -24,7 +24,7 @@
           Opened <AnimatedNumber class="number" :value="props.opened" comma /> PRs
         </p>
         <p class="headline extra">
-          <span class="dot developers"/>
+          <span class="dot closed"/>
           Closed <AnimatedNumber class="number" :value="props.closed" comma /> PRs
         </p>
         <hr />
@@ -132,15 +132,15 @@ a {
   border-radius: 3px;
   margin-left: 3px;
   margin-right: 3px;
-  vertical-align: middle;
+  vertical-align: 1px;
 }
 
 .opened.dot {
   background: var(--c1);
 }
 
-.developers.dot {
-  background: var(--c3);
+.closed.dot {
+  background: var(--c2);
 }
 
 .merged.dot {

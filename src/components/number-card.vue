@@ -55,8 +55,8 @@ const size = useSize();
     height: 100%;
     z-index: 0;
 
-    &-c3-c7 {
-      background: linear-gradient(95.09deg, var(--c3) 1.97%, var(--c7) 94.72%);
+    &-c2-c7 {
+      background: linear-gradient(95.09deg, var(--c2) 1.97%, var(--c7) 94.72%);
     }
 
     &-c1-c6 {
