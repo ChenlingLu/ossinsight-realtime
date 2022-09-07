@@ -1,5 +1,5 @@
 <template>
-  <flex info direction="row" justify="space-between">
+  <flex v-if="size.height > 430" info direction="row" justify="space-between">
     <h2 class="events-player-title">
       <PlayButton v-model="play" />
       Real-Time Pull Requests

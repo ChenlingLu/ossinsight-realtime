@@ -13,7 +13,7 @@
         </flex>
       </template>
     </status-card>
-    <template v-if="size.height >= 420">
+    <template v-if="size.height >= 400">
       <divider style="margin: 8px 2px" />
       <events-player />
       <divider />

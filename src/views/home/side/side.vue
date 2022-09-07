@@ -4,7 +4,7 @@
         v-bind="summary"
         :time="`in ${(new Date()).getUTCFullYear()}`"
     />
-    <template v-if="size.height >= 420">
+    <template v-if="size.height >= 400">
       <divider style="margin: 8px 2px" />
       <events-player />
       <divider />
