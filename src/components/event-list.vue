@@ -28,7 +28,7 @@ const active = useActive();
 const subject = new Subject<FilteredEvent>();
 
 const props = defineProps<{
-  stream: ConnectionSource<RawFilteredEvent, RawSamplingFirstMessage>,
+  stream: ConnectionSource<FilteredEvent, RawSamplingFirstMessage>,
   language: string,
   repo: string,
   play: boolean,
@@ -47,7 +47,6 @@ subject.pipe(bufferTime(300)).subscribe(items => {
 watchEffect((onCleanup) => {
   if (active.value) {
     const subscription = props.stream
-        .pipe(map(process))
         .pipe(filter(eventFilter.value))
         .subscribe(subject);
     onCleanup(() => subscription.unsubscribe());

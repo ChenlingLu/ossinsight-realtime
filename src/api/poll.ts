@@ -1,6 +1,8 @@
 import type { components } from '@octokit/openapi-types';
 import { Observer, Subject, Subscription } from 'rxjs';
 import { createDebugLogger } from "@/utils/debug";
+import { ref } from "vue";
+import { FilteredEvent, process } from "@/store";
 
 export type GithubEvent = components['schemas']['event']
 const WS_URL = 'wss://api.ossinsight.io/websocket';
@@ -81,9 +83,8 @@ export interface RawSamplingFirstMessage extends FirstMessage {
 }
 
 export class ConnectionSource<T, F extends FirstMessage> extends Subject<T> {
-  private readonly stateListener: ((state: ConnectionState) => void)[] = [];
-  public readonly firstMessage = new Subject<F>();
-  public lastFirstMessage?: F;
+  public readonly firstMessage = ref<F>();
+  public readonly connectionState = ref(ConnectionState.CONNECTING);
   public apiVersion: number | undefined;
   private conn: Connection | undefined = undefined;
   private debug = createDebugLogger('ws');
@@ -92,23 +93,18 @@ export class ConnectionSource<T, F extends FirstMessage> extends Subject<T> {
     const firstMessage: F = JSON.parse(event.data);
     this.debug('firstMessage', firstMessage);
     this.apiVersion = firstMessage.apiVersion
-    this.firstMessage.next(firstMessage);
-    this.lastFirstMessage = firstMessage;
+    this.firstMessage.value = firstMessage;
     this.adaptVersion?.(this, this.apiVersion)
     this.conn?.sendInitialMessage()
     this.conn?.addEventListener('message', this.handleMessage)
   }
 
   private handleMessage = (event: MessageEvent) => {
-    this.next(JSON.parse(event.data));
+    this.next(this.process(JSON.parse(event.data)));
   };
 
-  onStateChange(cb: (state: ConnectionState) => void) {
-    this.stateListener.push(cb);
-  }
-
   stateChange(state: ConnectionState) {
-    this.stateListener.forEach(cb => cb(state));
+    this.connectionState.value = state;
   }
 
   subscribe(observer?: Partial<Observer<T>> | ((value: T) => void) | null): Subscription {
@@ -128,7 +124,6 @@ export class ConnectionSource<T, F extends FirstMessage> extends Subject<T> {
         this.stateChange(ConnectionState.CONNECTED);
       }, { once: true });
       theConn.addEventListener('close', () => {
-        this.lastFirstMessage = undefined;
         this.stateChange(ConnectionState.CLOSED);
       }, { once: true });
       theConn.addEventListener('error', () => {
@@ -161,11 +156,11 @@ export class ConnectionSource<T, F extends FirstMessage> extends Subject<T> {
     return s;
   }
 
-  constructor(private type: string, private initReq?: any, private adaptVersion?: (self: ConnectionSource<T, F>, apiVersion: number) => void) {
+  constructor(private type: string, private initReq?: any, private process: (raw: any) => T = t => t, private adaptVersion?: (self: ConnectionSource<T, F>, apiVersion: number) => void) {
     super();
   }
 }
 
-export function sampling<Event = Partial<GithubEvent>>(req: SamplingRequest): ConnectionSource<Event, RawSamplingFirstMessage> {
-  return new ConnectionSource('sampling', req);
+export function sampling(req: SamplingRequest): ConnectionSource<FilteredEvent, RawSamplingFirstMessage> {
+  return new ConnectionSource('sampling', req, process);
 }

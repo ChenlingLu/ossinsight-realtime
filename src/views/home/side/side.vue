@@ -16,16 +16,14 @@
   </flex>
 </template>
 <script setup lang="ts">
-import { reactive, ref, watchEffect } from "vue";
-import { prEventsPollStore, process } from "@/store/poll";
+import { reactive, watch, watchEffect } from "vue";
+import { prEventsPollStore } from "@/store/poll";
 import { useActive } from "@/components/hooks/lifecycle";
-import { ConnectionState } from "@/api/poll";
 import Flex from "@/components/ui/flex.vue";
 import FlexSpacer from "@/components/ui/flex-spacer.vue";
 import EventsPlayer from "@/components/events-player.vue";
 import Divider from "@/components/ui/divider.vue";
 import { useSize } from "@/store";
-import { map } from "rxjs";
 import StatusCard from "@/components/status-card/StatusCard.vue";
 import SideFooter from "@/components/side-footer.vue";
 
@@ -33,7 +31,6 @@ const usePrEvents = prEventsPollStore('pullRequestEvents');
 
 const active = useActive();
 const prEvents = usePrEvents();
-const state = ref(ConnectionState.CONNECTING);
 
 const size = useSize();
 
@@ -47,15 +44,21 @@ const summary = reactive({
   deletions: 0,
 });
 
-prEvents.stream.onStateChange(newState => state.value = newState);
-
 function mergeCount(map: Record<string, string>) {
   return Object.values(map).reduce((p, c) => p + parseInt(c), 0);
 }
 
+watch(prEvents.firstMessage, fm => {
+  if (fm) {
+    summary.developers = parseInt(fm.devMap.total);
+    summary.merged = mergeCount(fm.mergeMap);
+    summary.opened = mergeCount(fm.openMap);
+  }
+})
+
 watchEffect((onCleanup) => {
   if (active.value) {
-    const subscription = prEvents.stream.pipe(map(process)).subscribe((ev) => {
+    const subscription = prEvents.stream.subscribe((ev) => {
       if (ev.isDevYear) {
         summary.developers++;
       }
@@ -73,11 +76,6 @@ watchEffect((onCleanup) => {
           break;
       }
     });
-    subscription.add(prEvents.firstMessage.subscribe(fm => {
-      summary.developers = parseInt(fm.devMap.total);
-      summary.merged = mergeCount(fm.mergeMap);
-      summary.opened = mergeCount(fm.openMap);
-    }));
     onCleanup(() => subscription.unsubscribe());
   }
 });

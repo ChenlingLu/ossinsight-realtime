@@ -16,6 +16,7 @@ function poll<TMap extends Record<K, T>, F extends FirstMessage, K extends strin
       actions: {},
       getters: {
         firstMessage: state => state.stream.firstMessage,
+        state: state => state.stream.connectionState
       },
     });
 
@@ -77,7 +78,7 @@ export function process(raw: RawFilteredEvent): FilteredEvent {
   return res;
 }
 
-export const prEventsPollStore = poll<{ 'pullRequestEvents': RawFilteredEvent }, RawSamplingFirstMessage>('sampling', sampling, {
+export const prEventsPollStore = poll<{ 'pullRequestEvents': FilteredEvent }, RawSamplingFirstMessage>('sampling', sampling, {
   pullRequestEvents: {
     samplingRate: 1,
     filter: CONFIG.map(config => config.path),

@@ -38,7 +38,7 @@ const processFirstMessage = (firstMessage?: RawSamplingFirstMessage): RawData[] 
 
 const usePREvents = prEventsPollStore('pullRequestEvents');
 const prEvents = usePREvents();
-const events = ref<RawData[]>(processFirstMessage(prEvents.stream.lastFirstMessage));
+const events = ref<RawData[]>(processFirstMessage(prEvents.firstMessage.value));
 
 const { CSSElements, tooltip, today: todayHistory } = useEngineCssElements(engineRef);
 
@@ -77,12 +77,17 @@ const today = reactive({
 })
 const log = createDebugLogger('scene');
 
+watch(prEvents.firstMessage, firstMessage => {
+  if (firstMessage) {
+    events.value = processFirstMessage(firstMessage)
+  }
+})
+
 watchEffect((onCleanup) => {
   const engine = engineRef.value;
   if (active.value && engine) {
     log('start subscription');
     const subscription = prEvents.stream
-        .pipe(map(process))
         .subscribe(event => engine.addBrick(event, () => {
           today.events++;
           switch (event.prEventType) {
@@ -97,12 +102,6 @@ watchEffect((onCleanup) => {
             today.developers++;
           }
         }));
-    if (prEvents.stream.lastFirstMessage) {
-      events.value = processFirstMessage(prEvents.stream.lastFirstMessage);
-    }
-    subscription.add(prEvents.firstMessage.subscribe(firstMessage => {
-      events.value = processFirstMessage(firstMessage);
-    }));
     onCleanup(() => {
       subscription.unsubscribe();
       log('dispose subscription');
