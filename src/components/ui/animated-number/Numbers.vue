@@ -10,6 +10,7 @@
 <script lang="ts" setup>
 import { computed, ref, watch } from "vue";
 import SingleNumber from "./SingleNumber.vue";
+import { useAnimationFrame } from "@/components/hooks/animation-frame";
 
 const props = defineProps<{
   value: number;
@@ -32,22 +33,26 @@ const currentTarget = ref(props.value);
 const nextTarget = ref(props.value);
 const running = ref(false);
 
-function animate(t: number) {
-  const delta = (t - ts.value - delay.value);
+const { start: _start, stop: _stop } = useAnimationFrame((timestamp: number) => {
+  const delta = (timestamp - ts.value - delay.value);
   if (delta > duration.value) {
     progress.value = 1;
-    running.value = false;
+    stop();
     return;
   }
 
   progress.value = ease(delta / duration.value);
-  requestAnimationFrame(animate);
+});
+
+function stop() {
+  running.value = false;
+  _stop();
 }
 
 function start() {
   running.value = true;
   ts.value = performance.now();
-  requestAnimationFrame(animate);
+  _start();
 }
 
 watch(() => props.value, value => {

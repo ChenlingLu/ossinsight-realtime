@@ -50,7 +50,8 @@ import { useBrownianMotion } from "@/components/hooks/brownian-motion";
 import { reactive, ref, watch } from "vue";
 import { useActive } from "@/components/hooks/lifecycle";
 import gsap from 'gsap';
-import { ac } from "vitest/dist/global-74489cc9";
+
+gsap.ticker.fps(60);
 
 const props = defineProps<{
   color: Property.Color
