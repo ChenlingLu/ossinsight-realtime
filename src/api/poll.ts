@@ -1,5 +1,5 @@
 import { Observer, Subject, Subscription } from 'rxjs';
-import { createDebugLogger } from "@/utils/debug";
+import { createDebugLogger, Logger } from "@/utils/debug";
 import { ref } from "vue";
 
 const WS_URL = 'wss://api.ossinsight.io/websocket';
@@ -29,6 +29,10 @@ export interface SamplingRequest {
 
   returnType?: 'map' | 'list';
 
+}
+
+export interface WatchLanguageRequest {
+  language?: string[]
 }
 
 class Connection extends WebSocket {
@@ -86,12 +90,16 @@ export interface RawSamplingFirstMessage extends FirstMessage {
   }
 }
 
+export interface RawWatchLanguageFirstMessage extends FirstMessage {
+  languageMap: Record<string, string>
+}
+
 export class ConnectionSource<T, F extends FirstMessage> extends Subject<T> {
   public readonly firstMessage = ref<F>();
   public readonly connectionState = ref(ConnectionState.CONNECTING);
   public apiVersion: number | undefined;
   private conn: Connection | undefined = undefined;
-  private debug = createDebugLogger('ws');
+  private debug: Logger;
 
   private handleFirstMessage = (event: MessageEvent) => {
     const firstMessage: F = JSON.parse(event.data);
@@ -162,9 +170,18 @@ export class ConnectionSource<T, F extends FirstMessage> extends Subject<T> {
 
   constructor(private type: string, private initReq?: any, private process: (raw: any) => T = t => t, private adaptVersion?: (self: ConnectionSource<T, F>, apiVersion: number) => void) {
     super();
+    this.debug = createDebugLogger(`ws:${this.type}`);
   }
+}
+
+export function wsApiV2<P, T, F extends FirstMessage>(name: string, req: P, process: (raw: any) => T): ConnectionSource<T, F> {
+  return new ConnectionSource(name, req, process);
 }
 
 export function sampling<T>(req: SamplingRequest, process: (raw: any) => T): ConnectionSource<T, RawSamplingFirstMessage> {
   return new ConnectionSource('sampling', req, process);
+}
+
+export function watchLanguage<T>(req: WatchLanguageRequest, process: (raw: any) => T): ConnectionSource<T, RawWatchLanguageFirstMessage> {
+  return new ConnectionSource('language/watch', req, process);
 }

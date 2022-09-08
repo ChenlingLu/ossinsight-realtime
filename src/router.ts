@@ -12,10 +12,10 @@ const router = createRouter({
       },
     },
     {
-      path: '/__preview__/detail',
+      path: import.meta.env.PROD ? '/__preview__/detail' : '/detail',
       name: '2D',
       components: {
-        // default: () => import('@/views/home/main'),
+        default: () => import('@/views/detail/main'),
         side: () => import('@/views/detail/side'),
       },
     },

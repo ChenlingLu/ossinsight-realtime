@@ -1,5 +1,6 @@
-import { defineStore } from "pinia";
+import { acceptHMRUpdate, defineStore } from "pinia";
 import { cancellableFetch } from "@/api/base";
+import { useSize } from "@/store/size";
 
 type ApiMap = {
   'live-time-base-information-hourly': {
@@ -94,6 +95,10 @@ export function useApiDataStore<K extends keyof ApiMap>(query: K) {
       },
     },
   });
+
+  if (import.meta.hot) {
+    import.meta.hot.accept(acceptHMRUpdate(useSize, import.meta.hot));
+  }
 
   const apiData = useApiData();
   if (!apiData.initialized) {

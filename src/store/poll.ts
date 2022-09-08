@@ -1,5 +1,14 @@
 import { acceptHMRUpdate, defineStore } from "pinia";
-import { ConnectionSource, FirstMessage, RawSamplingFirstMessage, sampling, SamplingRequest } from "@/api/poll";
+import {
+  ConnectionSource,
+  FirstMessage,
+  RawSamplingFirstMessage,
+  RawWatchLanguageFirstMessage,
+  sampling,
+  SamplingRequest,
+  WatchLanguageRequest,
+  wsApiV2,
+} from "@/api/poll";
 import { markRaw } from "vue";
 
 export type CreatePoller<P, T, F extends FirstMessage> = (params: P) => ConnectionSource<T, F>
@@ -16,7 +25,7 @@ function poll<TMap extends Record<K, T>, F extends FirstMessage, K extends strin
       actions: {},
       getters: {
         firstMessage: state => state.stream.firstMessage,
-        state: state => state.stream.connectionState
+        state: state => state.stream.connectionState,
       },
     });
 
@@ -29,6 +38,10 @@ function poll<TMap extends Record<K, T>, F extends FirstMessage, K extends strin
 }
 
 export type RawFilteredEvent = any[]
+export type RawWatchLanguageData = {
+  deletions: Record<string, string>;
+  additions: Record<string, string>;
+};
 
 export interface FilteredEvent {
   id: number;
@@ -80,11 +93,16 @@ export function process(raw: RawFilteredEvent): FilteredEvent {
   return res;
 }
 
-export const prEventsPollStore = poll<{ 'pullRequestEvents': FilteredEvent }, RawSamplingFirstMessage>('sampling', req => sampling(req, process), {
+export const prEventsPollStore = poll<{ 'pullRequestEvents': FilteredEvent }, RawSamplingFirstMessage>('sampling', req => wsApiV2('sampling', req, process), {
   pullRequestEvents: {
     samplingRate: 1,
     filter: PR_EVENTS_POLL_CONFIG.map(config => config.path),
     eventType: 'PullRequestEvent',
     returnType: 'list',
   } as SamplingRequest,
+});
+
+export const watchLanguageStore = poll<{ 'watchLanguage': RawWatchLanguageData }, RawWatchLanguageFirstMessage>('language/watch', req => wsApiV2('language/watch', req, t => t), {
+  watchLanguage: {
+  } as WatchLanguageRequest,
 });

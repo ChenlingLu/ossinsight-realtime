@@ -1,4 +1,4 @@
-import { defineStore } from "pinia";
+import { acceptHMRUpdate, defineStore } from "pinia";
 
 const getWindow = () => {
   if (typeof window === "undefined") {
@@ -62,6 +62,10 @@ export const useSize = defineStore('size', {
 });
 
 export function installResize() {
+  if (import.meta.hot) {
+    import.meta.hot.accept(acceptHMRUpdate(useSize, import.meta.hot));
+  }
+
   const size = useSize();
 
   if (typeof window !== 'undefined') {

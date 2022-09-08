@@ -1,7 +1,7 @@
 const noop: Logger = () => {
 };
 
-type Logger = (label: string, ...args: any[]) => void
+export type Logger = (label: string, ...args: any[]) => void
 
 export function createDebugLogger(tag: string): Logger {
   if (import.meta.env.DEV) {
