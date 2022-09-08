@@ -155,8 +155,8 @@ defineExpose({
   }
 });
 
-const onInEnter = (e: HTMLElement, done: () => void) => {
-  const { key } = e.dataset;
+const onInEnter = (e: Element, done: () => void) => {
+  const { key } = (e as HTMLElement).dataset;
   if (!key) {
     done();
     return;
@@ -196,8 +196,8 @@ const onInEnter = (e: HTMLElement, done: () => void) => {
 };
 
 
-const onOutEnter = (e: HTMLElement, done: () => void) => {
-  const { key } = e.dataset;
+const onOutEnter = (e: Element, done: () => void) => {
+  const { key } = (e as HTMLElement).dataset;
   if (!key) {
     done();
     return;
@@ -235,7 +235,7 @@ const onOutEnter = (e: HTMLElement, done: () => void) => {
   });
 };
 
-const onLeave = (_: HTMLElement, done: () => void) => {
+const onLeave = (_: Element, done: () => void) => {
   done();
 };
 

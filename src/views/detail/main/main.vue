@@ -2,7 +2,7 @@
   <flex direction="row" justify="space-around" align="stretch" style="margin-top: 32px">
     <flex v-for="{ language, count, color, size } in top8" :key="language">
       <flex justify="center" style="flex: 1; margin-bottom: 20px">
-        <animated-circle :ref="e => refs[language] = markRaw(e)" :color="color" :size="`${size}px`" />
+        <animated-circle :ref="(e: any) => circleRefs[language] = markRaw(e)" :color="color" :size="`${size}px`" />
       </flex>
       <animated-number class="number" :value="count" comma />
       <span class="language">{{language}}</span>
@@ -19,7 +19,7 @@ import AnimatedNumber from '@/components/ui/animated-number';
 const useLanguages = watchLanguageStore('watchLanguage');
 
 const store = useLanguages();
-const refs = reactive({} as Record<string, { in (cnt: number): void, out (cnt: number): void }>);
+const circleRefs = reactive({} as Record<string, { in (cnt: number): void, out (cnt: number): void }>);
 const languageCount: Record<string, number> = reactive({});
 
 watch(store.firstMessage, fm => {
@@ -50,11 +50,11 @@ const top8 = computed(() => sortedLanguage.value.slice(0, 6).map(({ language, co
 const s = store.stream.subscribe(item => {
   Object.entries(item.additions).forEach(([lang, count]) => {
     languageCount[lang] = (languageCount[lang] ?? 0) + parseInt(count);
-    refs[lang]?.in(parseInt(count));
+    circleRefs[lang]?.in(parseInt(count));
   });
   Object.entries(item.deletions).forEach(([lang, count]) => {
     languageCount[lang] = Math.max(0, (languageCount[lang] ?? 0) - parseInt(count));
-    refs[lang]?.out(parseInt(count));
+    circleRefs[lang]?.out(parseInt(count));
   });
 });
 
