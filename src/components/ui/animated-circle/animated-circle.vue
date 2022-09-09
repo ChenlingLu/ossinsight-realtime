@@ -1,7 +1,5 @@
 <template>
   <div class="coordinator">
-    <div class="animated-circle"
-         :style="{ backgroundColor: color, width: size, height: size, transform: `translate(${offset.x}px, ${offset.y}px)` }" />
     <div class="bubble-container" :style="{ transform: `translate(${offset.x}px, ${offset.y}px)` }">
       <transition-group
           @enter="onInEnter"
@@ -42,6 +40,7 @@
         />
       </transition-group>
     </div>
+    <div ref="bubble" class="animated-circle" />
   </div>
 </template>
 <script lang="ts" setup>
@@ -50,18 +49,81 @@ import { useBrownianMotion } from "@/components/hooks/brownian-motion";
 import { reactive, ref, watch } from "vue";
 import { useActive } from "@/components/hooks/lifecycle";
 import gsap from 'gsap';
+import { arc, random } from "@/components/ui/animated-circle/util";
 
 gsap.ticker.fps(60);
 
 const props = defineProps<{
   color: Property.Color
-  size: Property.Width
+  size: number
 }>();
 
 const container = ref<HTMLElement>();
 
 const { offset, start } = useBrownianMotion();
 const active = useActive(0);
+const bubble = ref<HTMLElement>();
+
+watch(bubble, (bubble, _, onCleanup) => {
+  if (bubble) {
+
+    onCleanup(watch(() => props.color, color => {
+      gsap.set(bubble, {
+        backgroundColor: color,
+      });
+    }, { immediate: true }));
+
+    onCleanup(watch(() => props.size, size => {
+      gsap.set(bubble, {
+        width: size,
+        height: size,
+      });
+    }, { immediate: true }));
+
+    onCleanup(watch(offset, offset => {
+      gsap.set(bubble, {
+        x: offset.x,
+        y: offset.y,
+      });
+    }, { immediate: true }));
+
+    const randomRadius = () => `${random(40, 60)}% ${random(40, 60)}%`;
+    const cache = ['50% 50%', '50% 50%', '50% 50%', '50% 50%', 0];
+    let cleanup = false;
+
+    gsap.set(bubble, {
+      borderBottomRightRadius: cache[0],
+      borderBottomLeftRadius: cache[1],
+      borderTopRightRadius: cache[2],
+      borderTopLeftRadius: cache[3],
+      duration: 0,
+    });
+
+    const runBubbleEffect = (key: keyof gsap.CSSProperties, i: number) => {
+      const run = () => {
+        if (cleanup) {
+          return;
+        }
+        gsap.from(bubble, {
+          [key]: cache[i],
+        });
+        gsap.to(bubble, {
+          [key]: cache[i] = randomRadius(),
+          duration: random(6, 10),
+          ease: 'power3.inOut',
+          onComplete: run,
+        });
+      };
+      run();
+    };
+
+    runBubbleEffect('borderTopLeftRadius', 0);
+    runBubbleEffect('borderTopRightRadius', 1);
+    runBubbleEffect('borderBottomLeftRadius', 2);
+    runBubbleEffect('borderBottomRightRadius', 3);
+    onCleanup(() => cleanup = true);
+  }
+});
 
 const bubblesIn = reactive<{
   key: number
@@ -77,7 +139,7 @@ const bubblesOut = reactive<{
   pass: { x: number, y: number }
   to: { x: number, y: number }
   size: number
-}[]>([])
+}[]>([]);
 
 watch(active, active => {
   if (active) {
@@ -94,14 +156,14 @@ defineExpose({
     if (!active.value) {
       return;
     }
-    const r = parseInt(props.size || "0") / 2;
+    const r = props.size / 2;
     const size = r * 0.5;
     const sr = r + size + 20;
-    const pr = r - size / 2;
+    const pr = r - size - 4;
     const c = -size / 2;
 
     for (let i = 0; i < count; i++) {
-      const theta = 7 / 6 * Math.PI + Math.PI * Math.random() * 2 / 3;
+      const theta = arc(random(210, 330));
       const cosTheta = Math.cos(theta);
       const sinTheta = Math.sin(theta);
       bubblesIn.push({
@@ -126,14 +188,14 @@ defineExpose({
     if (!active.value) {
       return;
     }
-    const r = parseInt(props.size || "0") / 2;
+    const r = props.size / 2;
     const size = r * 0.5;
     const sr = r + size + 20;
-    const pr = r - size / 2;
+    const pr = r - size - 4;
     const c = -size / 2;
 
     for (let i = 0; i < count; i++) {
-      const theta = 1 / 6 * Math.PI  + Math.PI * Math.random() * 2 / 3;
+      const theta = arc(random(30, 150));
       const cosTheta = Math.cos(theta);
       const sinTheta = Math.sin(theta);
       bubblesIn.push({
@@ -153,7 +215,7 @@ defineExpose({
         size: size,
       });
     }
-  }
+  },
 });
 
 const onInEnter = (e: Element, done: () => void) => {
@@ -174,13 +236,13 @@ const onInEnter = (e: Element, done: () => void) => {
     y: bubble.from.y,
     scale: 0,
   });
-  tl.delay(Math.random());
+  tl.delay(random(0, 1));
   tl.to(e, {
     opacity: 1,
     x: bubble.pass.x,
     y: bubble.pass.y,
     scale: 1,
-    duration: 2 + .500 * Math.random(),
+    duration: random(2, 4),
     ease: 'power2.out',
   });
   tl.to(e, {
@@ -216,7 +278,7 @@ const onOutEnter = (e: Element, done: () => void) => {
     scale: 1,
     opacity: 1,
   });
-  tl.delay(Math.random());
+  tl.delay(random(0, 1));
   tl.to(e, {
     x: bubble.pass.x,
     y: bubble.pass.y,
@@ -225,7 +287,7 @@ const onOutEnter = (e: Element, done: () => void) => {
   tl.to(e, {
     x: bubble.to.x,
     y: bubble.to.y,
-    duration: 2 + .500 * Math.random(),
+    duration: random(2, 4),
     scale: 0,
     opacity: 0,
     ease: 'power2.out',
@@ -246,9 +308,44 @@ const onLeave = (_: Element, done: () => void) => {
   position: relative;
 }
 
-.animated-circle, .bubble {
+.animated-circle {
+  transform-origin: center center;
+  box-shadow: 2px -2px 6px white inset, -4px 4px 15px rgba(0,0,0,.2);
+  z-index: 1;
+}
+
+.animated-circle:before {
+  position: absolute;
+  content: ' ';
+  display: block;
+  width: 20%;
+  height: 20%;
+  right: calc(20% + 2px);
+  top: calc(20% - 2px);
+  background: white;
+  border-radius: 51% 49% 48% 52% / 62% 44% 56% 38%;
+  z-index: 1;
+  opacity: 0.5;
+}
+
+.animated-circle:after {
+  position: absolute;
+  content: ' ';
+  display: block;
+  width: 10%;
+  height: 10%;
+  right: calc(10% + 2px);
+  top: calc(40% - 2px);
+  background: white;
+  border-radius: 51% 49% 48% 52% / 62% 44% 56% 38%;
+  z-index: 1;
+  opacity: 0.8;
+}
+
+.bubble {
   border-radius: 50%;
   transform-origin: center center;
+  z-index: 0;
 }
 
 .bubble-container {
@@ -256,6 +353,7 @@ const onLeave = (_: Element, done: () => void) => {
   width: 100%;
   left: 50%;
   top: 50%;
+  z-index: 0;
 }
 
 .bubble {

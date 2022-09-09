@@ -1,8 +1,8 @@
 <template>
   <flex direction="row" justify="space-around" align="stretch" style="margin-top: 32px">
-    <flex v-for="{ language, count, color, size } in top8" :key="language">
+    <flex v-for="{ language, count, color, size } in top6" :key="language">
       <flex justify="center" style="flex: 1; margin-bottom: 20px">
-        <animated-circle :ref="(e: any) => circleRefs[language] = markRaw(e)" :color="color" :size="`${size}px`" />
+        <animated-circle :ref="(e: any) => circleRefs[language] = markRaw(e)" :color="color" :size="size" />
       </flex>
       <animated-number class="number" :value="count" comma />
       <span class="language">{{language}}</span>
@@ -39,7 +39,7 @@ const sortedLanguage = computed(() =>
         .sort((a, b) => b.count - a.count),
 );
 
-const top8 = computed(() => sortedLanguage.value.slice(0, 6).map(({ language, count }, i) => ({
+const top6 = computed(() => sortedLanguage.value.slice(0, 6).map(({ language, count }, i) => ({
   language,
   count,
   size: Math.pow(count, 1 / 2),
