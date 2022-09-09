@@ -10,7 +10,7 @@ class UnifiedAnimationFrameSource extends Observable<readonly [number, number, n
   subscription?: Subscription;
 
   constructor() {
-    const debug = createDebugLogger('[animation-frame-source]');
+    const debug = createDebugLogger('animation-frame-source');
     super(subscriber => {
       const shouldStart = this.subscribers.size === 0;
       this.subscribers.add(subscriber);
