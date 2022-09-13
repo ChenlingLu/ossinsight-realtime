@@ -2,7 +2,7 @@ import { acceptHMRUpdate, defineStore } from "pinia";
 import { cancellableFetch } from "@/api/base";
 import { useSize } from "@/store/size";
 
-type ApiMap = {
+export type ApiMap = {
   'live-time-base-information-hourly': {
     additions: number
     closed_prs: number
@@ -30,7 +30,8 @@ type ApiMap = {
   }
 }
 
-type ApiState<T> = {
+export type ApiState<T> = {
+  query: string,
   loading: boolean
   data: {
     data: T[]
@@ -46,6 +47,7 @@ type ApiState<T> = {
 export function useApiDataStore<K extends keyof ApiMap>(query: K) {
   const useApiData = defineStore(`q/${query}`, {
     state: () => ({
+      query,
       loading: false,
       data: undefined,
       error: undefined,

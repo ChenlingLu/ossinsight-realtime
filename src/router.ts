@@ -1,4 +1,18 @@
 import { createRouter, createWebHistory } from "vue-router";
+import { CSSProperties } from "vue";
+import { Breakpoint } from "@/store";
+
+declare module 'vue-router' {
+  interface RouteMeta {
+    main?: {
+      style?: CSSProperties
+      breakpoint?: Breakpoint | number
+    };
+    side?: {
+      style?: CSSProperties
+    }
+  }
+}
 
 const router = createRouter({
   history: createWebHistory(),
@@ -18,6 +32,14 @@ const router = createRouter({
         default: () => import('@/views/detail/main'),
         side: () => import('@/views/detail/side'),
       },
+      meta: {
+        main: {
+          style: {
+            backgroundColor: 'var(--b7)'
+          },
+          breakpoint: 'sm'
+        }
+      }
     },
   ],
 });

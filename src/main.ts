@@ -6,6 +6,7 @@ import { SYMBOL_VISIBLE, SYMBOL_VISIBLE_INSTANT, visible, VISIBLE_THROTTLE } fro
 import router from "@/router";
 import * as Sentry from "@sentry/vue";
 import { BrowserTracing } from "@sentry/tracing";
+import scopePlugin from "@/plugins/scope";
 
 const app = createApp(App);
 Sentry.init({
@@ -25,6 +26,7 @@ app
   .use(router)
   .use(visible({ throttle: VISIBLE_THROTTLE, injectionKey: SYMBOL_VISIBLE }))
   .use(visible({ throttle: 0, injectionKey: SYMBOL_VISIBLE_INSTANT }))
+  .use(scopePlugin)
   .mount('#app');
 
 installResize();

@@ -46,16 +46,16 @@ export const useSize = defineStore('size', {
     direction: (state): DeviceDirection => {
       return state.height > state.width ? DeviceDirection.portrait : DeviceDirection.landscape;
     },
-    down: (state): (breakpoint: Breakpoint) => boolean => {
+    down: (state): (breakpoint: Breakpoint | number) => boolean => {
       const { width } = state;
       return breakpoint => {
-        return width <= BREAKPOINTS_DOWN[breakpoint];
+        return width <= (typeof breakpoint === 'number' ? breakpoint : BREAKPOINTS_DOWN[breakpoint]);
       };
     },
-    up: (state): (breakpoint: Breakpoint) => boolean => {
+    up: (state): (breakpoint: Breakpoint | number) => boolean => {
       const { width } = state;
       return breakpoint => {
-        return width >= BREAKPOINTS[breakpoint];
+        return width >= (typeof breakpoint === 'number' ? breakpoint : BREAKPOINTS_DOWN[breakpoint]);
       };
     },
   },

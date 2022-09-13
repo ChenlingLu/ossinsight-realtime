@@ -1,15 +1,19 @@
 <template>
-  <span class="popper-anchor" ref="anchorRef" @mouseenter="show = true" @mouseleave="show = false">
+  <span
+      class="popper-anchor"
+      v-bind="Object.assign({}, $attrs, $parentScopeId && {[$parentScopeId]: ''})"
+      ref="anchorRef"
+      @mouseenter="show = true"
+      @mouseleave="show = false"
+  >
     <slot name="label" />
   </span>
   <teleport to="body">
     <transition name="fade">
-      <keep-alive>
-        <div v-if="show" ref="popperRef" class="popper-content">
-          <slot />
-          <span class="popper-arrow" ref="arrowRef" />
-        </div>
-      </keep-alive>
+      <div v-if="show" ref="popperRef" class="popper-content" @transitionstart="transition = true" @transitioncancel="transition = false" @transitionend="transition = false">
+        <slot />
+        <span class="popper-arrow" ref="arrowRef" />
+      </div>
     </transition>
   </teleport>
 </template>
@@ -18,6 +22,7 @@ import { createPopper, Options, State } from "@popperjs/core";
 import { ref, watch } from "vue";
 
 const show = ref(false);
+const transition = ref(false);
 
 const props = defineProps<{
   placement?: Options['placement'],
@@ -65,7 +70,9 @@ watch([anchorRef, popperRef, arrowRef, props], ([anchor, popper, arrow, props], 
     state.value = popperInstance.state;
 
     onCleanup(() => {
-      popperInstance.destroy();
+      setTimeout(() => {
+        popperInstance.destroy();
+      }, 500)
     });
   }
 });
@@ -122,7 +129,7 @@ watch([anchorRef, popperRef, arrowRef, props], ([anchor, popper, arrow, props], 
 }
 
 .fade-enter-active, .fade-leave-active {
-  transition: opacity .2s ease;
+  transition: opacity .4s ease;
 }
 
 .fade-enter-active {
