@@ -27,7 +27,7 @@ function vec2Mod(v: Vec2): number {
   return Math.sqrt(v.x * v.x + v.y * v.y);
 }
 
-export function useBrownianMotion(randomForce = 5, gravityFactor = 5, maxVelocity = 5, maxOffset = 5) {
+export function useBrownianMotion(randomForce = 5, gravityFactor = 2, maxVelocity = 3, maxOffset = 5) {
   const initial = Math.random() * Math.PI * 2;
 
   const a = ref(vec2(randomForce * Math.cos(initial), randomForce * Math.sin(initial)));

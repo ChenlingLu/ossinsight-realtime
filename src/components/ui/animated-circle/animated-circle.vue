@@ -74,9 +74,12 @@ watch(bubble, (bubble, _, onCleanup) => {
     }, { immediate: true }));
 
     onCleanup(watch(() => props.size, size => {
-      gsap.set(bubble, {
+      gsap.to(bubble, {
         width: size,
         height: size,
+        duration: 1,
+        ease: 'power3.inOut',
+        delay: Math.random(),
       });
     }, { immediate: true }));
 
@@ -87,7 +90,7 @@ watch(bubble, (bubble, _, onCleanup) => {
       });
     }, { immediate: true }));
 
-    const randomRadius = () => `${random(40, 60)}% ${random(40, 60)}%`;
+    const randomRadius = () => `${random(43, 57)}% ${random(43, 57)}%`;
     const cache = ['50% 50%', '50% 50%', '50% 50%', '50% 50%', 0];
     let cleanup = false;
 
