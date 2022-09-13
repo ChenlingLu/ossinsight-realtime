@@ -10,7 +10,7 @@ declare module 'vue-router' {
     };
     side?: {
       style?: CSSProperties
-    }
+    };
   }
 }
 
@@ -24,6 +24,11 @@ const router = createRouter({
         default: () => import('@/views/home/main'),
         side: () => import('@/views/home/side'),
       },
+      meta: {
+        main: {
+          breakpoint: 'sm',
+        },
+      },
     },
     {
       path: import.meta.env.PROD ? '/__preview__/detail' : '/detail',
@@ -35,11 +40,11 @@ const router = createRouter({
       meta: {
         main: {
           style: {
-            backgroundColor: 'var(--b7)'
+            backgroundColor: 'var(--b7)',
           },
-          breakpoint: 'sm'
-        }
-      }
+          breakpoint: 'sm',
+        },
+      },
     },
   ],
 });
