@@ -17,6 +17,7 @@ import GhPr from './gh-pr.vue';
 import GhRepo from './gh-repo.vue';
 import { FilteredEvent } from "@/store/poll";
 import { toRefs } from "vue";
+import GhAvatar from "@/components/ui/gh-avatar.vue";
 
 const props = defineProps<{ event: FilteredEvent }>();
 const { event } = toRefs(props)

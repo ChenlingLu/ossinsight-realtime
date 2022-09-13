@@ -1,5 +1,6 @@
 <template>
   <flex direction="row" style="width: 100%">
+    <GhAvatar :name="actor_login" style="margin-right: 4px" />
     <GhUser :login="actor_login" />
     <span>&nbsp;·&nbsp;{{ opened_prs + closed_prs + merged_prs }} events</span>
     <flex-spacer style="min-width: 16px" />
@@ -11,6 +12,7 @@ import Bar from "@/views/detail/main/rank/Bar.vue";
 import Flex from "@/components/ui/flex.vue";
 import FlexSpacer from "@/components/ui/flex-spacer.vue";
 import GhUser from "@/components/ui/gh-user.vue";
+import GhAvatar from "@/components/ui/gh-avatar.vue";
 
 const props = defineProps<{
   actor_id: number
