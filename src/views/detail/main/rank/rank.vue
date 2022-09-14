@@ -36,6 +36,7 @@ import { ApiMap, useApiDataStore } from "@/store/apiData";
 import TopRepo from './TopRepo.vue';
 import TopUser from './TopUser.vue';
 import RepoSvg from '@primer/octicons/build/svg/repo-16.svg?component';
+import PeopleSvg from '@primer/octicons/build/svg/people-16.svg?component';
 import Flex from "@/components/ui/flex.vue";
 
 type RankDetails<T extends keyof ApiMap = keyof ApiMap> = {
@@ -57,7 +58,7 @@ const ranks: RankDetails[] = [
   {
     key: 'live-time-top-developers-by-prs-daily',
     title: 'Top 5 Active Developers Last 24 Hours',
-    icon: h(RepoSvg),
+    icon: h(PeopleSvg),
     render: props => h(TopUser as any, props),
     store: useApiDataStore('live-time-top-developers-by-prs-daily'),
   },
@@ -83,7 +84,7 @@ col {
 }
 
 table, th, td {
-  border: 3px dashed var(--border);
+  border: 2px dashed var(--border);
 }
 
 td {
@@ -92,7 +93,7 @@ td {
 
 :deep(a) {
   display: inline-block;
-  max-width: 300px;
+  max-width: 200px;
   overflow: hidden;
   white-space: nowrap;
   text-overflow: ellipsis;
@@ -103,14 +104,15 @@ td {
   white-space: nowrap;
 }
 
-thead {
+/* thead {
   font-weight: bold;
-}
+} */
 
 </style>
 <style lang="less" scoped>
 thead {
   font-size: 14px;
+  font-weight: bold;
 }
 
 tbody {
@@ -120,11 +122,11 @@ tbody {
 
 @media screen and (min-width: 1080px) {
   thead {
-    font-size: 16px;
+    font-size: 14px;
   }
 
   tbody {
-    font-size: 14px
+    font-size: 12px
   }
 }
 
