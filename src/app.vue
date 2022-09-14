@@ -4,8 +4,11 @@
       <header>
         <Logo class="logo" />
         <flex-spacer />
-        <h1 :style="route.meta.title.style">{{route.meta.title.text}}</h1>
+        <h1 :style="route.meta.title.style">{{ route.meta.title.text }}</h1>
         <flex-spacer />
+        <span style="display: flex; align-items: center; justify-content: center; height: 48px">
+          <Switch v-model="view" />
+        </span>
       </header>
       <main class="main" :style="route.meta.main?.style">
         <router-view name="default" />
@@ -18,12 +21,33 @@
 </template>
 <script lang="ts" setup>
 import { useSize } from "@/store/size";
-import { useRoute } from "vue-router";
+import { useRoute, useRouter } from "vue-router";
 import Logo from './ossinsight.svg?component';
 import FlexSpacer from "@/components/ui/flex-spacer.vue";
+import Switch from "@/components/ui/switch.vue";
+import { customRef } from "vue";
 
-const size = useSize()
-const route = useRoute()
+const size = useSize();
+const route = useRoute();
+const router = useRouter();
+const view = customRef((track, trigger) => ({
+  get() {
+    track();
+    return route.name === '3D';
+  },
+  set(view) {
+    const old = route.name === '3D';
+    if (old === view) {
+      return;
+    }
+    trigger();
+    if (view) {
+      router.push({ name: '3D' });
+    } else {
+      router.push({ name: '2D' });
+    }
+  },
+}));
 </script>
 <style scoped>
 header {

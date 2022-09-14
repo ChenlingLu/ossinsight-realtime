@@ -23,7 +23,7 @@ const router = createRouter({
   routes: [
     {
       path: '/',
-      name: 'Home',
+      name: '3D',
       components: {
         default: () => import('@/views/home/main'),
         side: () => import('@/views/home/side'),
