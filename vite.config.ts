@@ -44,18 +44,18 @@ export default defineConfig({
             }
           }
         },
-        'detail': {
+        '2d': {
           entry: 'src/main.ts',
-          filename: 'detail.html',
+          filename: '2d.html',
           template: 'template-2d.html',
           inject: {
             data: {
               title: 'Real-time GitHub Contribution Insight | OSS Insight ',
               description: 'Here you can find some insights into GitHub real-time contribution, including pull request events grouped by programming languages, top 5 active repositories and developers last 24 hours.',
               keywords: 'Open Source,GitHub contribution, GitHub Trending, GitHub, pull request, real time, Open Source Programming Language',
-              home: 'https://live.ossinsight.io/detail',
+              home: 'https://live.ossinsight.io/2d',
               domain: 'live.ossinsight.io',
-              image: 'thumbnail.png',
+              image: 'thumbnail-2d.png',
               gtag: 'G-KW4FDPBLLJ',
               gtagContentGroup: 'Realtime2D',
             }

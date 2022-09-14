@@ -31,11 +31,11 @@ const router = createRouter({
       },
     },
     {
-      path: '/detail',
+      path: '/2d',
       name: '2D',
       components: {
-        default: () => import('@/views/detail/main'),
-        side: () => import('@/views/detail/side'),
+        default: () => import('@/views/2d/main'),
+        side: () => import('@/views/2d/side'),
       },
       meta: {
         main: {

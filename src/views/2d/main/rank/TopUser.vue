@@ -8,7 +8,7 @@
   </flex>
 </template>
 <script lang="ts" setup>
-import Bar from "@/views/detail/main/rank/Bar.vue";
+import Bar from "@/views/2d/main/rank/Bar.vue";
 import Flex from "@/components/ui/flex.vue";
 import FlexSpacer from "@/components/ui/flex-spacer.vue";
 import GhUser from "@/components/ui/gh-user.vue";
