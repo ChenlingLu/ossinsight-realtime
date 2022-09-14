@@ -53,7 +53,7 @@ export default defineConfig({
               title: 'Real-time GitHub Contribution Insight | OSS Insight ',
               description: 'Here you can find some insights into GitHub real-time contribution, including pull request events grouped by programming languages, top 5 active repositories and developers last 24 hours.',
               keywords: 'Open Source,GitHub contribution, GitHub Trending, GitHub, pull request, real time, Open Source Programming Language',
-              home: 'https://live.ossinsight.io/2d',
+              home: 'https://live.ossinsight.io/',
               domain: 'live.ossinsight.io',
               image: 'thumbnail-2d.png',
               gtag: 'G-KW4FDPBLLJ',
