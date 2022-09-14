@@ -1,15 +1,4 @@
 <template>
-  <a href="https://ossinsight.io" target="_blank">
-    <Logo class="logo" height="42" alt="OSSInsight Logo" />
-  </a>
-  <header class="heading">
-    <h1>
-      Real-time GitHub Contribution City 2022
-    </h1>
-    <p>
-      {{ formattedDate }}
-    </p>
-  </header>
   <Scene />
   <demo-tag />
   <footer>
@@ -20,7 +9,7 @@
 </template>
 <script lang="ts" setup>
 import { computed, ref } from "vue";
-import Logo from '../../ossinsight.svg?component';
+import Logo from '../../../ossinsight.svg?component';
 import Scene from "@/views/home/main/scene.vue";
 import GhRepo from "@/components/ui/gh-repo.vue";
 import DemoTag from "@/components/ui/demo-tag.vue";
@@ -44,43 +33,6 @@ const formattedDate = computed(() => {
 });
 </script>
 <style scoped>
-.logo {
-  position: fixed;
-  z-index: 1000;
-  left: 8px;
-  top: 8px;
-}
-
-header {
-  width: var(--main-size);
-  position: fixed;
-  left: 0;
-  top: 16px;
-  pointer-events: none;
-}
-
-@media screen and (max-width: 1350px) {
-  header {
-    top: 56px;
-  }
-}
-
-header h1 {
-  margin: 0 auto;
-  text-align: center;
-  color: white;
-  font-size: 24px;
-  font-weight: bold;
-}
-
-header p {
-  margin-top: 16px;
-  margin-left: auto;
-  margin-right: auto;
-  text-align: center;
-  color: white;
-}
-
 footer {
   width: var(--main-size);
   position: fixed;

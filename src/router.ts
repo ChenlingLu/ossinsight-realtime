@@ -4,6 +4,10 @@ import { Breakpoint } from "@/store";
 
 declare module 'vue-router' {
   interface RouteMeta {
+    title: {
+      text: string
+      style?: CSSProperties
+    };
     main?: {
       style?: CSSProperties
       breakpoint?: Breakpoint | number
@@ -25,6 +29,12 @@ const router = createRouter({
         side: () => import('@/views/home/side'),
       },
       meta: {
+        title: {
+          text: 'Real-time GitHub Contribution City 2022',
+          style: {
+            color: 'white'
+          }
+        },
         main: {
           breakpoint: 'sm',
         },
@@ -38,6 +48,9 @@ const router = createRouter({
         side: () => import('@/views/2d/side'),
       },
       meta: {
+        title: {
+          text: 'Real-time GitHub Contribution Insight',
+        },
         main: {
           style: {
             backgroundColor: 'var(--b7)',
