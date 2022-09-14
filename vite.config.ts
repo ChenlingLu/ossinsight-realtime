@@ -2,10 +2,8 @@ import { defineConfig } from "vite";
 import vue from "@vitejs/plugin-vue";
 import path from 'path';
 import svgLoader from 'vite-svg-loader';
-import _htmlTemplate from "vite-plugin-html-template";
 import mpaPlugin from 'vite-plugin-mpa-plus';
 
-const htmlTemplate = (_htmlTemplate as any).default as typeof _htmlTemplate
 export default defineConfig({
   plugins: [
     vue(),
