@@ -24,8 +24,6 @@ const url = computed(() => {
 });
 
 const alt = computed(() => props.name.split('/')[0]);
-
-console.debug(props, url, alt)
 </script>
 <style scoped>
 .avatar-container {

@@ -85,13 +85,4 @@ defineProps<{
   }
 }
 
-
-.info {
-  width: 100%;
-  margin: 8px 0;
-}
-
-.info + .info {
-  margin-top: 0;
-}
 </style>

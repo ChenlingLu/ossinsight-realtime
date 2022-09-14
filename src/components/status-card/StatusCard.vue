@@ -16,7 +16,7 @@
         -<AnimatedNumber :value="deletions" comma />
       </span>
     </div>
-    <flex class="number-cards" info :direction="size.down('xs') ? 'column' : 'row'" gap="4px">
+    <flex class="number-cards info" :direction="size.down('xs') ? 'column' : 'row'" gap="4px">
       <number-card title="Opened PRs" :value="opened" color-start="1" color-stop="6" />
       <number-card title="Merged PRs" :value="merged" color-start="7" color-stop="5" />
       <number-card title="Closed PRs" :value="closed" color-start="2" color-stop="7" />

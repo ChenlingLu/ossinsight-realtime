@@ -1,5 +1,5 @@
 <template>
-  <flex info direction="row" justify="center">
+  <flex class="info" direction="row" justify="center">
     <a class="more-info" href="https://ossinsight.io/blog/why-we-choose-tidb-to-support-ossinsight">🤖️ how to make
       it</a>
     <flex-spacer />

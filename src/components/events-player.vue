@@ -1,11 +1,11 @@
 <template>
-  <flex v-if="size.height > 430" info direction="row" justify="space-between">
+  <flex v-if="size.height > 430" class="info" direction="row" justify="space-between">
     <h2 class="events-player-title">
       <PlayButton v-model="play" />
       Real-Time Pull Requests
     </h2>
   </flex>
-  <flex v-if="size.height > 530" info direction="row" justify="space-between">
+  <flex v-if="size.height > 530" class="info" direction="row" justify="space-between">
     <LangSelect v-model="language" />
     <RepoFilter v-model="repo" style="margin-left: 16px; flex: 1" />
   </flex>
