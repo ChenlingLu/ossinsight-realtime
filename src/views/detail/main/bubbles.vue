@@ -106,6 +106,6 @@ onBeforeUnmount(() => {
 
 .language {
   font-weight: bold;
-  font-size: 16px;
+  font-size: 14px;
 }
 </style>
