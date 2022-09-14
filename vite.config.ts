@@ -29,7 +29,8 @@ export default defineConfig({
       pages: {
         '': {
           entry: 'src/main.ts',
-          template: 'src/index.html',
+          filename: 'index.html',
+          template: 'template.html',
           inject: {
             data: {
               title: 'Real-time GitHub Contribution City 2022 | OSS Insight',
@@ -39,12 +40,14 @@ export default defineConfig({
               domain: 'live.ossinsight.io',
               image: 'thumbnail.png',
               gtag: 'G-KW4FDPBLLJ',
+              gtagContentGroup: 'Realtime3D',
             }
           }
         },
         'detail': {
           entry: 'src/main.ts',
-          template: 'src/index.html',
+          filename: 'detail.html',
+          template: 'template-2d.html',
           inject: {
             data: {
               title: 'Real-time GitHub Contribution City 2022 | OSS Insight',
@@ -54,6 +57,7 @@ export default defineConfig({
               domain: 'live.ossinsight.io',
               image: 'thumbnail.png',
               gtag: 'G-KW4FDPBLLJ',
+              gtagContentGroup: 'Realtime2D',
             }
           }
         }

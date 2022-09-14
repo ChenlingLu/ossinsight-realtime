@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="viewport-fit=cover, width=device-width, initial-scale=1.0, maximum-scale=1, user-scalable=0">
+    <link href="/logos/favicon.svg" rel="shortcut icon">
+    <title><%- title %></title>
+    <meta name="description" content="<%- description %>">
+    <meta name="keyword" content="<%- keywords %>">
+    <!-- og -->
+    <meta name="og:title" content="<%- title %>">
+    <meta name="og:url" content="<%- home %>">
+    <meta name="og:description" content="<%- description %>">
+    <meta name="og:image" content="<%- home %><%- image %>">
+    <!-- twitter -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:site" content="@ossinsight">
+    <meta property="twitter:domain" content="<%- domain %>">
+    <meta property="twitter:url" content="<%- home %>">
+    <meta name="twitter:title" content="<%- title %>">
+    <meta name="twitter:description" content="<%- description %>">
+    <meta name="twitter:image" content="<%- home %><%- image %>">
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=<%- gtag %>"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+
+      gtag('config', '<%- gtag %>');
+      gtag('set', 'content_group', '<%- gtagContentGroup %>');
+    </script>
+  </head>
+  <body>
+    <div id="app"></div>
+  </body>
+</html>

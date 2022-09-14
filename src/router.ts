@@ -31,7 +31,7 @@ const router = createRouter({
       },
     },
     {
-      path: import.meta.env.PROD ? '/__preview__/detail' : '/detail',
+      path: '/detail',
       name: '2D',
       components: {
         default: () => import('@/views/detail/main'),
