@@ -36,7 +36,7 @@ import { ApiMap, useApiDataStore } from "@/store/apiData";
 import TopRepo from './TopRepo.vue';
 import TopUser from './TopUser.vue';
 import RepoSvg from '@primer/octicons/build/svg/repo-16.svg?component';
-import PeopleSvg from '@primer/octicons/build/svg/People-16.svg?component';
+import PeopleSvg from '@primer/octicons/build/svg/people-16.svg?component';
 import Flex from "@/components/ui/flex.vue";
 
 type RankDetails<T extends keyof ApiMap = keyof ApiMap> = {
