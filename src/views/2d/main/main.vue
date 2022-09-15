@@ -1,8 +1,6 @@
 <template>
   <flex class="container-2d" direction="column" full-height full-width>
-    <flex-spacer />
     <bubbles />
-    <flex-spacer />
     <rank />
     <footer>
       Get more insights about <strong>rankings</strong>, <strong>repositories</strong> and <strong>developers</strong>

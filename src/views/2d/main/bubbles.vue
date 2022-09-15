@@ -7,13 +7,18 @@
       Time Range: last hour ~ now
     </span>
   </flex>
-  <flex ref="el" direction="row" justify="space-around" align="stretch" full-width style="margin-top: 32px">
-    <flex v-for="{ language, count, color, size } in languages" :key="language">
-      <flex justify="center" style="flex: 1; margin-bottom: 20px">
-        <animated-circle :ref="(e: any) => circleRefs[language] = markRaw(e)" :color="color" :size="size" />
-      </flex>
-      <animated-number class="number" :value="count" comma />
-      <span class="language">{{ language }}</span>
+  <flex ref="el" style="margin-top: 32px; flex: 1" full-width direction="column" justify="space-around">
+    <flex v-for="i in [0, 1]" direction="row" justify="space-around" align="center" full-width>
+      <div v-for="{ language, count, color, size } in languages.slice(i * 6, (i + 1) * 6)" :key="language"
+           style="position: relative" :style="{ width: `${size}px`, height: `${size}px` }">
+        <flex justify="center" style="flex: 1; margin-bottom: 20px">
+          <animated-circle :ref="(e: any) => circleRefs[language] = markRaw(e)" :color="color" :size="size" />
+        </flex>
+        <flex class="bubble-text" style="position: absolute; left: 0; top: 0" full-height full-width justify="center">
+          <animated-number class="number" :value="count" comma />
+          <span class="language">{{ language }}</span>
+        </flex>
+      </div>
     </flex>
   </flex>
 </template>
@@ -34,6 +39,15 @@ const languageCount: Record<string, number> = reactive({});
 const el = ref<{ el: HTMLElement }>();
 const elSize = useElementSize(computed(() => el.value?.el));
 
+const gridSize = computed(() => {
+  const { width = 600, height = 200 } = elSize.value ?? {};
+  const max = Math.min(width / 6, height / 2);
+  return {
+    max,
+    min: max * 0.35,
+  };
+});
+
 watch(store.firstMessage, fm => {
   if (fm) {
     Object.entries(fm.languageMap).forEach(([lang, count]) => {
@@ -52,15 +66,7 @@ const sortedLanguage = computed(() =>
         .sort((a, b) => b.count - a.count),
 );
 
-const LANGUAGES = new Set(['JavaScript', 'Python', 'Java', 'TypeScript', 'Go', 'Rust', ' C++ ', 'C# ', 'PHP', 'Ruby']);
-
-const len = computed(() => {
-  if (elSize.value) {
-    return Math.floor(elSize.value?.width / 80);
-  } else {
-    return LANGUAGES.size;
-  }
-});
+const LANGUAGES = new Set(['JavaScript', 'Python', 'Java', 'TypeScript', 'Go', 'Rust', ' C++ ', 'C# ', 'PHP', 'Ruby', 'C#', 'C++', 'HTML', 'Shell']);
 
 const languages = computed(() => {
   let array = sortedLanguage.value;
@@ -70,12 +76,10 @@ const languages = computed(() => {
       .map(({ language, count }, i) => ({
         language,
         count,
-        size: 10 + 70 * Math.pow((count - min) / (max - min), 2),
+        size: gridSize.value.min + (gridSize.value.max - gridSize.value.min) * Math.pow((count - min) / (max - min), 2),
         color: `var(--c${i + 1})`,
       }))
-      .slice(0, len.value);
 });
-
 
 const s = store.stream.subscribe(item => {
   Object.entries(item.additions).forEach(([lang, count]) => {
@@ -107,5 +111,10 @@ onBeforeUnmount(() => {
 .language {
   font-weight: bold;
   font-size: 14px;
+}
+
+.bubble-text {
+  text-shadow: 1px 0 #fff, -1px 0 #fff, 0 1px #fff, 0 -1px #fff, 1px 1px #fff, -1px -1px #fff, 1px -1px #fff, -1px 1px #fff;
+  white-space: nowrap;
 }
 </style>

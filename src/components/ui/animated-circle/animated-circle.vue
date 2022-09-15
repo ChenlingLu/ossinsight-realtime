@@ -66,20 +66,18 @@ const bubble = ref<HTMLElement>();
 
 watch(bubble, (bubble, _, onCleanup) => {
   if (bubble) {
-
     onCleanup(watch(() => props.color, color => {
       gsap.set(bubble, {
         backgroundColor: color,
       });
     }, { immediate: true }));
 
-    onCleanup(watch(() => props.size, size => {
+    onCleanup(watch(() => props.size, (size, prev) => {
       gsap.to(bubble, {
         width: size,
         height: size,
         duration: 1,
         ease: 'power3.inOut',
-        delay: Math.random(),
       });
     }, { immediate: true }));
 
