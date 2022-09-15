@@ -46,7 +46,7 @@ type RankDetails<T extends keyof ApiMap = keyof ApiMap> = {
 const ranks: RankDetails[] = [
   {
     key: 'live-time-top-repos-by-prs-daily',
-    title: 'Top 5 Active Repository Last 24 Hours',
+    title: 'Top 5 Active Repositories Last 24 Hours',
     icon: h(RepoSvg),
     render: props => h(TopRepo as any, props),
     store: useApiDataStore('live-time-top-repos-by-prs-daily'),
