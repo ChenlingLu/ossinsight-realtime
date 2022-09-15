@@ -1,32 +1,28 @@
 <template>
   <div class="table-container">
-    <table :style="{'--rank-count': ranks.length}">
-      <colgroup>
-        <col v-for="{ key } in ranks" :key="key">
-      </colgroup>
-      <thead>
-      <tr>
-        <td v-for="{ key, title, icon } in ranks" :key="key">
-          <flex direction="row" gap="8px">
+    <flex class="b" direction="column" full-width :style="{'--rank-count': ranks.length}">
+      <flex direction="row" full-width gap="8px">
+        <div class="bl" v-for="{ key, title, icon } in ranks" :key="key" style="flex: 1">
+          <flex class="heading" direction="row" gap="8px" style="padding: 4px">
             <v-node-wrapper :value="icon" />
             <span>
               {{ title }}
             </span>
           </flex>
-        </td>
-      </tr>
-      </thead>
-      <tbody>
-      <tr v-for="(_, i) in 5" :key="i">
-        <td v-for="{ key, render, store: { data } } in ranks" :key="key">
-          <template v-if="data">
-            <v-node-wrapper :value="render(data.data[i])" />
-          </template>
-          <template v-else>loading...</template>
-        </td>
-      </tr>
-      </tbody>
-    </table>
+        </div>
+      </flex>
+      <flex direction="column" full-width>
+        <flex class="bt" direction="row" full-width v-for="(_, i) in 5" :key="i" gap="8px">
+          <flex class="bl data" v-for="{ key, render, store: { data } } in ranks" :key="key"
+                style="flex: 1; min-width: 0; padding: 4px">
+            <template v-if="data">
+              <v-node-wrapper :value="render(data.data[i])" />
+            </template>
+            <template v-else>loading...</template>
+          </flex>
+        </flex>
+      </flex>
+    </flex>
   </div>
 </template>
 <script lang="ts" setup>
@@ -66,34 +62,36 @@ const ranks: RankDetails[] = [
 
 </script>
 <style scoped>
-table {
-  border-collapse: collapse;
-  margin: 16px;
-  min-width: calc(100% - 32px);
-  color: var(--text-primary);
-}
-
-col {
-  /*noinspection CssUnresolvedCustomProperty*/
-  width: calc(100% / var(--rank-count));
-}
 
 .table-container {
   width: 100%;
   overflow-x: scroll;
-}
-
-table, th, td {
-  border: 2px dashed var(--border);
-}
-
-td {
   padding: 8px;
+  box-sizing: border-box;
+  font-size: 12px;
+}
+
+@media screen and (min-width: 1080px) {
+  .table-container {
+    font-size: 14px;
+  }
+}
+
+@media screen and (min-width: 1440px) {
+  .table-container {
+    font-size: 16px;
+  }
+}
+
+.heading {
+  font-size: calc(1em + 2px);
+  font-weight: bold;
+}
+
+.data {
 }
 
 :deep(a) {
-  display: inline-block;
-  max-width: 200px;
   overflow: hidden;
   white-space: nowrap;
   text-overflow: ellipsis;
@@ -104,40 +102,15 @@ td {
   white-space: nowrap;
 }
 
-/* thead {
-  font-weight: bold;
-} */
-
-</style>
-<style lang="less" scoped>
-thead {
-  font-size: 14px;
-  font-weight: bold;
+.b {
+  border: 2px dashed var(--border);
 }
 
-tbody {
-  font-size: 12px
+.bt {
+  border-top: 2px dashed var(--border);
 }
 
-
-@media screen and (min-width: 1080px) {
-  thead {
-    font-size: 14px;
-  }
-
-  tbody {
-    font-size: 12px
-  }
+.bl:not(:first-child) {
+  border-left: 2px dashed var(--border);
 }
-
-@media screen and (min-width: 1440px) {
-  thead {
-    font-size: 18px;
-  }
-
-  tbody {
-    font-size: 16px
-  }
-}
-
 </style>

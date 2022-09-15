@@ -31,7 +31,7 @@
 
 // sizes
 :root {
-  --side-size: @side-size;
+  --side-size: max(~"min(30%, @{side-size-max}), @{side-size-min}");
   --main-size: calc(~"100% - var(--side-size)");
 }
 

@@ -1,14 +1,14 @@
 <template>
-  <div class="number-card" :class="{ small: size.down('xs') }">
+  <div class="number-card" :class="{ small }">
     <div class="number-card-bg" :class="`number-card-bg-c${props.colorStart}-c${props.colorStop}`" />
     <flex class="number-card-content"
-          :direction="size.down('xs') ? 'row' : 'column'"
-          :align="size.down('xs') ? 'center' : 'flex-start'"
+          :direction="small ? 'row' : 'column'"
+          :align="small ? 'center' : 'flex-start'"
     >
       <flex class="number-card-content-title" justify="center" align="flex-start">
         {{ props.title }}
       </flex>
-      <flex class="number-card-content-value" align="center" :direction="size.down('xs') ? 'row-reverse' : 'row'" gap="8px">
+      <flex class="number-card-content-value" align="center" :direction="small ? 'row-reverse' : 'row'" gap="8px">
         <dot :color="`var(--c${props.colorStart})`" />
         <animated-number :value="props.value" comma />
       </flex>
@@ -26,6 +26,7 @@ const props = defineProps<{
   value: number
   colorStart: number | string,
   colorStop: number | string,
+  small: boolean
 }>();
 
 const size = useSize();

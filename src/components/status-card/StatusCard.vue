@@ -1,10 +1,12 @@
 <template>
-  <flex class="banner">
+  <flex ref="el" class="banner">
     <div class="banner-title">
-      <AnimatedNumber class="number" :value="developers" comma /> developers collaborated on
+      <AnimatedNumber class="number" :value="developers" comma />
+      developers collaborated on
       <br />
-      <AnimatedNumber class="number" :value="repositories" comma /> repositories
-      <b>{{time}}</b>.
+      <AnimatedNumber class="number" :value="repositories" comma />
+      repositories
+      <b>{{ time }}</b>.
     </div>
     <div class="code-info">
       Total code line changes:
@@ -16,10 +18,10 @@
         -<AnimatedNumber :value="deletions" comma />
       </span>
     </div>
-    <flex class="number-cards info" :direction="size.down('xs') ? 'column' : 'row'" gap="4px">
-      <number-card title="Opened PRs" :value="opened" color-start="1" color-stop="6" />
-      <number-card title="Merged PRs" :value="merged" color-start="7" color-stop="5" />
-      <number-card title="Closed PRs" :value="closed" color-start="2" color-stop="7" />
+    <flex class="number-cards info" :direction="small ? 'column' : 'row'" gap="4px">
+      <number-card :small="small" title="Opened PRs" :value="opened" color-start="1" color-stop="6" />
+      <number-card :small="small" title="Merged PRs" :value="merged" color-start="7" color-stop="5" />
+      <number-card :small="small" title="Closed PRs" :value="closed" color-start="2" color-stop="7" />
     </flex>
     <slot name="footer" />
   </flex>
@@ -29,7 +31,8 @@
 import NumberCard from '@/components/number-card.vue';
 import AnimatedNumber from '@/components/ui/animated-number';
 import Flex from '@/components/ui/flex.vue';
-import { useSize } from "@/store";
+import { useElementSize } from "@/components/hooks/element-size";
+import { computed, ref, watch } from "vue";
 
 const props = defineProps<{
   developers: number
@@ -42,8 +45,9 @@ const props = defineProps<{
   time: string
 }>();
 
-const size = useSize();
-
+const el = ref<{ el: HTMLElement | undefined }>();
+const size = useElementSize(computed(() => el.value?.el));
+const small = computed(() => (size.value?.width ?? 1920) < 468)
 </script>
 <style lang="less" scoped>
 
@@ -95,6 +99,7 @@ const size = useSize();
     &.addition {
       color: var(--c1);
     }
+
     &.deletion {
       color: var(--c2);
     }
