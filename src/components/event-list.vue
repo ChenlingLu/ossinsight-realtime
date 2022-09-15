@@ -32,6 +32,7 @@ const props = defineProps<{
   language: string,
   repo: string,
   play: boolean,
+  excludeBots: boolean,
 }>();
 
 const refEl = (i: number, el: any) => {
@@ -77,8 +78,9 @@ watch(elements, elements => {
   }
 }, { immediate: false, flush: 'post' });
 
+const BOT_REGEXP = /(?:robot|bot|\[bot])$/i
 
-watch([() => props.language, () => props.repo], ([language, repo]) => {
+watch([() => props.language, () => props.repo, () => props.excludeBots], ([language, repo, excludeBots]) => {
   repo = repo.toLowerCase().trim();
   let filters: (typeof allPass)[] = [];
   if (language === 'Others') {
@@ -99,6 +101,10 @@ watch([() => props.language, () => props.repo], ([language, repo]) => {
     filters.push(ev => ev.actorLogin.toLowerCase().indexOf(repo) !== -1 || ev.repoName.toLowerCase().indexOf(repo) !== -1);
   }
 
+  if (excludeBots) {
+    filters.push(ev => !BOT_REGEXP.test(ev.actorLogin))
+  }
+
   if (filters.length === 0) {
     eventFilter.value = allPass;
   } else {
@@ -111,7 +117,7 @@ watch([() => props.language, () => props.repo], ([language, repo]) => {
       return true;
     };
   }
-});
+}, { immediate: true });
 
 watch(eventFilter, (filter) => {
   const filtered = realtimeEvents.filter(filter);

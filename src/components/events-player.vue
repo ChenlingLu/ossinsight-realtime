@@ -4,12 +4,16 @@
       <PlayButton v-model="play" />
       Real-Time Pull Requests
     </h2>
+    <label style="font-size: 14px; color: var(--text-secondary)">
+      Exclude bots
+      <input v-model="excludeBots" type="checkbox">
+    </label>
   </flex>
   <flex v-if="size.height > 530" class="info" direction="row" justify="space-between">
     <LangSelect v-model="language" />
     <RepoFilter v-model="repo" style="margin-left: 16px; flex: 1" />
   </flex>
-  <event-list :stream="prEvents.stream" :language="language" :repo="repo" :play="play" />
+  <event-list :stream="prEvents.stream" :language="language" :repo="repo" :play="play" :exclude-bots="excludeBots" />
 </template>
 <script lang="ts" setup>
 import Flex from '@/components/ui/flex.vue';
@@ -24,6 +28,7 @@ import { useSize } from "@/store";
 const language = ref('Any Language');
 const repo = ref('');
 const play = ref(true);
+const excludeBots = ref(true);
 
 const size = useSize()
 
