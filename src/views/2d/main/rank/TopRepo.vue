@@ -19,6 +19,6 @@ const props = defineProps<{
   opened_prs: number
   repo_id: number
   repo_name: string
-  total_prs: number
+  total_pr_events: number
 }>();
 </script>

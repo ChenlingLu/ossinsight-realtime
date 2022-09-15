@@ -19,6 +19,6 @@ const props = defineProps<{
   closed_prs: number
   merged_prs: number
   opened_prs: number
-  total_prs: number
+  total_pr_events: number
 }>();
 </script>

@@ -27,10 +27,10 @@ export default defineConfig({
     }),
     mpaPlugin({
       pages: {
-        '': {
+        '3d': {
           entry: 'src/main.ts',
-          filename: 'index.html',
-          template: 'template.html',
+          filename: '3d.html',
+          template: 'template-3d.html',
           inject: {
             data: {
               title: 'Real-time GitHub Contribution City 2022 | OSS Insight',
@@ -44,9 +44,9 @@ export default defineConfig({
             }
           }
         },
-        '2d': {
+        '': {
           entry: 'src/main.ts',
-          filename: '2d.html',
+          filename: 'index.html',
           template: 'template-2d.html',
           inject: {
             data: {

@@ -11,7 +11,7 @@ import scopePlugin from "@/plugins/scope";
 const app = createApp(App);
 Sentry.init({
   app,
-  dsn: "https://d326eccb0d414397a2cbfbc4f7271823@o226447.ingest.sentry.io/6726051",
+  dsn: import.meta.env.PROD ? "https://d326eccb0d414397a2cbfbc4f7271823@o226447.ingest.sentry.io/6726051" : undefined,
   integrations: [
     new BrowserTracing({
       routingInstrumentation: Sentry.vueRouterInstrumentation(router),

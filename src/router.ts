@@ -22,7 +22,7 @@ const router = createRouter({
   history: createWebHistory(),
   routes: [
     {
-      path: '/',
+      path: '/3d',
       name: '3D',
       components: {
         default: () => import('@/views/home/main'),
@@ -41,7 +41,7 @@ const router = createRouter({
       },
     },
     {
-      path: '/2d',
+      path: '/',
       name: '2D',
       components: {
         default: () => import('@/views/2d/main'),
@@ -59,6 +59,11 @@ const router = createRouter({
         },
       },
     },
+    {
+      path: '/:pathMatch(.*)*',
+      name: 'NotFound',
+      redirect: '/',
+    }
   ],
 });
 

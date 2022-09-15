@@ -18,7 +18,7 @@ export type ApiMap = {
     closed_prs: number
     merged_prs: number
     opened_prs: number
-    total_prs: number
+    total_pr_events: number
   }
   'live-time-top-repos-by-prs-daily': {
     closed_prs: number
@@ -26,7 +26,7 @@ export type ApiMap = {
     opened_prs: number
     repo_id: number
     repo_name: string
-    total_prs: number
+    total_pr_events: number
   }
 }
 
