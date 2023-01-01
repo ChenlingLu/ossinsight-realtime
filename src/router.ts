@@ -30,7 +30,7 @@ const router = createRouter({
       },
       meta: {
         title: {
-          text: 'Real-time GitHub Contribution City 2022',
+          text: 'Real-time GitHub Contribution City 2023',
           style: {
             color: 'white'
           }
